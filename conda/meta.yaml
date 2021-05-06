@@ -1,0 +1,30 @@
+package:
+  name: roq-python
+  version: {{ GIT_DESCRIBE_TAG }}
+
+source:
+  git_url: ..
+
+build:
+  number: {{ GIT_DESCRIBE_NUMBER }}
+  script: python -m pip install . -vvv
+
+requirements:
+  build:
+    - python {{ python }}
+    - pybind11
+    - roq-client
+    - roq-oss-abseil-cpp                                                                                                
+    - roq-oss-magic_enum
+  run:
+    - python
+    - roq-client
+
+about:
+  home: https://roq-trading.com
+  doc_url: https://roq-trading.com/docs
+  dev_url: https://github.com/roq-trading
+  license: BSD-3-Clause
+  license_family: BSD
+  license_file: LICENSE
+  summary: Roq Python Tools
