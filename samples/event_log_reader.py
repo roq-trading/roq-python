@@ -25,6 +25,7 @@ def callback(
     top_of_book: roq.TopOfBook,
 ):
     print(f"top_of_book={top_of_book}")
+
     print(f"BBO: ({top_of_book.bid_price}, {top_of_book.ask_price})")
 
 
@@ -34,6 +35,7 @@ def callback(
     market_by_price_update: roq.MarketByPriceUpdate,
 ):
     print(f"market_by_price_update={market_by_price_update}")
+
     # update cache
     key = (market_by_price_update.exchange, market_by_price_update.symbol)
     global mbp_cache
@@ -43,18 +45,15 @@ def callback(
         mbp_cache[key] = mbp
     mbp.apply(market_by_price_update)
     depth = mbp.extract(2)  # top 2 layers
-    print("DEPTH: {}".format(depth))
+    print(f"DEPTH: {depth}")
 
 
 def test_reader(path: str):
 
     reader = roq.client.EventLogReader(path)
 
-    try:
-        while reader.dispatch(callback):
-            sleep(0.1)
-    except Exception as err:
-        print("{}".format(err))
+    while reader.dispatch(callback):
+        sleep(0.1)
 
 
 path = "{CONDA_PREFIX}/share/roq/data/deribit.roq".format(**os.environ)
@@ -65,4 +64,4 @@ try:
     while reader.dispatch(callback):
         sleep(0.1)  # just for the example, probably you want "pass" here
 except Exception as err:
-    print("{}".format(err))
+    print(f"{err}")
