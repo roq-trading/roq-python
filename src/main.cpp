@@ -24,7 +24,7 @@ namespace roq {
 namespace python {
 namespace utils {
 auto to_list(const auto &values) {
-  using value_type = std::remove_cvref<decltype(values)>::type::value_type;
+  using value_type = typename std::remove_cvref<decltype(values)>::type::value_type;
   py::list result;
   for (auto &item : values)
     result.append(value_type{item});
