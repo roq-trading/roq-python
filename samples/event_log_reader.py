@@ -1,14 +1,22 @@
 #!/usr/bin/env python
 
+"""
+Copyright (c) 2017-2022, Hans Erik Thrane
+
+Demonstrates how to replay an event-log.
+"""
+
 import os
 
-from fastcore.all import *
+from time import sleep
+
+from fastcore.all import typedispatch
 
 import roq
 
-# global cache
+# cache: market by price (L2 order book)
 
-mbp_cache = {}
+MBP_CACHE = {}
 
 
 @typedispatch
@@ -122,11 +130,11 @@ def callback(
 
     # update cache
     key = (market_by_price_update.exchange, market_by_price_update.symbol)
-    global mbp_cache
-    mbp = mbp_cache.get(key)
+    global MBP_CACHE
+    mbp = MBP_CACHE.get(key)
     if mbp is None:
         mbp = roq.cache.MarketByPrice(*key)
-        mbp_cache[key] = mbp
+        MBP_CACHE[key] = mbp
     mbp.apply(market_by_price_update)
 
     # extract top 2 layers
