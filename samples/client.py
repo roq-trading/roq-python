@@ -26,7 +26,7 @@ def callback(
 ):
     print(f"top_of_book={top_of_book}")
 
-    print(f"BBO: ({top_of_book.bid_price}, {top_of_book.ask_price})")
+    print(f"BBO: ({top_of_book.layer.bid_price}, {top_of_book.layer.ask_price})")
 
 
 @typedispatch
@@ -48,8 +48,6 @@ def callback(
     # extract top 2 layers
     depth = mbp.extract(2)
     print(f"DEPTH: {depth}")
-
-
 
 
 def test_client(connections: list[str]):

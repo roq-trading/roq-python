@@ -16,6 +16,7 @@ def callback(
     message_info: roq.MessageInfo,
     reference_data: roq.ReferenceData,
 ):
+    print(f"message_info={message_info}")
     print(f"reference_data={reference_data}")
 
 
@@ -26,7 +27,8 @@ def callback(
 ):
     print(f"top_of_book={top_of_book}")
 
-    print(f"BBO: ({top_of_book.bid_price}, {top_of_book.ask_price})")
+    # best bid/ask price
+    print(f"BBO: ({top_of_book.layer.bid_price}, {top_of_book.layer.ask_price})")
 
 
 @typedispatch
@@ -60,7 +62,6 @@ def test_event_log_reader(path: str):
             sleep(0.1)  # just for the example, probably you want "pass" here
     except Exception as err:
         print(f"{err}")
-
 
 
 test_event_log_reader("{CONDA_PREFIX}/share/roq/data/deribit.roq".format(**os.environ))
