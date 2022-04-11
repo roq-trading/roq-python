@@ -2,3 +2,4 @@ cmake
 autogen struct bindings
 new client type: one-shot dispatch / external loop
 git tag --> version
+use py::cpp_function to document callback arguments?

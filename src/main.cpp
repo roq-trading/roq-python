@@ -30,6 +30,11 @@ auto to_list(const auto &values) {
     result.append(value_type{item});
   return result;
 }
+// note! this is a work-around until IntFlag (?) can be supported properly
+template <typename T>
+auto to_int_flag(const Mask<T> &value) {
+  return static_cast<T>(value.get());
+}
 template <typename T>
 void create_enum(auto &context, const std::string &name) {
   pybind11::enum_<T> enum_(context, name.c_str());
@@ -194,6 +199,129 @@ void create_message_info(auto &context, const std::string &name) {
 }
 // messages
 // note! wrappers storing references to underlying objects / user is therefore not allowed to store the objects
+void create_external_latency(auto &context, const std::string &name) {
+  using value_type = roq::ExternalLatency;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "latency",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.latency;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_gateway_settings(auto &context, const std::string &name) {
+  using value_type = roq::GatewaySettings;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "supports",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_int_flag(value.supports);
+          })
+      .def_property_readonly(
+          "mbp_max_depth",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.mbp_max_depth;
+          })
+      .def_property_readonly(
+          "mbp_tick_size_multiplier",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.mbp_tick_size_multiplier;
+          })
+      .def_property_readonly(
+          "mbp_min_trade_vol_multiplier",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.mbp_min_trade_vol_multiplier;
+          })
+      .def_property_readonly(
+          "mbp_allow_remove_non_existing",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.mbp_allow_remove_non_existing;
+          })
+      .def_property_readonly(
+          "mbp_allow_price_inversion",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.mbp_allow_price_inversion;
+          })
+      .def_property_readonly(
+          "oms_download_has_state",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.oms_download_has_state;
+          })
+      .def_property_readonly(
+          "oms_download_has_routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.oms_download_has_routing_id;
+          })
+      .def_property_readonly(
+          "oms_request_id_type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.oms_request_id_type;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_gateway_status(auto &context, const std::string &name) {
+  using value_type = roq::GatewayStatus;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "supported",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_int_flag(value.supported);
+          })
+      .def_property_readonly(
+          "available",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_int_flag(value.available);
+          })
+      .def_property_readonly(
+          "unavailable",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_int_flag(value.unavailable);
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
 void create_market_by_price_update(auto &context, const std::string &name) {
   using value_type = roq::MarketByPriceUpdate;
   using ref_type = utils::Ref<value_type>;
@@ -263,6 +391,90 @@ void create_market_by_price_update(auto &context, const std::string &name) {
           [](const ref_type &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.checksum;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_market_status(auto &context, const std::string &name) {
+  using value_type = roq::MarketStatus;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "trading_status",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.trading_status;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_rate_limit_trigger(auto &context, const std::string &name) {
+  using value_type = roq::RateLimitTrigger;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "name",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.name;
+          })
+      .def_property_readonly(
+          "origin",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.origin;
+          })
+      .def_property_readonly(
+          "type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.type;
+          })
+      .def_property_readonly(
+          "users",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.users);
+          })
+      .def_property_readonly(
+          "accounts",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.accounts);
+          })
+      .def_property_readonly(
+          "ban_expires",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.ban_expires;
+          })
+      .def_property_readonly(
+          "triggered_by",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.triggered_by;
           })
       .def("__repr__", [](const ref_type &obj) {
         auto &value = static_cast<const value_type &>(obj);
@@ -410,6 +622,96 @@ void create_reference_data(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
+void create_statistics_update(auto &context, const std::string &name) {
+  using value_type = roq::StatisticsUpdate;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "statistics",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.statistics);
+          })
+      .def_property_readonly(
+          "update_type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_type;
+          })
+      .def_property_readonly(
+          "exchange_time_utc",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_time_utc;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_stream_status(auto &context, const std::string &name) {
+  using value_type = roq::StreamStatus;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "supports",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.supports;
+          })
+      .def_property_readonly(
+          "status",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.status;
+          })
+      .def_property_readonly(
+          "type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.type;
+          })
+      .def_property_readonly(
+          "priority",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.priority;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
 void create_top_of_book(auto &context, const std::string &name) {
   using value_type = roq::TopOfBook;
   using ref_type = utils::Ref<value_type>;
@@ -437,6 +739,45 @@ void create_top_of_book(auto &context, const std::string &name) {
           [](const ref_type &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.update_type;
+          })
+      .def_property_readonly(
+          "exchange_time_utc",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_time_utc;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_trade_summary(auto &context, const std::string &name) {
+  using value_type = roq::TradeSummary;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "trades",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.trades);
           })
       .def_property_readonly(
           "exchange_time_utc",
@@ -553,7 +894,7 @@ struct EventLogReader final {
 
    protected:
     template <typename T>
-    void dispatch(const auto &message_info, const auto &value) {
+    void dispatch(const auto &message_info, const T &value) {
       auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
       auto arg1 = py::cast(utils::Ref<T>{value});
       callback_(arg0, arg1);
@@ -562,30 +903,23 @@ struct EventLogReader final {
     }
 
    protected:
-    void operator()(const Event<roq::GatewaySettings> &) override {}
+    void operator()(const Event<roq::GatewaySettings> &event) override { dispatch(event.message_info, event.value); }
 
-    void operator()(const Event<roq::StreamStatus> &) override {}
-    void operator()(const Event<roq::ExternalLatency> &) override {}
-    void operator()(const Event<roq::RateLimitTrigger> &) override {}
+    void operator()(const Event<roq::StreamStatus> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::ExternalLatency> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::RateLimitTrigger> &event) override { dispatch(event.message_info, event.value); }
 
-    void operator()(const Event<roq::GatewayStatus> &) override {}
+    void operator()(const Event<roq::GatewayStatus> &event) override { dispatch(event.message_info, event.value); }
 
-    void operator()(const Event<roq::ReferenceData> &event) override {
-      auto &[message_info, reference_data] = event;
-      dispatch<ReferenceData>(message_info, reference_data);
-    }
-    void operator()(const Event<roq::MarketStatus> &) override {}
-    void operator()(const Event<roq::TopOfBook> &event) override {
-      auto &[message_info, top_of_book] = event;
-      dispatch<TopOfBook>(message_info, top_of_book);
-    }
+    void operator()(const Event<roq::ReferenceData> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::MarketStatus> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::TopOfBook> &event) override { dispatch(event.message_info, event.value); }
     void operator()(const Event<roq::MarketByPriceUpdate> &event) override {
-      auto &[message_info, market_by_price_update] = event;
-      dispatch<MarketByPriceUpdate>(message_info, market_by_price_update);
+      dispatch(event.message_info, event.value);
     }
     void operator()(const Event<roq::MarketByOrderUpdate> &) override {}
-    void operator()(const Event<roq::TradeSummary> &) override {}
-    void operator()(const Event<roq::StatisticsUpdate> &) override {}
+    void operator()(const Event<roq::TradeSummary> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::StatisticsUpdate> &event) override { dispatch(event.message_info, event.value); }
 
     void operator()(const Event<roq::CreateOrder> &) override {}
     void operator()(const Event<roq::ModifyOrder> &) override {}
@@ -721,9 +1055,17 @@ PYBIND11_MODULE(roq, m) {
 
   // struct
 
-  roq::python::create_reference_data(m, "ReferenceData"s);
-  roq::python::create_top_of_book(m, "TopOfBook"s);
+  roq::python::create_external_latency(m, "ExternalLatency"s);
+  roq::python::create_gateway_settings(m, "GatewaySettings"s);
+  roq::python::create_gateway_status(m, "GatewayStatus"s);
   roq::python::create_market_by_price_update(m, "MarketByPriceUpdate"s);
+  roq::python::create_market_status(m, "MarketStatus"s);
+  roq::python::create_rate_limit_trigger(m, "RateLimitTrigger"s);
+  roq::python::create_reference_data(m, "ReferenceData"s);
+  roq::python::create_statistics_update(m, "StatisticsUpdate"s);
+  roq::python::create_stream_status(m, "StreamStatus"s);
+  roq::python::create_top_of_book(m, "TopOfBook"s);
+  roq::python::create_trade_summary(m, "TradeSummary"s);
 
   auto client = m.def_submodule("client");
 
