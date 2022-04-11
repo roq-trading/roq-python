@@ -8,7 +8,7 @@ import roq
 
 # global cache
 
-mbp_cache = dict()
+mbp_cache = {}
 
 
 @typedispatch
@@ -16,6 +16,10 @@ def callback(
     message_info: roq.MessageInfo,
     gateway_settings: roq.GatewaySettings,
 ):
+    """
+    GatewaySettings is received once when connecting to a gateway.
+    The message includes information about the gateway configuration.
+    """
     print(f"gateway_settings={gateway_settings}")
 
 
@@ -24,6 +28,10 @@ def callback(
     message_info: roq.MessageInfo,
     stream_status: roq.StreamStatus,
 ):
+    """
+    StreamStatus is received whenever a stream (a connection) changes state.
+    The user can monitor the state of any connection maintained by the gateway.
+    """
     print(f"stream_status={stream_status}")
 
 
@@ -32,6 +40,11 @@ def callback(
     message_info: roq.MessageInfo,
     external_latency: roq.ExternalLatency,
 ):
+    """
+    ExternalLatency is received whenever the latency of a stream has been measured.
+    The user can monitor external latency and use this to time order actions or
+    possibly implement protective measures if latency increases.
+    """
     print(f"external_latency={external_latency}")
 
 
@@ -40,6 +53,10 @@ def callback(
     message_info: roq.MessageInfo,
     rate_limit_trigger: roq.RateLimitTrigger,
 ):
+    """
+    RateLimitTrigger is received whenever the gateway detects rate-limit violation.
+    The message includes enough information to answer "what" and "who".
+    """
     print(f"rate_limit_trigger={rate_limit_trigger}")
 
 
@@ -48,6 +65,10 @@ def callback(
     message_info: roq.MessageInfo,
     gateway_status: roq.GatewayStatus,
 ):
+    """
+    GatewayStatus is received whenever internal status has changed.
+    This is an aggregate of all streams, login status, etc.
+    """
     print(f"gateway_status={gateway_status}")
 
 
@@ -56,6 +77,9 @@ def callback(
     message_info: roq.MessageInfo,
     reference_data: roq.ReferenceData,
 ):
+    """
+    ReferenceData contains static information for a symbol.
+    """
     print(f"reference_data={reference_data}")
 
 
@@ -64,6 +88,9 @@ def callback(
     message_info: roq.MessageInfo,
     market_status: roq.MarketStatus,
 ):
+    """
+    MarketStatus contains the trading status of a symbol.
+    """
     print(f"market_status={market_status}")
 
 
@@ -72,6 +99,10 @@ def callback(
     message_info: roq.MessageInfo,
     top_of_book: roq.TopOfBook,
 ):
+    """
+    TopOfBook contains best bid/ask price/quantity.
+    Note! This is **NOT** the same feed as MarketByPriceUpdate.
+    """
     print(f"top_of_book={top_of_book}")
 
     # best bid/ask price
@@ -81,30 +112,12 @@ def callback(
 @typedispatch
 def callback(
     message_info: roq.MessageInfo,
-    trade_summary: roq.TradeSummary,
-):
-    print(f"trade_summary={trade_summary}")
-
-    # trades
-    print(f"TRADE: {trade_summary.trades}")
-
-@typedispatch
-def callback(
-    message_info: roq.MessageInfo,
-    statistics_update: roq.StatisticsUpdate,
-):
-    print(f"statistics_update={statistics_update}")
-
-    # statistics
-    print(f"STATISTICS: {statistics_update.statistics}")
-
-
-
-@typedispatch
-def callback(
-    message_info: roq.MessageInfo,
     market_by_price_update: roq.MarketByPriceUpdate,
 ):
+    """
+    MarketByPrice contains level 2 order book updates.
+    Note! The updates are applied to a cached object.
+    """
     print(f"market_by_price_update={market_by_price_update}")
 
     # update cache
@@ -121,7 +134,38 @@ def callback(
     print(f"DEPTH: {depth}")
 
 
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    trade_summary: roq.TradeSummary,
+):
+    """
+    TradeSummary contains trades originating from order matching on the exchange.
+    """
+    print(f"trade_summary={trade_summary}")
+
+    # trades
+    print(f"TRADE: {trade_summary.trades}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    statistics_update: roq.StatisticsUpdate,
+):
+    """
+    StatisticsUpdate contains values published from the exchange.
+    """
+    print(f"statistics_update={statistics_update}")
+
+    # statistics
+    print(f"STATISTICS: {statistics_update.statistics}")
+
+
 def test_event_log_reader(path: str):
+    """
+    The main function.
+    """
     print(f"path={path}")
 
     reader = roq.client.EventLogReader(path)
