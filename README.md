@@ -21,7 +21,7 @@ This is the Python binding of the Roq C++ API.
 * [magic_enum](https://github.com/Neargye/magic_enum) (MIT License)
 * [nameof](https://github.com/Neargye/nameof) (MIT License)
 * [pybind11](https://github.com/pybind/pybind11) (BSD 3-Clause License)
-* roq-client (BSD 3-Clause License)
+* roq-client (Proprietary)
 
 
 ## Prerequisites
