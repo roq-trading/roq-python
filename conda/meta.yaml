@@ -12,10 +12,10 @@ build:
 requirements:
   build:
     - python {{ python }}
+    - fmt
     - pybind11
     - roq-client
-  host:
-    - fmt
+    - roq-oss-abseil-cpp
     - roq-oss-magic_enum
     - roq-oss-nameof
   run:

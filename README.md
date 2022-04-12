@@ -16,6 +16,7 @@ This is the Python binding of the Roq C++ API.
 
 ## Library/Package Dependencies
 
+* [Abseil-C++](https://github.com/abseil/abseil-cpp) (Apache 2.0 License)
 * [fmt](https://github.com/fmtlib/fmt) (MIT License)
 * [magic_enum](https://github.com/Neargye/magic_enum) (MIT License)
 * [nameof](https://github.com/Neargye/nameof) (MIT License)
