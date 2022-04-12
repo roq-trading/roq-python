@@ -14,8 +14,10 @@ requirements:
     - python {{ python }}
     - pybind11
     - roq-client
-    - roq-oss-abseil-cpp                                                                                                
+  host:
+    - fmt
     - roq-oss-magic_enum
+    - roq-oss-nameof
   run:
     - python
     - roq-client

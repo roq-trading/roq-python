@@ -8,6 +8,8 @@
 
 #include <magic_enum.hpp>
 
+#include <nameof.hpp>
+
 #include "roq/client.hpp"
 
 #include "roq/logging.hpp"
@@ -1569,6 +1571,8 @@ PYBIND11_MODULE(roq, m) {
 
   // enums
 
+  static_assert(nameof::nameof_short_type<roq::ConnectionStatus>() == "ConnectionStatus"sv);
+
   roq::python::utils::create_enum<roq::ConnectionStatus>(m, "ConnectionStatus"s);
   roq::python::utils::create_enum<roq::Decimals>(m, "Decimals"s);
   roq::python::utils::create_enum<roq::Error>(m, "Error"s);
@@ -1598,6 +1602,8 @@ PYBIND11_MODULE(roq, m) {
 
   // helpers
 
+  static_assert(nameof::nameof_short_type<roq::Fill>() == "Fill"sv);
+
   roq::python::create_fill(m, "Fill"s);
   roq::python::create_layer(m, "Layer"s);
   roq::python::create_mbp_update(m, "MBPUpdate"s);
@@ -1607,6 +1613,8 @@ PYBIND11_MODULE(roq, m) {
   roq::python::create_uuid(m, "UUID"s);
 
   // transport
+
+  static_assert(nameof::nameof_short_type<roq::MessageInfo>() == "MessageInfo"sv);
 
   roq::python::create_message_info(m, "MessageInfo"s);
 
