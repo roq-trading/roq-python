@@ -790,6 +790,560 @@ void create_trade_summary(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
+// ...
+void create_order_ack(auto &context, const std::string &name) {
+  using value_type = roq::OrderAck;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "side",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.side;
+          })
+      .def_property_readonly(
+          "type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.type;
+          })
+      .def_property_readonly(
+          "origin",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.origin;
+          })
+      .def_property_readonly(
+          "status",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.status;
+          })
+      .def_property_readonly(
+          "error",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.error;
+          })
+      .def_property_readonly(
+          "text",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.text;
+          })
+      .def_property_readonly(
+          "request_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.request_id;
+          })
+      .def_property_readonly(
+          "external_account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_account;
+          })
+      .def_property_readonly(
+          "external_order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_order_id;
+          })
+      .def_property_readonly(
+          "routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.routing_id;
+          })
+      .def_property_readonly(
+          "version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.version;
+          })
+      .def_property_readonly(
+          "round_trip_latency",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.round_trip_latency;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_order_update(auto &context, const std::string &name) {
+  using value_type = roq::OrderUpdate;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "side",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.side;
+          })
+      .def_property_readonly(
+          "position_effect",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.position_effect;
+          })
+      .def_property_readonly(
+          "max_show_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_show_quantity;
+          })
+      .def_property_readonly(
+          "order_type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_type;
+          })
+      .def_property_readonly(
+          "time_in_force",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.time_in_force;
+          })
+      .def_property_readonly(
+          "execution_instructions",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_int_flag(value.execution_instructions);
+          })
+      .def_property_readonly(
+          "order_template",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_template;
+          })
+      .def_property_readonly(
+          "create_time_utc",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.create_time_utc;
+          })
+      .def_property_readonly(
+          "update_time_utc",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_time_utc;
+          })
+      .def_property_readonly(
+          "external_account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_account;
+          })
+      .def_property_readonly(
+          "external_order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_order_id;
+          })
+      .def_property_readonly(
+          "status",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.status;
+          })
+      .def_property_readonly(
+          "quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.quantity;
+          })
+      .def_property_readonly(
+          "price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.price;
+          })
+      .def_property_readonly(
+          "stop_price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stop_price;
+          })
+      .def_property_readonly(
+          "remaining_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.remaining_quantity;
+          })
+      .def_property_readonly(
+          "traded_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.traded_quantity;
+          })
+      .def_property_readonly(
+          "average_traded_price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.average_traded_price;
+          })
+      .def_property_readonly(
+          "last_traded_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.last_traded_quantity;
+          })
+      .def_property_readonly(
+          "last_traded_price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.last_traded_price;
+          })
+      .def_property_readonly(
+          "last_liquidity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.last_liquidity;
+          })
+      .def_property_readonly(
+          "routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.routing_id;
+          })
+      .def_property_readonly(
+          "max_request_version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_request_version;
+          })
+      .def_property_readonly(
+          "max_response_version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_response_version;
+          })
+      .def_property_readonly(
+          "max_accepted_version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_accepted_version;
+          })
+      .def_property_readonly(
+          "update_type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_type;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_trade_update(auto &context, const std::string &name) {
+  using value_type = roq::TradeUpdate;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "side",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.side;
+          })
+      .def_property_readonly(
+          "position_effect",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.position_effect;
+          })
+      .def_property_readonly(
+          "create_time_utc",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.create_time_utc;
+          })
+      .def_property_readonly(
+          "update_time_utc",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_time_utc;
+          })
+      .def_property_readonly(
+          "external_account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_account;
+          })
+      .def_property_readonly(
+          "external_order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_order_id;
+          })
+      .def_property_readonly(
+          "fills",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.fills);
+          })
+      .def_property_readonly(
+          "routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.routing_id;
+          })
+      .def_property_readonly(
+          "update_type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_type;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_position_update(auto &context, const std::string &name) {
+  using value_type = roq::PositionUpdate;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "external_account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_account;
+          })
+      .def_property_readonly(
+          "long_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.long_quantity;
+          })
+      .def_property_readonly(
+          "short_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.short_quantity;
+          })
+      .def_property_readonly(
+          "long_quantity_begin",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.long_quantity_begin;
+          })
+      .def_property_readonly(
+          "short_quantity_begin",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.short_quantity_begin;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+void create_funds_update(auto &context, const std::string &name) {
+  using value_type = roq::FundsUpdate;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "currency",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.currency;
+          })
+      .def_property_readonly(
+          "balance",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.balance;
+          })
+      .def_property_readonly(
+          "hold",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.hold;
+          })
+      .def_property_readonly(
+          "external_account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_account;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+//
+void create_custom_metrics_update(auto &context, const std::string &name) {
+  using value_type = roq::CustomMetricsUpdate;
+  using ref_type = utils::Ref<value_type>;
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "user",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.user;
+          })
+      .def_property_readonly(
+          "label",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.label;
+          })
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "measurements",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.measurements);
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
 namespace client {
 void create_settings(auto &context, const std::string &name) {
   using value_type = roq::client::Settings;
@@ -921,19 +1475,22 @@ struct EventLogReader final {
     void operator()(const Event<roq::TradeSummary> &event) override { dispatch(event.message_info, event.value); }
     void operator()(const Event<roq::StatisticsUpdate> &event) override { dispatch(event.message_info, event.value); }
 
+    // XXX these overlap with similarly named request objects
     void operator()(const Event<roq::CreateOrder> &) override {}
     void operator()(const Event<roq::ModifyOrder> &) override {}
     void operator()(const Event<roq::CancelOrder> &) override {}
     void operator()(const Event<roq::CancelAllOrders> &) override {}
 
-    void operator()(const Event<roq::OrderAck> &) override {}
-    void operator()(const Event<roq::OrderUpdate> &) override {}
-    void operator()(const Event<roq::TradeUpdate> &) override {}
+    void operator()(const Event<roq::OrderAck> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::OrderUpdate> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::TradeUpdate> &event) override { dispatch(event.message_info, event.value); }
 
-    void operator()(const Event<roq::PositionUpdate> &) override {}
-    void operator()(const Event<roq::FundsUpdate> &) override {}
+    void operator()(const Event<roq::PositionUpdate> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::FundsUpdate> &event) override { dispatch(event.message_info, event.value); }
 
-    void operator()(const Event<roq::CustomMetricsUpdate> &) override {}
+    void operator()(const Event<roq::CustomMetricsUpdate> &event) override {
+      dispatch(event.message_info, event.value);
+    }
 
    private:
     const Callback &callback_;
@@ -1066,6 +1623,15 @@ PYBIND11_MODULE(roq, m) {
   roq::python::create_stream_status(m, "StreamStatus"s);
   roq::python::create_top_of_book(m, "TopOfBook"s);
   roq::python::create_trade_summary(m, "TradeSummary"s);
+
+  roq::python::create_order_ack(m, "OrderAck"s);
+  roq::python::create_order_update(m, "OrderUpdate"s);
+  roq::python::create_trade_update(m, "TradeUpdate"s);
+
+  roq::python::create_position_update(m, "PositionUpdate"s);
+  roq::python::create_funds_update(m, "FundsUpdate"s);
+
+  roq::python::create_custom_metrics_update(m, "CustomMetricsUpdate"s);
 
   auto client = m.def_submodule("client");
 

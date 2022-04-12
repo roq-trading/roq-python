@@ -170,6 +170,61 @@ def callback(
     print(f"STATISTICS: {statistics_update.statistics}")
 
 
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    order_ack: roq.OrderAck,
+):
+    """
+    OrderAck contains response from gateway or exchange
+    """
+    print(f"order_ack={order_ack}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    order_update: roq.OrderUpdate,
+):
+    """
+    OrderUpdate contains the last known order status
+    """
+    print(f"order_update={order_update}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    trade_update: roq.TradeUpdate,
+):
+    """
+    TradeUpdate contains one or more fills.
+    """
+    print(f"trade_update={trade_update}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    position_update: roq.PositionUpdate,
+):
+    """
+    PositionUpdate contains positions published by the exchange.
+    """
+    print(f"position_update={position_update}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    funds_update: roq.FundsUpdate,
+):
+    """
+    FundsUpdate contains currency balance published by the exchange.
+    """
+    print(f"funds_update={funds_update}")
+
+
 def test_event_log_reader(path: str):
     """
     The main function.
