@@ -225,6 +225,17 @@ def callback(
     print(f"funds_update={funds_update}")
 
 
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    custom_metrics_update: roq.CustomMetricsUpdate,
+):
+    """
+    CustomMetricsUpdate are values published by other components.
+    """
+    print(f"custom_metrics_update={custom_metrics_update}")
+
+
 def test_event_log_reader(path: str):
     """
     The main function.

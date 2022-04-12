@@ -22,6 +22,11 @@ namespace py = pybind11;  // convention
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+// verify nameof reflection (just testing some relevant samples)
+static_assert(nameof::nameof_short_type<roq::ConnectionStatus>() == "ConnectionStatus"sv);
+static_assert(nameof::nameof_short_type<roq::Fill>() == "Fill"sv);
+static_assert(nameof::nameof_short_type<roq::MessageInfo>() == "MessageInfo"sv);
+
 namespace roq {
 namespace python {
 namespace utils {
@@ -38,7 +43,8 @@ auto to_int_flag(const Mask<T> &value) {
   return static_cast<T>(value.get());
 }
 template <typename T>
-void create_enum(auto &context, const std::string &name) {
+void create_enum(auto &context) {
+  std::string name{nameof::nameof_short_type<T>()};
   pybind11::enum_<T> enum_(context, name.c_str());
   for (auto item : magic_enum::enum_values<T>()) {
     std::string name{magic_enum::enum_name(item)};
@@ -56,10 +62,17 @@ struct Ref final {
   const T &value;
 };
 }  // namespace utils
+// note! copy values
+template <typename T>
+void create_struct(py::module_ &context);
+// note! reference to an underlying object (user is therefore not allowed to keep handles)
+template <typename T>
+void create_ref_struct(py::module_ &context);
 // helpers
-// note! they all use copies
-void create_fill(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::Fill>(py::module_ &context) {
   using value_type = roq::Fill;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def_property_readonly("external_trade_id", [](const value_type &value) { return value.external_trade_id; })
       .def_property_readonly("quantity", [](const value_type &value) { return value.quantity; })
@@ -67,8 +80,10 @@ void create_fill(auto &context, const std::string &name) {
       .def_property_readonly("liquidity", [](const value_type &value) { return value.liquidity; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
-void create_layer(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::Layer>(py::module_ &context) {
   using value_type = roq::Layer;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def_property_readonly("bid_price", [](const value_type &value) { return value.bid_price; })
       .def_property_readonly("bid_quantity", [](const value_type &value) { return value.bid_quantity; })
@@ -76,8 +91,10 @@ void create_layer(auto &context, const std::string &name) {
       .def_property_readonly("ask_quantity", [](const value_type &value) { return value.ask_quantity; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
-void create_mbp_update(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::MBPUpdate>(py::module_ &context) {
   using value_type = roq::MBPUpdate;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def_property_readonly("price", [](const value_type &value) { return value.price; })
       .def_property_readonly("quantity", [](const value_type &value) { return value.quantity; })
@@ -86,15 +103,19 @@ void create_mbp_update(auto &context, const std::string &name) {
       .def_property_readonly("number_of_orders", [](const value_type &value) { return value.number_of_orders; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
-void create_measurement(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::Measurement>(py::module_ &context) {
   using value_type = roq::Measurement;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def_property_readonly("name", [](const value_type &value) { return value.name; })
       .def_property_readonly("value", [](const value_type &value) { return value.value; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
-void create_statistics(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::Statistics>(py::module_ &context) {
   using value_type = roq::Statistics;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def_property_readonly("type", [](const value_type &value) { return value.type; })
       .def_property_readonly("value", [](const value_type &value) { return value.value; })
@@ -102,8 +123,10 @@ void create_statistics(auto &context, const std::string &name) {
       .def_property_readonly("end_time_utc", [](const value_type &value) { return value.end_time_utc; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
-void create_trade(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::Trade>(py::module_ &context) {
   using value_type = roq::Trade;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def_property_readonly("side", [](const value_type &value) { return value.side; })
       .def_property_readonly("price", [](const value_type &value) { return value.price; })
@@ -111,16 +134,20 @@ void create_trade(auto &context, const std::string &name) {
       .def_property_readonly("trade_id", [](const value_type &value) { return value.trade_id; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
-void create_uuid(auto &context, const std::string &name) {
+template <>
+void create_struct<roq::UUID>(py::module_ &context) {
   using value_type = roq::UUID;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str()).def("__repr__", [](const value_type &obj) {
     return fmt::format("{}"sv, obj);
   });
 }
 // transport
-void create_message_info(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::MessageInfo>(py::module_ &context) {
   using value_type = roq::MessageInfo;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "source",
@@ -200,10 +227,11 @@ void create_message_info(auto &context, const std::string &name) {
       });
 }
 // messages
-// note! wrappers storing references to underlying objects / user is therefore not allowed to store the objects
-void create_external_latency(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::ExternalLatency>(py::module_ &context) {
   using value_type = roq::ExternalLatency;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -228,9 +256,11 @@ void create_external_latency(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_gateway_settings(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::GatewaySettings>(py::module_ &context) {
   using value_type = roq::GatewaySettings;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "supports",
@@ -291,9 +321,11 @@ void create_gateway_settings(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_gateway_status(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::GatewayStatus>(py::module_ &context) {
   using value_type = roq::GatewayStatus;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "account",
@@ -324,9 +356,11 @@ void create_gateway_status(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_market_by_price_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::MarketByPriceUpdate>(py::module_ &context) {
   using value_type = roq::MarketByPriceUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "exchange",
@@ -399,9 +433,11 @@ void create_market_by_price_update(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_market_status(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::MarketStatus>(py::module_ &context) {
   using value_type = roq::MarketStatus;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -432,9 +468,11 @@ void create_market_status(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_rate_limit_trigger(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::RateLimitTrigger>(py::module_ &context) {
   using value_type = roq::RateLimitTrigger;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "name",
@@ -483,9 +521,11 @@ void create_rate_limit_trigger(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_reference_data(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::ReferenceData>(py::module_ &context) {
   using value_type = roq::ReferenceData;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "exchange",
@@ -624,9 +664,11 @@ void create_reference_data(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_statistics_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::StatisticsUpdate>(py::module_ &context) {
   using value_type = roq::StatisticsUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -669,9 +711,11 @@ void create_statistics_update(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_stream_status(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::StreamStatus>(py::module_ &context) {
   using value_type = roq::StreamStatus;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -714,9 +758,11 @@ void create_stream_status(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_top_of_book(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::TopOfBook>(py::module_ &context) {
   using value_type = roq::TopOfBook;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "exchange",
@@ -753,9 +799,11 @@ void create_top_of_book(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_trade_summary(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::TradeSummary>(py::module_ &context) {
   using value_type = roq::TradeSummary;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -793,9 +841,11 @@ void create_trade_summary(auto &context, const std::string &name) {
       });
 }
 // ...
-void create_order_ack(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::OrderAck>(py::module_ &context) {
   using value_type = roq::OrderAck;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -904,9 +954,11 @@ void create_order_ack(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_order_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::OrderUpdate>(py::module_ &context) {
   using value_type = roq::OrderUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -1099,9 +1151,11 @@ void create_order_update(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_trade_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::TradeUpdate>(py::module_ &context) {
   using value_type = roq::TradeUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -1192,9 +1246,11 @@ void create_trade_update(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_position_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::PositionUpdate>(py::module_ &context) {
   using value_type = roq::PositionUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -1255,9 +1311,11 @@ void create_position_update(auto &context, const std::string &name) {
         return fmt::format("{}"sv, value);
       });
 }
-void create_funds_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::FundsUpdate>(py::module_ &context) {
   using value_type = roq::FundsUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "stream_id",
@@ -1301,9 +1359,11 @@ void create_funds_update(auto &context, const std::string &name) {
       });
 }
 //
-void create_custom_metrics_update(auto &context, const std::string &name) {
+template <>
+void create_ref_struct<roq::CustomMetricsUpdate>(py::module_ &context) {
   using value_type = roq::CustomMetricsUpdate;
   using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<ref_type>(context, name.c_str())
       .def_property_readonly(
           "user",
@@ -1347,17 +1407,6 @@ void create_custom_metrics_update(auto &context, const std::string &name) {
       });
 }
 namespace client {
-void create_settings(auto &context, const std::string &name) {
-  using value_type = roq::client::Settings;
-  py::class_<value_type>(context, name.c_str())
-      .def(
-          py::init<OrderCancelPolicy, OrderManagement>(),
-          py::arg("order_cancel_policy") = OrderCancelPolicy::UNDEFINED,
-          py::arg("order_management") = OrderManagement::UNDEFINED)
-      .def_readonly("order_cancel_policy", &value_type::order_cancel_policy)
-      .def_readonly("order_management", &value_type::order_management)
-      .def("__repr__", [](const value_type &value) { return fmt::format("{}", value); });
-}
 struct Config final : public roq::client::Config {
   Config(
       const roq::client::Settings &settings,
@@ -1387,15 +1436,6 @@ struct Config final : public roq::client::Config {
   const std::set<std::string> accounts_;
   const std::map<std::string, std::set<std::string>> symbols_;
 };
-void create_config(auto &context, const std::string &name) {
-  using value_type = Config;
-  py::class_<value_type>(context, name.c_str())
-      .def(
-          py::init<roq::client::Settings, std::set<std::string>, std::map<std::string, std::set<std::string>>>(),
-          py::arg("settings"),
-          py::arg("accounts"),
-          py::arg("symbols"));
-}
 struct Manager final {
   Manager(const Config &, [[maybe_unused]] const std::vector<std::string> &connections) {}
 
@@ -1433,16 +1473,6 @@ struct Manager final {
     return false;
   }
 };
-void create_manager(auto &context, const std::string &name) {
-  using value_type = Manager;
-  py::class_<value_type>(context, name.c_str())
-      .def(py::init<const Config &, std::vector<std::string>>(), py::arg("config"), py::arg("connections"))
-      // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
-      .def(
-          "dispatch",
-          [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
-          py::arg("callback"));
-}
 struct EventLogReader final {
   template <typename Callback>
   struct Handler final : public roq::client::EventLogReader::Handler {
@@ -1521,8 +1551,47 @@ struct EventLogReader final {
  private:
   std::unique_ptr<roq::client::EventLogReader> reader_;
 };
-void create_event_log_reader(auto &context, const std::string &name) {
-  using value_type = EventLogReader;
+}  // namespace client
+template <>
+void create_struct<roq::client::Settings>(py::module_ &context) {
+  using value_type = roq::client::Settings;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def(
+          py::init<OrderCancelPolicy, OrderManagement>(),
+          py::arg("order_cancel_policy") = OrderCancelPolicy::UNDEFINED,
+          py::arg("order_management") = OrderManagement::UNDEFINED)
+      .def_readonly("order_cancel_policy", &value_type::order_cancel_policy)
+      .def_readonly("order_management", &value_type::order_management)
+      .def("__repr__", [](const value_type &value) { return fmt::format("{}", value); });
+}
+template <>
+void create_struct<client::Config>(py::module_ &context) {
+  using value_type = client::Config;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def(
+          py::init<roq::client::Settings, std::set<std::string>, std::map<std::string, std::set<std::string>>>(),
+          py::arg("settings"),
+          py::arg("accounts"),
+          py::arg("symbols"));
+}
+template <>
+void create_struct<client::Manager>(py::module_ &context) {
+  using value_type = client::Manager;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def(py::init<const client::Config &, std::vector<std::string>>(), py::arg("config"), py::arg("connections"))
+      // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
+      .def(
+          "dispatch",
+          [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
+          py::arg("callback"));
+}
+template <>
+void create_struct<client::EventLogReader>(py::module_ &context) {
+  using value_type = client::EventLogReader;
+  std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def(py::init<const std::string_view &, size_t>(), py::arg("path"), py::arg("buffer_size") = 0)
       // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
@@ -1531,7 +1600,6 @@ void create_event_log_reader(auto &context, const std::string &name) {
           [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
           py::arg("callback"));
 }
-}  // namespace client
 namespace cache {
 struct MarketByPrice final {
   MarketByPrice(const std::string_view &exchange, const std::string_view &symbol)
@@ -1551,9 +1619,12 @@ struct MarketByPrice final {
  private:
   std::unique_ptr<roq::cache::MarketByPrice> market_by_price_;
 };
-void create_market_by_price(auto &context, const std::string &name) {
-  using value_type = MarketByPrice;
-  py::class_<MarketByPrice>(context, name.c_str())
+}  // namespace cache
+template <>
+void create_struct<cache::MarketByPrice>(py::module_ &context) {
+  using value_type = cache::MarketByPrice;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
       .def(py::init<const std::string_view &, const std::string_view &>(), py::arg("exchange") = "", py::arg("symbol"))
       .def(
           "apply",
@@ -1562,7 +1633,6 @@ void create_market_by_price(auto &context, const std::string &name) {
           })
       .def("extract", [](const value_type &value, size_t depth) { return value.extract(depth); });
 }
-}  // namespace cache
 }  // namespace python
 }  // namespace roq
 
@@ -1571,87 +1641,81 @@ PYBIND11_MODULE(roq, m) {
 
   // enums
 
-  static_assert(nameof::nameof_short_type<roq::ConnectionStatus>() == "ConnectionStatus"sv);
-
-  roq::python::utils::create_enum<roq::ConnectionStatus>(m, "ConnectionStatus"s);
-  roq::python::utils::create_enum<roq::Decimals>(m, "Decimals"s);
-  roq::python::utils::create_enum<roq::Error>(m, "Error"s);
-  roq::python::utils::create_enum<roq::ExecutionInstruction>(m, "ExecutionInstruction"s);
-  roq::python::utils::create_enum<roq::Liquidity>(m, "Liquidity"s);
-  roq::python::utils::create_enum<roq::OptionType>(m, "OptionType"s);
-  roq::python::utils::create_enum<roq::OrderCancelPolicy>(m, "OrderCancelPolicy"s);
-  roq::python::utils::create_enum<roq::OrderManagement>(m, "OrderManagement"s);
-  roq::python::utils::create_enum<roq::OrderStatus>(m, "OrderStatus"s);
-  roq::python::utils::create_enum<roq::OrderType>(m, "OrderType"s);
-  roq::python::utils::create_enum<roq::OrderUpdateAction>(m, "OrderUpdateAction"s);
-  roq::python::utils::create_enum<roq::Origin>(m, "Origin"s);
-  roq::python::utils::create_enum<roq::PositionEffect>(m, "PositionEffect"s);
-  roq::python::utils::create_enum<roq::Priority>(m, "Priority"s);
-  roq::python::utils::create_enum<roq::RateLimitType>(m, "RateLimitType"s);
-  roq::python::utils::create_enum<roq::RequestIdType>(m, "RequestIdType"s);
-  roq::python::utils::create_enum<roq::RequestStatus>(m, "RequestStatus"s);
-  roq::python::utils::create_enum<roq::RequestType>(m, "RequestType"s);
-  roq::python::utils::create_enum<roq::SecurityType>(m, "SecurityType"s);
-  roq::python::utils::create_enum<roq::Side>(m, "Side"s);
-  roq::python::utils::create_enum<roq::StatisticsType>(m, "StatisticsType"s);
-  roq::python::utils::create_enum<roq::StreamType>(m, "StreamType"s);
-  roq::python::utils::create_enum<roq::SupportType>(m, "SupportType"s);
-  roq::python::utils::create_enum<roq::TimeInForce>(m, "TimeInForce"s);
-  roq::python::utils::create_enum<roq::TradingStatus>(m, "TradingStatus"s);
-  roq::python::utils::create_enum<roq::UpdateType>(m, "UpdateType"s);
+  roq::python::utils::create_enum<roq::ConnectionStatus>(m);
+  roq::python::utils::create_enum<roq::Decimals>(m);
+  roq::python::utils::create_enum<roq::Error>(m);
+  roq::python::utils::create_enum<roq::ExecutionInstruction>(m);
+  roq::python::utils::create_enum<roq::Liquidity>(m);
+  roq::python::utils::create_enum<roq::OptionType>(m);
+  roq::python::utils::create_enum<roq::OrderCancelPolicy>(m);
+  roq::python::utils::create_enum<roq::OrderManagement>(m);
+  roq::python::utils::create_enum<roq::OrderStatus>(m);
+  roq::python::utils::create_enum<roq::OrderType>(m);
+  roq::python::utils::create_enum<roq::OrderUpdateAction>(m);
+  roq::python::utils::create_enum<roq::Origin>(m);
+  roq::python::utils::create_enum<roq::PositionEffect>(m);
+  roq::python::utils::create_enum<roq::Priority>(m);
+  roq::python::utils::create_enum<roq::RateLimitType>(m);
+  roq::python::utils::create_enum<roq::RequestIdType>(m);
+  roq::python::utils::create_enum<roq::RequestStatus>(m);
+  roq::python::utils::create_enum<roq::RequestType>(m);
+  roq::python::utils::create_enum<roq::SecurityType>(m);
+  roq::python::utils::create_enum<roq::Side>(m);
+  roq::python::utils::create_enum<roq::StatisticsType>(m);
+  roq::python::utils::create_enum<roq::StreamType>(m);
+  roq::python::utils::create_enum<roq::SupportType>(m);
+  roq::python::utils::create_enum<roq::TimeInForce>(m);
+  roq::python::utils::create_enum<roq::TradingStatus>(m);
+  roq::python::utils::create_enum<roq::UpdateType>(m);
 
   // helpers
 
-  static_assert(nameof::nameof_short_type<roq::Fill>() == "Fill"sv);
-
-  roq::python::create_fill(m, "Fill"s);
-  roq::python::create_layer(m, "Layer"s);
-  roq::python::create_mbp_update(m, "MBPUpdate"s);
-  roq::python::create_measurement(m, "Measurement"s);
-  roq::python::create_statistics(m, "Statistics"s);
-  roq::python::create_trade(m, "Trade"s);
-  roq::python::create_uuid(m, "UUID"s);
+  roq::python::create_struct<roq::Fill>(m);
+  roq::python::create_struct<roq::Layer>(m);
+  roq::python::create_struct<roq::MBPUpdate>(m);
+  roq::python::create_struct<roq::Measurement>(m);
+  roq::python::create_struct<roq::Statistics>(m);
+  roq::python::create_struct<roq::Trade>(m);
+  roq::python::create_struct<roq::UUID>(m);
 
   // transport
 
-  static_assert(nameof::nameof_short_type<roq::MessageInfo>() == "MessageInfo"sv);
-
-  roq::python::create_message_info(m, "MessageInfo"s);
+  roq::python::create_ref_struct<roq::MessageInfo>(m);
 
   // struct
 
-  roq::python::create_external_latency(m, "ExternalLatency"s);
-  roq::python::create_gateway_settings(m, "GatewaySettings"s);
-  roq::python::create_gateway_status(m, "GatewayStatus"s);
-  roq::python::create_market_by_price_update(m, "MarketByPriceUpdate"s);
-  roq::python::create_market_status(m, "MarketStatus"s);
-  roq::python::create_rate_limit_trigger(m, "RateLimitTrigger"s);
-  roq::python::create_reference_data(m, "ReferenceData"s);
-  roq::python::create_statistics_update(m, "StatisticsUpdate"s);
-  roq::python::create_stream_status(m, "StreamStatus"s);
-  roq::python::create_top_of_book(m, "TopOfBook"s);
-  roq::python::create_trade_summary(m, "TradeSummary"s);
+  roq::python::create_ref_struct<roq::ExternalLatency>(m);
+  roq::python::create_ref_struct<roq::GatewaySettings>(m);
+  roq::python::create_ref_struct<roq::GatewayStatus>(m);
+  roq::python::create_ref_struct<roq::MarketByPriceUpdate>(m);
+  roq::python::create_ref_struct<roq::MarketStatus>(m);
+  roq::python::create_ref_struct<roq::RateLimitTrigger>(m);
+  roq::python::create_ref_struct<roq::ReferenceData>(m);
+  roq::python::create_ref_struct<roq::StatisticsUpdate>(m);
+  roq::python::create_ref_struct<roq::StreamStatus>(m);
+  roq::python::create_ref_struct<roq::TopOfBook>(m);
+  roq::python::create_ref_struct<roq::TradeSummary>(m);
 
-  roq::python::create_order_ack(m, "OrderAck"s);
-  roq::python::create_order_update(m, "OrderUpdate"s);
-  roq::python::create_trade_update(m, "TradeUpdate"s);
+  roq::python::create_ref_struct<roq::OrderAck>(m);
+  roq::python::create_ref_struct<roq::OrderUpdate>(m);
+  roq::python::create_ref_struct<roq::TradeUpdate>(m);
 
-  roq::python::create_position_update(m, "PositionUpdate"s);
-  roq::python::create_funds_update(m, "FundsUpdate"s);
+  roq::python::create_ref_struct<roq::PositionUpdate>(m);
+  roq::python::create_ref_struct<roq::FundsUpdate>(m);
 
-  roq::python::create_custom_metrics_update(m, "CustomMetricsUpdate"s);
+  roq::python::create_ref_struct<roq::CustomMetricsUpdate>(m);
 
   auto client = m.def_submodule("client");
 
-  roq::python::client::create_settings(client, "Settings"s);
-  roq::python::client::create_config(client, "Config"s);
-  roq::python::client::create_manager(client, "Manager"s);
+  roq::python::create_struct<roq::client::Settings>(client);
+  roq::python::create_struct<roq::python::client::Config>(client);
+  roq::python::create_struct<roq::python::client::Manager>(client);
 
-  roq::python::client::create_event_log_reader(client, "EventLogReader"s);
+  roq::python::create_struct<roq::python::client::EventLogReader>(client);
 
   auto cache = m.def_submodule("cache");
 
-  roq::python::cache::create_market_by_price(cache, "MarketByPrice"s);
+  roq::python::create_struct<roq::python::cache::MarketByPrice>(cache);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
