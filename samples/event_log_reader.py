@@ -173,6 +173,50 @@ def callback(
 @typedispatch
 def callback(
     message_info: roq.MessageInfo,
+    create_order: roq.CreateOrder,
+):
+    """
+    CreateOrder when a client requests an order to be created.
+    """
+    print(f"create_order={create_order}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    modify_order: roq.ModifyOrder,
+):
+    """
+    ModifyOrder when a client requests an order to be modified.
+    """
+    print(f"modify_order={modify_order}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    cancel_order: roq.CancelOrder,
+):
+    """
+    CancelOrder when a client requests an order to be canceled.
+    """
+    print(f"cancel_order={cancel_order}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
+    cancel_all_orders: roq.CancelAllOrders,
+):
+    """
+    CancelAllOrders when a client requests all orders to be canceled.
+    """
+    print(f"cancel_all_orders={cancel_all_orders}")
+
+
+@typedispatch
+def callback(
+    message_info: roq.MessageInfo,
     order_ack: roq.OrderAck,
 ):
     """

@@ -842,6 +842,219 @@ void create_ref_struct<roq::TradeSummary>(py::module_ &context) {
 }
 // ...
 template <>
+void create_ref_struct<roq::CreateOrder>(py::module_ &context) {
+  using value_type = roq::CreateOrder;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "exchange",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "side",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.side;
+          })
+      .def_property_readonly(
+          "position_effect",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.position_effect;
+          })
+      .def_property_readonly(
+          "max_show_quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_show_quantity;
+          })
+      .def_property_readonly(
+          "order_type",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_type;
+          })
+      .def_property_readonly(
+          "time_in_force",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.time_in_force;
+          })
+      .def_property_readonly(
+          "execution_instructions",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_int_flag(value.execution_instructions);
+          })
+      .def_property_readonly(
+          "order_template",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_template;
+          })
+      .def_property_readonly(
+          "quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.quantity;
+          })
+      .def_property_readonly(
+          "price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.price;
+          })
+      .def_property_readonly(
+          "stop_price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stop_price;
+          })
+      .def_property_readonly(
+          "routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.routing_id;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
+void create_ref_struct<roq::ModifyOrder>(py::module_ &context) {
+  using value_type = roq::ModifyOrder;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "quantity",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.quantity;
+          })
+      .def_property_readonly(
+          "price",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.price;
+          })
+      .def_property_readonly(
+          "routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.routing_id;
+          })
+      .def_property_readonly(
+          "version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.version;
+          })
+      .def_property_readonly(
+          "conditional_on_version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.conditional_on_version;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
+void create_ref_struct<roq::CancelOrder>(py::module_ &context) {
+  using value_type = roq::CancelOrder;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "routing_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.routing_id;
+          })
+      .def_property_readonly(
+          "version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.version;
+          })
+      .def_property_readonly(
+          "conditional_on_version",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.conditional_on_version;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
+void create_ref_struct<roq::CancelAllOrders>(py::module_ &context) {
+  using value_type = roq::CancelAllOrders;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+// ...
+template <>
 void create_ref_struct<roq::OrderAck>(py::module_ &context) {
   using value_type = roq::OrderAck;
   using ref_type = utils::Ref<value_type>;
@@ -1472,6 +1685,18 @@ struct Manager final {
     }
     return false;
   }
+  void send(const roq::CreateOrder &, [[maybe_unused]] uint8_t source) {
+    // XXX send
+  }
+  void send(const roq::ModifyOrder &, [[maybe_unused]] uint8_t source) {
+    // XXX send
+  }
+  void send(const roq::CancelOrder &, [[maybe_unused]] uint8_t source) {
+    // XXX send
+  }
+  void send(const roq::CancelAllOrders &cancel_all_orders, [[maybe_unused]] uint8_t source) {
+    // XXX send
+  }
 };
 struct EventLogReader final {
   template <typename Callback>
@@ -1507,11 +1732,10 @@ struct EventLogReader final {
     void operator()(const Event<roq::TradeSummary> &event) override { dispatch(event.message_info, event.value); }
     void operator()(const Event<roq::StatisticsUpdate> &event) override { dispatch(event.message_info, event.value); }
 
-    // XXX these overlap with similarly named request objects
-    void operator()(const Event<roq::CreateOrder> &) override {}
-    void operator()(const Event<roq::ModifyOrder> &) override {}
-    void operator()(const Event<roq::CancelOrder> &) override {}
-    void operator()(const Event<roq::CancelAllOrders> &) override {}
+    void operator()(const Event<roq::CreateOrder> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::ModifyOrder> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::CancelOrder> &event) override { dispatch(event.message_info, event.value); }
+    void operator()(const Event<roq::CancelAllOrders> &event) override { dispatch(event.message_info, event.value); }
 
     void operator()(const Event<roq::OrderAck> &event) override { dispatch(event.message_info, event.value); }
     void operator()(const Event<roq::OrderUpdate> &event) override { dispatch(event.message_info, event.value); }
@@ -1586,7 +1810,125 @@ void create_struct<client::Manager>(py::module_ &context) {
       .def(
           "dispatch",
           [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
-          py::arg("callback"));
+          py::arg("callback"))
+      .def(
+          "create_order",
+          [](value_type &obj,
+             const std::string_view &account,
+             uint32_t order_id,
+             const std::string_view &exchange,
+             const std::string_view &symbol,
+             roq::Side side,
+             roq::PositionEffect position_effect,
+             double max_show_quantity,
+             roq::OrderType order_type,
+             roq::TimeInForce time_in_force,
+             const roq::Mask<roq::ExecutionInstruction> &execution_instructions,
+             const std::string_view &order_template,
+             double quantity,
+             double price,
+             double stop_price,
+             const std::string_view &routing_id,
+             uint8_t source) {
+            roq::CreateOrder create_order{
+                .account = account,
+                .order_id = order_id,
+                .exchange = exchange,
+                .symbol = symbol,
+                .side = side,
+                .position_effect = position_effect,
+                .max_show_quantity = max_show_quantity,
+                .order_type = order_type,
+                .time_in_force = time_in_force,
+                .execution_instructions = execution_instructions,
+                .order_template = order_template,
+                .quantity = quantity,
+                .price = price,
+                .stop_price = stop_price,
+                .routing_id = routing_id,
+            };
+            obj.send(create_order, source);
+          },
+          py::arg("account"),
+          py::arg("order_id"),
+          py::arg("exchange"),
+          py::arg("symbol"),
+          py::arg("side"),
+          py::arg("position_effect") = roq::PositionEffect::UNDEFINED,
+          py::arg("max_show_quantity") = NaN,
+          py::arg("order_type"),
+          py::arg("time_in_force") = roq::TimeInForce::UNDEFINED,
+          py::arg("execution_instructions"),  // = roq::Mask<roq::ExecutionInstruction>{},
+          py::arg("order_template") = "",
+          py::arg("quantity"),
+          py::arg("price") = NaN,
+          py::arg("stop_price") = NaN,
+          py::arg("routing_id") = "",
+          py::arg("source"))
+      .def(
+          "modify_order",
+          [](value_type &obj,
+             const std::string_view &account,
+             uint32_t order_id,
+             double quantity,
+             double price,
+             const std::string_view &routing_id,
+             uint32_t version,
+             uint32_t conditional_on_version,
+             uint8_t source) {
+            roq::ModifyOrder modify_order{
+                .account = account,
+                .order_id = order_id,
+                .quantity = quantity,
+                .price = price,
+                .routing_id = routing_id,
+                .version = version,
+                .conditional_on_version = conditional_on_version,
+            };
+            obj.send(modify_order, source);
+          },
+          py::arg("account"),
+          py::arg("order_id"),
+          py::arg("quantity") = NaN,
+          py::arg("price") = NaN,
+          py::arg("routing_id") = "",
+          py::arg("version") = 0,
+          py::arg("conditional_on_version") = 0,
+          py::arg("source"))
+      .def(
+          "cancel_order",
+          [](value_type &obj,
+             const std::string_view &account,
+             uint32_t order_id,
+             const std::string_view &routing_id,
+             uint32_t version,
+             uint32_t conditional_on_version,
+             uint8_t source) {
+            roq::CancelOrder cancel_order{
+                .account = account,
+                .order_id = order_id,
+                .routing_id = routing_id,
+                .version = version,
+                .conditional_on_version = conditional_on_version,
+            };
+            obj.send(cancel_order, source);
+          },
+          py::arg("account"),
+          py::arg("order_id"),
+          py::arg("routing_id") = "",
+          py::arg("version") = 0,
+          py::arg("conditional_on_version") = 0,
+          py::arg("source"))
+      .def(
+          "cancel_all_orders",
+          [](value_type &obj, const std::string_view &account, uint8_t source) {
+            roq::CancelAllOrders cancel_all_orders{
+                .account = account,
+            };
+            obj.send(cancel_all_orders, source);
+          },
+          py::arg("account") = "",
+          py::arg("source"));
 }
 template <>
 void create_struct<client::EventLogReader>(py::module_ &context) {
@@ -1695,6 +2037,11 @@ PYBIND11_MODULE(roq, m) {
   roq::python::create_ref_struct<roq::StreamStatus>(m);
   roq::python::create_ref_struct<roq::TopOfBook>(m);
   roq::python::create_ref_struct<roq::TradeSummary>(m);
+
+  roq::python::create_ref_struct<roq::CreateOrder>(m);
+  roq::python::create_ref_struct<roq::ModifyOrder>(m);
+  roq::python::create_ref_struct<roq::CancelOrder>(m);
+  roq::python::create_ref_struct<roq::CancelAllOrders>(m);
 
   roq::python::create_ref_struct<roq::OrderAck>(m);
   roq::python::create_ref_struct<roq::OrderUpdate>(m);
