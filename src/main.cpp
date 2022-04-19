@@ -1649,8 +1649,26 @@ struct Config final : public roq::client::Config {
   const std::set<std::string> accounts_;
   const std::map<std::string, std::set<std::string>> symbols_;
 };
+struct Handler : public roq::client::Handler {
+  virtual ~Handler() {}
+};
+namespace {
+// XXX this is **NOT** the final solution
+struct Bridge final : public roq::client::Handler {
+  explicit Bridge(roq::client::Dispatcher &, python::client::Handler &handler) : handler_(handler) {}
+
+ protected:
+  void operator()(const Event<Connected> &) {}
+  void operator()(const Event<Disconnected> &) {}
+
+ private:
+  python::client::Handler &handler_;
+};
+}  // namespace
 struct Manager final {
-  Manager(const Config &, [[maybe_unused]] const std::vector<std::string> &connections) {}
+  // XXX reference to config?
+  Manager(const python::client::Config &config, const std::vector<std::string> &connections)
+      : config_(config), connections_(connections) {}
 
  protected:
   template <typename T>
@@ -1663,19 +1681,14 @@ struct Manager final {
   }
 
  public:
-  bool dispatch(const std::function<void(py::object, py::object)> &callback) {
+  static bool dispatch(Manager &manager, Handler &handler) {
+    // XXX we need an external loop here
+    // XXX for now, only exceptions can break the dispatch loop
     try {
-      // XXX exception must break the dispatch loop
-      {
-        roq::MessageInfo message_info;
-        roq::ReferenceData reference_data;
-        dispatch(callback, message_info, reference_data);
-      }
-      {
-        roq::MessageInfo message_info;
-        roq::TopOfBook top_of_book;
-        dispatch(callback, message_info, top_of_book);
-      }
+      std::vector<std::string_view> connections;
+      for (auto &connection : manager.connections_)
+        connections.emplace_back(connection);
+      roq::client::Trader(manager.config_, std::span{connections}).dispatch<Bridge>(handler);
     } catch (py::error_already_set &) {
       /*
       log::warn("caught exception!"sv);
@@ -1694,9 +1707,13 @@ struct Manager final {
   void send(const roq::CancelOrder &, [[maybe_unused]] uint8_t source) {
     // XXX send
   }
-  void send(const roq::CancelAllOrders &cancel_all_orders, [[maybe_unused]] uint8_t source) {
+  void send(const roq::CancelAllOrders &, [[maybe_unused]] uint8_t source) {
     // XXX send
   }
+
+ private:
+  const python::client::Config config_;
+  const std::vector<std::string> connections_;
 };
 struct EventLogReader final {
   template <typename Callback>
@@ -1805,12 +1822,17 @@ void create_struct<client::Manager>(py::module_ &context) {
   using value_type = client::Manager;
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
-      .def(py::init<const client::Config &, std::vector<std::string>>(), py::arg("config"), py::arg("connections"))
-      // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
       .def(
+          py::init<const python::client::Config &, const std::vector<std::string> &>(),
+          py::arg("config"),
+          py::arg("connections"))
+      .def_static(
           "dispatch",
-          [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
-          py::arg("callback"))
+          [](value_type &manager, python::client::Handler &handler) {
+            return [&](auto &manager, auto &handler) { value_type::dispatch(manager, handler); };
+          },
+          py::arg("manager"),
+          py::arg("handler"))
       .def(
           "create_order",
           [](value_type &obj,
@@ -2054,9 +2076,16 @@ PYBIND11_MODULE(roq, m) {
 
   auto client = m.def_submodule("client");
 
+  py::class_<roq::python::client::Handler>(client, "Handler").def(py::init<>());
+
   roq::python::create_struct<roq::client::Settings>(client);
   roq::python::create_struct<roq::python::client::Config>(client);
   roq::python::create_struct<roq::python::client::Manager>(client);
+
+  /*
+  m.def(
+      "create", [](py::object x) { fmt::print("test"sv); }, py::arg("client_type"));
+  */
 
   roq::python::create_struct<roq::python::client::EventLogReader>(client);
 
