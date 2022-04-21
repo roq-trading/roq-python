@@ -736,22 +736,34 @@ void create_ref_struct<roq::StreamStatus>(py::module_ &context) {
             return value.supports;
           })
       .def_property_readonly(
-          "status",
+          "transport",
           [](const ref_type &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.status;
+            return value.transport;
           })
       .def_property_readonly(
-          "type",
+          "protocol",
           [](const ref_type &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.type;
+            return value.protocol;
+          })
+      .def_property_readonly(
+          "encoding",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.encoding;
           })
       .def_property_readonly(
           "priority",
           [](const ref_type &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.priority;
+          })
+      .def_property_readonly(
+          "connection_status",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.connection_status;
           })
       .def("__repr__", [](const ref_type &obj) {
         auto &value = static_cast<const value_type &>(obj);
@@ -2007,6 +2019,7 @@ PYBIND11_MODULE(roq, m) {
 
   roq::python::utils::create_enum<roq::ConnectionStatus>(m);
   roq::python::utils::create_enum<roq::Decimals>(m);
+  roq::python::utils::create_enum<roq::Encoding>(m);
   roq::python::utils::create_enum<roq::Error>(m);
   roq::python::utils::create_enum<roq::ExecutionInstruction>(m);
   roq::python::utils::create_enum<roq::Liquidity>(m);
@@ -2019,6 +2032,7 @@ PYBIND11_MODULE(roq, m) {
   roq::python::utils::create_enum<roq::Origin>(m);
   roq::python::utils::create_enum<roq::PositionEffect>(m);
   roq::python::utils::create_enum<roq::Priority>(m);
+  roq::python::utils::create_enum<roq::Protocol>(m);
   roq::python::utils::create_enum<roq::RateLimitType>(m);
   roq::python::utils::create_enum<roq::RequestIdType>(m);
   roq::python::utils::create_enum<roq::RequestStatus>(m);
@@ -2026,10 +2040,10 @@ PYBIND11_MODULE(roq, m) {
   roq::python::utils::create_enum<roq::SecurityType>(m);
   roq::python::utils::create_enum<roq::Side>(m);
   roq::python::utils::create_enum<roq::StatisticsType>(m);
-  roq::python::utils::create_enum<roq::StreamType>(m);
   roq::python::utils::create_enum<roq::SupportType>(m);
   roq::python::utils::create_enum<roq::TimeInForce>(m);
   roq::python::utils::create_enum<roq::TradingStatus>(m);
+  roq::python::utils::create_enum<roq::Transport>(m);
   roq::python::utils::create_enum<roq::UpdateType>(m);
 
   // helpers
