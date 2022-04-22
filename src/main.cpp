@@ -806,6 +806,12 @@ void create_ref_struct<roq::TopOfBook>(py::module_ &context) {
             auto &value = static_cast<const value_type &>(obj);
             return value.exchange_time_utc;
           })
+      .def_property_readonly(
+          "exchange_sequence",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_sequence;
+          })
       .def("__repr__", [](const ref_type &obj) {
         auto &value = static_cast<const value_type &>(obj);
         return fmt::format("{}"sv, value);
