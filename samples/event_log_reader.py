@@ -124,7 +124,7 @@ def callback(
 ):
     """
     MarketByPrice contains level 2 order book updates.
-    Note! The updates are applied to a cached object.
+    Note! The updates are incremental and must be applied to a cached object.
     """
     print(f"market_by_price_update={market_by_price_update}")
 
