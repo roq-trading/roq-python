@@ -17,7 +17,7 @@ import roq
 
 class Strategy(roq.client.Handler):
     def __init__(self, *args):
-        roq.client.Handler.__init__(self)  # important! required by pybind11
+        roq.client.Handler.__init__(self)  # required by pybind11
 
     @typedispatch
     @classmethod
@@ -31,8 +31,7 @@ class Strategy(roq.client.Handler):
         print(f"mid={mid:.2f}")
 
 
-# workaround currently needed to deal with flags
-roq.client.set_flags(
+roq.client.set_flags(  # workaround currently required to deal with flags
     dict(
         name="trader",
         timer_freq="1s",
