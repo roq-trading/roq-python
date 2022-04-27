@@ -22,7 +22,7 @@ Many of the examples benefit greatly from `@typedispatch` decorator from
 conda install -y fastcore
 ```
 
-This would be the minimal implementation for a subscriber
+This is what you need to write a subscriber
 
 ```python
 class Strategy(roq.client.Handler):
