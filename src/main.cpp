@@ -242,6 +242,103 @@ void create_ref_struct<roq::MessageInfo>(py::module_ &context) {
 }
 // messages
 template <>
+void create_ref_struct<roq::Start>(py::module_ &context) {
+  using value_type = roq::Start;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str()).def("__repr__", [](const ref_type &obj) {
+    auto &value = static_cast<const value_type &>(obj);
+    return fmt::format("{}"sv, value);
+  });
+}
+template <>
+void create_ref_struct<roq::Stop>(py::module_ &context) {
+  using value_type = roq::Stop;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str()).def("__repr__", [](const ref_type &obj) {
+    auto &value = static_cast<const value_type &>(obj);
+    return fmt::format("{}"sv, value);
+  });
+}
+template <>
+void create_ref_struct<roq::Timer>(py::module_ &context) {
+  using value_type = roq::Timer;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "now",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.now;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
+void create_ref_struct<roq::Connected>(py::module_ &context) {
+  using value_type = roq::Connected;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str()).def("__repr__", [](const ref_type &obj) {
+    auto &value = static_cast<const value_type &>(obj);
+    return fmt::format("{}"sv, value);
+  });
+}
+template <>
+void create_ref_struct<roq::Disconnected>(py::module_ &context) {
+  using value_type = roq::Disconnected;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str()).def("__repr__", [](const ref_type &obj) {
+    auto &value = static_cast<const value_type &>(obj);
+    return fmt::format("{}"sv, value);
+  });
+}
+template <>
+void create_ref_struct<roq::DownloadBegin>(py::module_ &context) {
+  using value_type = roq::DownloadBegin;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
+void create_ref_struct<roq::DownloadEnd>(py::module_ &context) {
+  using value_type = roq::DownloadEnd;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "account",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "max_order_id",
+          [](const ref_type &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_order_id;
+          })
+      .def("__repr__", [](const ref_type &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
 void create_ref_struct<roq::ExternalLatency>(py::module_ &context) {
   using value_type = roq::ExternalLatency;
   using ref_type = utils::Ref<value_type>;
@@ -1709,8 +1806,14 @@ struct Bridge final : public roq::client::Handler {
   }
 
  protected:
-  void operator()(const Event<Connected> &) override {}
-  void operator()(const Event<Disconnected> &) override {}
+  void operator()(const Event<roq::Start> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::Stop> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::Timer> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::Connected> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::Disconnected> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::DownloadBegin> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::DownloadEnd> &event) override { dispatch(event.message_info, event.value); }
 
   void operator()(const Event<roq::GatewaySettings> &event) override { dispatch(event.message_info, event.value); }
 
@@ -1742,10 +1845,9 @@ struct Bridge final : public roq::client::Handler {
 };
 }  // namespace
 struct Manager final {
-  // XXX reference to config?
   Manager(py::object handler, const python::client::Config &config, const std::vector<std::string> &connections)
       : config_(config), connections_(connections), handler_(handler(123)) {
-    py::cast<python::client::Handler &>(handler_);  // XXX is there a typeof test?
+    py::cast<python::client::Handler &>(handler_);  // will throw exception if not inherited from
   }
 
  protected:
@@ -2162,17 +2264,29 @@ PYBIND11_MODULE(roq, m) {
 
   // struct
 
-  roq::python::create_ref_struct<roq::ExternalLatency>(m);
+  roq::python::create_ref_struct<roq::Start>(m);
+  roq::python::create_ref_struct<roq::Stop>(m);
+  roq::python::create_ref_struct<roq::Timer>(m);
+  roq::python::create_ref_struct<roq::Connected>(m);
+  roq::python::create_ref_struct<roq::Disconnected>(m);
+
+  roq::python::create_ref_struct<roq::DownloadBegin>(m);
+  roq::python::create_ref_struct<roq::DownloadEnd>(m);
+
   roq::python::create_ref_struct<roq::GatewaySettings>(m);
-  roq::python::create_ref_struct<roq::GatewayStatus>(m);
-  roq::python::create_ref_struct<roq::MarketByPriceUpdate>(m);
-  roq::python::create_ref_struct<roq::MarketStatus>(m);
-  roq::python::create_ref_struct<roq::RateLimitTrigger>(m);
-  roq::python::create_ref_struct<roq::ReferenceData>(m);
-  roq::python::create_ref_struct<roq::StatisticsUpdate>(m);
+
   roq::python::create_ref_struct<roq::StreamStatus>(m);
+  roq::python::create_ref_struct<roq::ExternalLatency>(m);
+  roq::python::create_ref_struct<roq::RateLimitTrigger>(m);
+
+  roq::python::create_ref_struct<roq::GatewayStatus>(m);
+
+  roq::python::create_ref_struct<roq::ReferenceData>(m);
+  roq::python::create_ref_struct<roq::MarketStatus>(m);
   roq::python::create_ref_struct<roq::TopOfBook>(m);
+  roq::python::create_ref_struct<roq::MarketByPriceUpdate>(m);
   roq::python::create_ref_struct<roq::TradeSummary>(m);
+  roq::python::create_ref_struct<roq::StatisticsUpdate>(m);
 
   roq::python::create_ref_struct<roq::CreateOrder>(m);
   roq::python::create_ref_struct<roq::ModifyOrder>(m);

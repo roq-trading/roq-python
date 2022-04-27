@@ -22,9 +22,105 @@ class Strategy(roq.client.Handler):
     def callback(
         self,
         message_info: roq.MessageInfo,
+        start: roq.Start,
+    ):
+        print(f"start={start}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        stop: roq.Stop,
+    ):
+        print(f"stop={start}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        timer: roq.Timer,
+    ):
+        print(f"timer={timer}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        connected: roq.Connected,
+    ):
+        print(f"connected={connected}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        disconnected: roq.Disconnected,
+    ):
+        print(f"disconnected={disconnected}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        download_begin: roq.DownloadBegin,
+    ):
+        print(f"download_begin={download_begin}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        download_end: roq.DownloadEnd,
+    ):
+        print(f"download_end={download_end}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        gateway_settings: roq.GatewaySettings,
+    ):
+        print(f"gateway_settings={gateway_settings}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        stream_status: roq.StreamStatus,
+    ):
+        print(f"stream_status={stream_status}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        external_latency: roq.ExternalLatency,
+    ):
+        print(f"external_latency={external_latency}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        rate_limit_trigger: roq.RateLimitTrigger,
+    ):
+        print(f"rate_limit_trigger={rate_limit_trigger}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
         reference_data: roq.ReferenceData,
     ):
         print(f"reference_data={reference_data}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        market_status: roq.MarketStatus,
+    ):
+        print(f"market_status={market_status}")
 
     @typedispatch
     def callback(
@@ -56,6 +152,62 @@ class Strategy(roq.client.Handler):
         # extract top 2 layers
         depth = mbp.extract(2)
         print(f"DEPTH: {depth}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        trade_summary: roq.TradeSummary,
+    ):
+        print(f"trade_summary={trade_summary}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        statistics_update: roq.StatisticsUpdate,
+    ):
+        print(f"statistics_update={statistics_update}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        order_ack: roq.OrderAck,
+    ):
+        print(f"order_ack={order_ack}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        order_update: roq.OrderUpdate,
+    ):
+        print(f"order_update={order_update}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        trade_update: roq.TradeUpdate,
+    ):
+        print(f"trade_update={trade_update}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        position_update: roq.PositionUpdate,
+    ):
+        print(f"position_update={position_update}")
+
+    @typedispatch
+    def callback(
+        self,
+        message_info: roq.MessageInfo,
+        funds_update: roq.FundsUpdate,
+    ):
+        print(f"funds_update={funds_update}")
 
 
 def test_client(connections: list[str]):
@@ -95,6 +247,7 @@ def test_client(connections: list[str]):
 roq.client.set_flags(
     dict(
         name="trader",
+        timer_freq="1s",
     )
 )
 
