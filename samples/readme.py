@@ -31,7 +31,7 @@ class Strategy(roq.client.Handler):
         print(f"mid={mid:.2f}")
 
 
-roq.client.set_flags(  # workaround currently required to deal with flags
+roq.client.set_flags(  # currently required to deal with flags
     dict(
         name="trader",
         timer_freq="1s",
