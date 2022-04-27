@@ -1,21 +1,20 @@
-# WORK IN PROGRESS !!!
+#!/usr/bin/env python
 
-This is the Python binding of the Roq C++ API.
+"""
+Copyright (c) 2017-2022, Hans Erik Thrane
+
+This the same code you will find at the top-level README.md.
+"""
+
+import os
+
+from time import sleep
+
+from fastcore.all import typedispatch
+
+import roq
 
 
-### Using
-
-
-```bash
-conda install -y --channel https://roq-trading.com/conda/stable \
-    roq-python
-```
-
-Samples can be found [here](https://github.com/roq-trading/roq-python/samples).
-
-This would be the minimal implementation for a subscriber
-
-```python
 class Strategy(roq.client.Handler):
     def __init__(self, *args):
         roq.client.Handler.__init__(self)  # important! required by pybind11
@@ -52,9 +51,3 @@ manager = roq.client.Manager(Strategy, config, connections)
 
 while manager.dispatch():
     pass
-```
-
-
-## License
-
-The project is released under the terms of the BSD 3-Clause license.

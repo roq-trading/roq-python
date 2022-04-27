@@ -3,7 +3,9 @@
 """
 Copyright (c) 2017-2022, Hans Erik Thrane
 
-Demonstrates how to connect to one or more gateways.
+Demonstrates how to connect to a gateway and receive the various callbacks.
+
+Although not required, **all** callback methods have been implemented here.
 """
 
 import os
