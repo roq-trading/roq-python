@@ -6,6 +6,14 @@
 #include <pybind11/functional.h>
 #include <pybind11/stl.h>
 
+// XXX shouldn't be here...
+#include <absl/flags/parse.h>
+
+#include <algorithm>
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include <magic_enum.hpp>
 
 #include <nameof.hpp>
@@ -13,6 +21,12 @@
 #include "roq/client.hpp"
 
 #include "roq/logging.hpp"
+
+/*
+ * notes:
+ * - absl flags is an issue... how to define from python?
+ * - need client external loop implementation
+ */
 
 using namespace std::literals;         // NOLINT
 using namespace std::chrono_literals;  // NOLINT
@@ -1667,17 +1681,61 @@ struct Config final : public roq::client::Config {
   const std::set<std::string> accounts_;
   const std::map<std::string, std::set<std::string>> symbols_;
 };
+// base class as callback handler
 struct Handler : public roq::client::Handler {
   virtual ~Handler() {}
+  virtual void callback(const py::object &, const py::object &) = 0;
+};
+// trampoline
+struct PyHandler : public Handler {
+  using Handler::Handler;
+
+  void callback(const py::object &message_info, const py::object &value) override {
+    PYBIND11_OVERRIDE_PURE(void, Handler, callback, message_info, value);
+  }
 };
 namespace {
-// XXX this is **NOT** the final solution
 struct Bridge final : public roq::client::Handler {
   explicit Bridge(roq::client::Dispatcher &, python::client::Handler &handler) : handler_(handler) {}
 
  protected:
-  void operator()(const Event<Connected> &) {}
-  void operator()(const Event<Disconnected> &) {}
+  template <typename T>
+  void dispatch(const auto &message_info, const T &value) {
+    auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
+    auto arg1 = py::cast(utils::Ref<T>{value});
+    handler_.callback(arg0, arg1);
+    if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
+      throw std::runtime_error("Objects must not be stored"s);
+  }
+
+ protected:
+  void operator()(const Event<Connected> &) override {}
+  void operator()(const Event<Disconnected> &) override {}
+
+  void operator()(const Event<roq::GatewaySettings> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::StreamStatus> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::ExternalLatency> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::RateLimitTrigger> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::GatewayStatus> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::ReferenceData> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::MarketStatus> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::TopOfBook> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::MarketByPriceUpdate> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::MarketByOrderUpdate> &) override {}
+  void operator()(const Event<roq::TradeSummary> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::StatisticsUpdate> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::OrderAck> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::OrderUpdate> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::TradeUpdate> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::PositionUpdate> &event) override { dispatch(event.message_info, event.value); }
+  void operator()(const Event<roq::FundsUpdate> &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(const Event<roq::CustomMetricsUpdate> &event) override { dispatch(event.message_info, event.value); }
 
  private:
   python::client::Handler &handler_;
@@ -1685,28 +1743,31 @@ struct Bridge final : public roq::client::Handler {
 }  // namespace
 struct Manager final {
   // XXX reference to config?
-  Manager(const python::client::Config &config, const std::vector<std::string> &connections)
-      : config_(config), connections_(connections) {}
+  Manager(py::object handler, const python::client::Config &config, const std::vector<std::string> &connections)
+      : config_(config), connections_(connections), handler_(handler(123)) {
+    py::cast<python::client::Handler &>(handler_);  // XXX is there a typeof test?
+  }
 
  protected:
   template <typename T>
-  void dispatch(const auto &callback, const auto &message_info, const T &value) {
+  void dispatch(const auto &message_info, const T &value) {
     auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
     auto arg1 = py::cast(utils::Ref<T>{value});
-    callback(arg0, arg1);
+    handler_(arg0, arg1);
     if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
       throw std::runtime_error("Objects must not be stored"s);
   }
 
  public:
-  static bool dispatch(Manager &manager, Handler &handler) {
+  bool dispatch() {
     // XXX we need an external loop here
     // XXX for now, only exceptions can break the dispatch loop
     try {
       std::vector<std::string_view> connections;
-      for (auto &connection : manager.connections_)
+      for (auto &connection : connections_)
         connections.emplace_back(connection);
-      roq::client::Trader(manager.config_, std::span{connections}).dispatch<Bridge>(handler);
+      auto &handler = py::cast<python::client::Handler &>(handler_);
+      roq::client::Trader(config_, std::span{connections}).dispatch<Bridge>(handler);
     } catch (py::error_already_set &) {
       /*
       log::warn("caught exception!"sv);
@@ -1717,22 +1778,60 @@ struct Manager final {
     return false;
   }
   void send(const roq::CreateOrder &, [[maybe_unused]] uint8_t source) {
+    log::info("HERE"sv);
     // XXX send
   }
   void send(const roq::ModifyOrder &, [[maybe_unused]] uint8_t source) {
+    log::info("HERE"sv);
     // XXX send
   }
   void send(const roq::CancelOrder &, [[maybe_unused]] uint8_t source) {
+    log::info("HERE"sv);
     // XXX send
   }
   void send(const roq::CancelAllOrders &, [[maybe_unused]] uint8_t source) {
+    log::info("HERE"sv);
     // XXX send
   }
 
  private:
   const python::client::Config config_;
   const std::vector<std::string> connections_;
+  py::object handler_;
 };
+void set_flags(const py::dict &key_value_pairs) {
+  // buffer (represents the command-line)
+  std::vector<char> buffer;
+  // - program
+  buffer.emplace_back('\0');
+  for (auto &[key, value] : key_value_pairs) {
+    // - key
+    auto k = py::cast<std::string>(key);
+    buffer.emplace_back('-');
+    buffer.emplace_back('-');
+    std::for_each(std::begin(k), std::end(k), [&](auto c) { buffer.emplace_back(c); });
+    buffer.emplace_back('\0');
+    // - value
+    auto v = py::cast<std::string>(value);
+    std::for_each(std::begin(v), std::end(v), [&](auto c) { buffer.emplace_back(c); });
+    buffer.emplace_back('\0');
+  }
+  assert(!std::empty(buffer));
+  // - args
+  std::vector<char *> args;
+  args.emplace_back(&buffer[0]);
+  bool insert = true;
+  for (auto i = 1; i < std::size(buffer); ++i) {
+    if (insert) {
+      args.emplace_back(&buffer[i]);
+      insert = false;
+    }
+    if (buffer[i] == '\0')
+      insert = true;
+  }
+  // initialize or override absl flags
+  absl::ParseCommandLine(std::size(args), std::data(args));
+}
 struct EventLogReader final {
   template <typename Callback>
   struct Handler final : public roq::client::EventLogReader::Handler {
@@ -1841,16 +1940,11 @@ void create_struct<client::Manager>(py::module_ &context) {
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
       .def(
-          py::init<const python::client::Config &, const std::vector<std::string> &>(),
+          py::init<py::object, const python::client::Config &, const std::vector<std::string> &>(),
+          py::arg("handler"),
           py::arg("config"),
           py::arg("connections"))
-      .def_static(
-          "dispatch",
-          [](value_type &manager, python::client::Handler &handler) {
-            return [&](auto &manager, auto &handler) { value_type::dispatch(manager, handler); };
-          },
-          py::arg("manager"),
-          py::arg("handler"))
+      .def("dispatch", [](value_type &obj) { return obj.dispatch(); })
       .def(
           "create_order",
           [](value_type &obj,
@@ -2096,16 +2190,15 @@ PYBIND11_MODULE(roq, m) {
 
   auto client = m.def_submodule("client");
 
-  py::class_<roq::python::client::Handler>(client, "Handler").def(py::init<>());
+  py::class_<roq::python::client::Handler, roq::python::client::PyHandler>(client, "Handler")
+      .def(py::init<>())
+      .def("callback", &roq::python::client::Handler::callback);
 
   roq::python::create_struct<roq::client::Settings>(client);
   roq::python::create_struct<roq::python::client::Config>(client);
   roq::python::create_struct<roq::python::client::Manager>(client);
 
-  /*
-  m.def(
-      "create", [](py::object x) { fmt::print("test"sv); }, py::arg("client_type"));
-  */
+  client.def("set_flags", &roq::python::client::set_flags, "WORKAROUND", py::arg("flags"));
 
   roq::python::create_struct<roq::python::client::EventLogReader>(client);
 

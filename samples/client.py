@@ -13,7 +13,10 @@ mbp_cache = dict()
 
 class Strategy(roq.client.Handler):
     def __init__(self, dispatcher):
+        roq.client.Handler.__init__(self)  # important! required by pybind11
         self.dispatcher = dispatcher
+
+    # XXX remember the roq.Timer event
 
     @typedispatch
     def callback(
@@ -69,27 +72,32 @@ def test_client(connections: list[str]):
         },
     )
 
-    # note! the following is not complete
+    # note!
+    # you must pass the *type* of the strategy
+    # this is because the manager must be control the life-time of the object
 
-    if True:
-        # this is the workaround
-        manager = roq.client.Manager(config, connections)
-        strategy = Strategy(manager)
-        try:
-            while Manager.dispatch(manager, strategy):
-                sleep(0.1)  # just for the example, probably you want "pass" here
-        except Exception as err:
-            print(f"{err}")
+    manager = roq.client.Manager(Strategy, config, connections)
 
-    else:
-        # this is how we would like it to be (Manager controls the life-time of the strategy, similar to C++)
-        manager = roq.client.Manager(Strategy, config, connections)
-        try:
-            while manager.dispatch():
-                sleep(0.1)  # just for the example, probably you want "pass" here
-        except Exception as err:
-            print(f"{err}")
+    try:
+        while manager.dispatch():
+            sleep(0.1)  # just for the example, probably you want "pass" here
+    except Exception as err:
+        print(f"{err}")
 
 
-# test_client(["{HOME}/deribit.sock".format(**os.environ)])
-roq.test(Strategy)
+# note!
+# a temporary solution to handle flags
+# the roq libraries were historically build for command-line applications
+# this will have to change in the future so we can pass these flags as a context
+# for now, this is unfortunately state-full (meaning: values are "remembered")
+#   and it therefore seems most useful to have a function like this
+
+roq.client.set_flags(
+    dict(
+        name="trader",
+    )
+)
+
+# main
+
+test_client(["{HOME}/run/deribit-test.sock".format(**os.environ)])
