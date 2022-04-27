@@ -2032,8 +2032,8 @@ void create_struct<client::Config>(py::module_ &context) {
   py::class_<value_type>(context, name.c_str())
       .def(
           py::init<roq::client::Settings, std::set<std::string>, std::map<std::string, std::set<std::string>>>(),
-          py::arg("settings"),
-          py::arg("accounts"),
+          py::arg("settings") = roq::client::Settings(),
+          py::arg("accounts") = std::set<std::string>(),
           py::arg("symbols"));
 }
 template <>

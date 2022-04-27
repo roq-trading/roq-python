@@ -21,7 +21,7 @@ class Strategy(roq.client.Handler):
     Important: **must** inherit from roq.client.Handler.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args):
         """
         Constructor.
         """
@@ -42,7 +42,7 @@ class Strategy(roq.client.Handler):
         ap = top_of_book.layer.ask_price
         aq = top_of_book.layer.ask_quantity
         mid = (bp * aq + ap * bq) / (bq + aq)
-        print(f"mid={mid}")
+        print(f"mid={mid:.2f}")
 
 
 def test_client(connections: list[str]):
