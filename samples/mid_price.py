@@ -66,7 +66,7 @@ def test_client(connections: list[str]):
 
     try:
         while manager.dispatch():
-            sleep(0.1)  # just for the example, probably you want "pass" here
+            pass
     except Exception as err:
         print(f"{err}")
 
