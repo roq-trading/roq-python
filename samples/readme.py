@@ -15,7 +15,7 @@ from fastcore.all import typedispatch
 import roq
 
 
-class Strategy(roq.client.Handler):
+class Subscriber(roq.client.Handler):
     def __init__(self, *args):
         roq.client.Handler.__init__(self)  # required by pybind11
 
@@ -46,7 +46,7 @@ config = roq.client.Config(
 
 connections = ["{HOME}/run/deribit-test.sock".format(**os.environ)]
 
-manager = roq.client.Manager(Strategy, config, connections)
+manager = roq.client.Manager(Subscriber, config, connections)
 
 while manager.dispatch():
     pass
