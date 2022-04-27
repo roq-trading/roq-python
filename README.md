@@ -60,7 +60,6 @@ manager = roq.client.Manager(Strategy, config, connections)
 
 while manager.dispatch():
     pass
-    pass
 ```
 
 
