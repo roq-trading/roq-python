@@ -21,7 +21,7 @@ MBP_CACHE = {}
 
 class Strategy(roq.client.Handler):
     """
-    Your implementation of a strategy.
+    Strategy implementation.
     Important: **must** inherit from roq.client.Handler.
     """
 
@@ -339,9 +339,13 @@ def test_client(connections: list[str]):
     The main function.
     """
 
+    # note! instruct gateway to auto-cancel open orders if we disconnect
+
     settings = roq.client.Settings(
         order_cancel_policy=roq.OrderCancelPolicy.BY_ACCOUNT,
     )
+
+    # configuration
 
     config = roq.client.Config(
         settings=settings,

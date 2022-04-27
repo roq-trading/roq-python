@@ -3,7 +3,7 @@
 """
 Copyright (c) 2017-2022, Hans Erik Thrane
 
-Demonstrates how to compute a weighted mid price.
+A very simple example demonstrating how to compute a live mid price.
 """
 
 import os
@@ -21,17 +21,15 @@ MBP_CACHE = {}
 
 class Strategy(roq.client.Handler):
     """
-    Your implementation of a strategy.
+    Strategy implementation.
     Important: **must** inherit from roq.client.Handler.
     """
 
-    def __init__(self, dispatcher):
+    def __init__(self, **kwargs):
         """
-        Constructor receiving an instance of the dispatch interface for sending
-        order actions.
+        Constructor.
         """
         roq.client.Handler.__init__(self)  # important! required by pybind11
-        self.dispatcher = dispatcher
 
     @typedispatch
     @classmethod
@@ -41,8 +39,7 @@ class Strategy(roq.client.Handler):
         top_of_book: roq.TopOfBook,
     ):
         """
-        Computes a mid price weighted by quantities.
-        The assumption is that volume will push the price "away".
+        Computes a "weighted" mid.
         """
         bp = top_of_book.layer.bid_price
         bq = top_of_book.layer.bid_quantity
@@ -57,13 +54,9 @@ def test_client(connections: list[str]):
     The main function.
     """
 
-    settings = roq.client.Settings(
-        order_cancel_policy=roq.OrderCancelPolicy.BY_ACCOUNT,
-    )
+    # configuration (subscriptions)
 
     config = roq.client.Config(
-        settings=settings,
-        accounts={"A1"},
         symbols={
             "deribit": {"BTC-PERPETUAL"},
         },
