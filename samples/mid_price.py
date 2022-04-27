@@ -14,10 +14,6 @@ from fastcore.all import typedispatch
 
 import roq
 
-# cache: market by price (L2 order book)
-
-MBP_CACHE = {}
-
 
 class Strategy(roq.client.Handler):
     """
