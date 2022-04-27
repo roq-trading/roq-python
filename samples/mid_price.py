@@ -37,10 +37,7 @@ class Strategy(roq.client.Handler):
         """
         Computes a "weighted" mid.
         """
-        bp = top_of_book.layer.bid_price
-        bq = top_of_book.layer.bid_quantity
-        ap = top_of_book.layer.ask_price
-        aq = top_of_book.layer.ask_quantity
+        bp, bq, ap, aq = top_of_book.layer.astuple()
         mid = (bp * aq + ap * bq) / (bq + aq)
         print(f"mid={mid:.2f}")
 

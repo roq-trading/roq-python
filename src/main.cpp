@@ -94,6 +94,7 @@ void create_struct<roq::Fill>(py::module_ &context) {
       .def_property_readonly("liquidity", [](const value_type &value) { return value.liquidity; })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
+// XXX it would be very convenient here to return tuple for unpack
 template <>
 void create_struct<roq::Layer>(py::module_ &context) {
   using value_type = roq::Layer;
@@ -103,6 +104,11 @@ void create_struct<roq::Layer>(py::module_ &context) {
       .def_property_readonly("bid_quantity", [](const value_type &value) { return value.bid_quantity; })
       .def_property_readonly("ask_price", [](const value_type &value) { return value.ask_price; })
       .def_property_readonly("ask_quantity", [](const value_type &value) { return value.ask_quantity; })
+      .def(
+          "astuple",
+          [](const value_type &value) {
+            return py::make_tuple(value.bid_price, value.bid_quantity, value.ask_price, value.ask_quantity);
+          })
       .def("__repr__", [](const value_type &value) { return fmt::format("{}"sv, value); });
 }
 template <>
