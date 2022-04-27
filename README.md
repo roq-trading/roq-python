@@ -15,8 +15,8 @@ conda install -y --channel https://roq-trading.com/conda/unstable \
 
 Samples can be found [here](https://github.com/roq-trading/roq-python/tree/unstable/samples).
 
-Many of the examples benefit greatly from [fastcore](https://github.com/fastai/fastcore) which
-you can install like this
+Many of the examples benefit greatly from `@typedispatch` decorator from
+[fastcore](https://github.com/fastai/fastcore) which you can install like this
 
 ```bash
 conda install -y fastcore
