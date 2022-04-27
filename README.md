@@ -7,11 +7,11 @@ This is the Python binding of the Roq C++ API.
 
 
 ```bash
-conda install -y --channel https://roq-trading.com/conda/stable \
+conda install -y --channel https://roq-trading.com/conda/unstable \
     roq-python
 ```
 
-Samples can be found [here](https://github.com/roq-trading/roq-python/samples).
+Samples can be found [here](https://github.com/roq-trading/roq-python/tree/unstable/samples).
 
 This would be the minimal implementation for a subscriber
 
