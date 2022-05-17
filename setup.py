@@ -1,3 +1,4 @@
+import os
 import sys
 
 from pybind11 import get_cmake_dir
@@ -5,7 +6,7 @@ from pybind11 import get_cmake_dir
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup
 
-__version__ = "0.8.3"
+__version__ = os.environ.get("GIT_DESCRIBE_TAG", "0.0.0")
 
 ext_modules = [
     Pybind11Extension(
