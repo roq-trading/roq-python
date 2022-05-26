@@ -9,8 +9,13 @@ build:
   number: {{ GIT_DESCRIBE_NUMBER }}
   script: python -m pip install . -vvv
 
+# https://conda-forge.org/blog/posts/2020-10-29-macos-arm64/#how-to-add-a-osx-arm64-build-to-a-feedstock
 requirements:
   build:
+    - {{ compiler('cxx') }}
+    - python                                 # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+  host:
     - python {{ python }}
     - fmt
     - pybind11
