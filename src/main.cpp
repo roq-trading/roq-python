@@ -776,6 +776,12 @@ void create_ref_struct<roq::ReferenceData>(py::module_ &context) {
             auto &value = static_cast<const value_type &>(obj);
             return value.expiry_datetime_utc;
           })
+      .def_property_readonly(
+          "discard",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.discard;
+          })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
         return fmt::format("{}"sv, value);
