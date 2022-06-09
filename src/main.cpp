@@ -119,8 +119,9 @@ void create_struct<roq::MBPUpdate>(py::module_ &context) {
       .def_property_readonly("price", [](value_type const &value) { return value.price; })
       .def_property_readonly("quantity", [](value_type const &value) { return value.quantity; })
       .def_property_readonly("implied_quantity", [](value_type const &value) { return value.implied_quantity; })
-      .def_property_readonly("price_level", [](value_type const &value) { return value.price_level; })
       .def_property_readonly("number_of_orders", [](value_type const &value) { return value.number_of_orders; })
+      .def_property_readonly("update_action", [](value_type const &value) { return value.update_action; })
+      .def_property_readonly("price_level", [](value_type const &value) { return value.price_level; })
       .def("__repr__", [](value_type const &value) { return fmt::format("{}"sv, value); });
 }
 template <>
@@ -2258,6 +2259,7 @@ PYBIND11_MODULE(roq, m) {
   roq::python::utils::create_enum<roq::TimeInForce>(m);
   roq::python::utils::create_enum<roq::TradingStatus>(m);
   roq::python::utils::create_enum<roq::Transport>(m);
+  roq::python::utils::create_enum<roq::UpdateAction>(m);
   roq::python::utils::create_enum<roq::UpdateType>(m);
 
   // helpers
