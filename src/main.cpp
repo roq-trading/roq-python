@@ -2243,7 +2243,6 @@ PYBIND11_MODULE(roq, m) {
   roq::python::utils::create_enum<roq::OrderManagement>(m);
   roq::python::utils::create_enum<roq::OrderStatus>(m);
   roq::python::utils::create_enum<roq::OrderType>(m);
-  roq::python::utils::create_enum<roq::OrderUpdateAction>(m);
   roq::python::utils::create_enum<roq::Origin>(m);
   roq::python::utils::create_enum<roq::PositionEffect>(m);
   roq::python::utils::create_enum<roq::Priority>(m);
