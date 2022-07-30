@@ -1853,6 +1853,10 @@ struct Bridge final : public roq::client::Handler {
 
   void operator()(Event<roq::CustomMetricsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
+  void operator()(Event<roq::ParameterUpdate> const &) override {
+    // XXX TODO
+  }
+
  private:
   python::client::Handler &handler_;
 };
@@ -1995,6 +1999,10 @@ struct EventLogReader final {
 
     void operator()(Event<roq::CustomMetricsUpdate> const &event) override {
       dispatch(event.message_info, event.value);
+    }
+
+    void operator()(Event<roq::ParameterUpdate> const &) override {
+      // XXX TODO
     }
 
    private:
