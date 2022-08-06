@@ -21,7 +21,7 @@ requirements:
     - fmt
     - pybind11
     - roq-client
-    - roq-oss-abseil-cpp
+    - abseil-cpp
     - roq-oss-magic_enum
     - roq-oss-nameof
   run:
