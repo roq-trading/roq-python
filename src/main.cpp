@@ -2016,8 +2016,8 @@ struct EventLogReader final {
     try {
       Handler handler(callback);
       for (;;) {
-        if ((*reader_).dispatch(handler))
-          continue;
+        if (!(*reader_).dispatch(handler))
+          break;
       }
     } catch (py::error_already_set &) {
       /*
@@ -2031,6 +2031,87 @@ struct EventLogReader final {
 
  private:
   std::unique_ptr<roq::client::EventLogReader> reader_;
+};
+struct EventLogMultiplexer final {
+  template <typename Callback>
+  struct Handler final : public roq::client::EventLogMultiplexer::Handler {
+    explicit Handler(Callback const &callback) : callback_(callback) {}
+
+   protected:
+    template <typename T>
+    void dispatch(auto const &message_info, const T &value) {
+      auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
+      auto arg1 = py::cast(utils::Ref<T>{value});
+      callback_(arg0, arg1);
+      if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
+        throw std::runtime_error("Objects must not be stored"s);
+    }
+
+   protected:
+    void operator()(Event<roq::GatewaySettings> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::StreamStatus> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::ExternalLatency> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::RateLimitTrigger> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::GatewayStatus> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::ReferenceData> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::MarketStatus> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::TopOfBook> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::MarketByPriceUpdate> const &event) override {
+      dispatch(event.message_info, event.value);
+    }
+    void operator()(Event<roq::MarketByOrderUpdate> const &) override {}
+    void operator()(Event<roq::TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::CreateOrder> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::ModifyOrder> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::CancelOrder> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::CancelAllOrders> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::OrderAck> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::OrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::TradeUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::PositionUpdate> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::FundsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+    void operator()(Event<roq::CustomMetricsUpdate> const &event) override {
+      dispatch(event.message_info, event.value);
+    }
+
+    void operator()(Event<roq::ParameterUpdate> const &) override {
+      // XXX TODO
+    }
+
+   private:
+    Callback const &callback_;
+  };
+  EventLogMultiplexer(std::vector<std::string_view> const &paths, size_t buffer_size)
+      : multiplexer_(roq::client::EventLogMultiplexerFactory::create(paths, buffer_size)) {}
+
+  template <typename Callback>
+  bool dispatch(Callback const &callback) {
+    try {
+      Handler handler(callback);
+      for (;;) {
+        if (!(*multiplexer_).dispatch(handler))
+          break;
+      }
+    } catch (py::error_already_set &) {
+      /*
+      log::warn("caught exception!"sv);
+      return false;  // break
+      */
+      throw;
+    }
+    return false;
+  }
+
+ private:
+  std::unique_ptr<roq::client::EventLogMultiplexer> multiplexer_;
 };
 }  // namespace client
 template <>
@@ -2199,6 +2280,18 @@ void create_struct<client::EventLogReader>(py::module_ &context) {
           [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
           py::arg("callback"));
 }
+template <>
+void create_struct<client::EventLogMultiplexer>(py::module_ &context) {
+  using value_type = client::EventLogMultiplexer;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def(py::init<std::vector<std::string_view> const &, size_t>(), py::arg("paths"), py::arg("buffer_size") = 0)
+      // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
+      .def(
+          "dispatch",
+          [](value_type &obj, std::function<void(py::object, py::object)> &callback) { return obj.dispatch(callback); },
+          py::arg("callback"));
+}
 namespace cache {
 struct MarketByPrice final {
   MarketByPrice(std::string_view const &exchange, std::string_view const &symbol)
@@ -2336,6 +2429,7 @@ PYBIND11_MODULE(roq, m) {
   client.def("set_flags", &roq::python::client::set_flags, "WORKAROUND", py::arg("flags"));
 
   roq::python::create_struct<roq::python::client::EventLogReader>(client);
+  roq::python::create_struct<roq::python::client::EventLogMultiplexer>(client);
 
   auto cache = m.def_submodule("cache");
 
