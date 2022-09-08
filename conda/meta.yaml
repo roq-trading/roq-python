@@ -6,9 +6,9 @@ source:
   git_url: ..
 
 build:
-  number: {{ ROQ_BUILD_NUMBER if ROQ_BUILD_NUMBER is defined else GIT_DESCRIBE_NUMBER }}                                
-  script_env:                                                                                                           
-    - ROQ_BUILD_NUMBER                                                                                                  
+  number: {{ ROQ_BUILD_NUMBER if ROQ_BUILD_NUMBER is defined else GIT_DESCRIBE_NUMBER }}
+  script_env:
+    - ROQ_BUILD_NUMBER
     - ROQ_BUILD_TYPE
   script: python -m pip install . -vvv
 
