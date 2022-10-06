@@ -2008,8 +2008,7 @@ struct EventLogReader final {
    private:
     Callback const &callback_;
   };
-  EventLogReader(std::string_view const &path, size_t buffer_size)
-      : reader_(roq::client::EventLogReaderFactory::create(path, buffer_size)) {}
+  EventLogReader(std::string_view const &path) : reader_(roq::client::EventLogReaderFactory::create(path)) {}
 
   template <typename Callback>
   bool dispatch(Callback const &callback) {
@@ -2089,8 +2088,8 @@ struct EventLogMultiplexer final {
    private:
     Callback const &callback_;
   };
-  EventLogMultiplexer(std::vector<std::string_view> const &paths, size_t buffer_size)
-      : multiplexer_(roq::client::EventLogMultiplexerFactory::create(paths, buffer_size)) {}
+  EventLogMultiplexer(std::vector<std::string_view> const &paths)
+      : multiplexer_(roq::client::EventLogMultiplexerFactory::create(paths)) {}
 
   template <typename Callback>
   bool dispatch(Callback const &callback) {
@@ -2273,7 +2272,7 @@ void create_struct<client::EventLogReader>(py::module_ &context) {
   using value_type = client::EventLogReader;
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
-      .def(py::init<std::string_view const &, size_t>(), py::arg("path"), py::arg("buffer_size") = 0)
+      .def(py::init<std::string_view const &>(), py::arg("path"))
       // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
       .def(
           "dispatch",
@@ -2285,7 +2284,7 @@ void create_struct<client::EventLogMultiplexer>(py::module_ &context) {
   using value_type = client::EventLogMultiplexer;
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
-      .def(py::init<std::vector<std::string_view> const &, size_t>(), py::arg("paths"), py::arg("buffer_size") = 0)
+      .def(py::init<std::vector<std::string_view> const &>(), py::arg("paths"))
       // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
       .def(
           "dispatch",
