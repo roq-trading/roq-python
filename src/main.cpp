@@ -68,12 +68,12 @@ void create_enum(auto &context) {
 template <typename T>
 struct Ref final {
   Ref() = delete;  // not allowed
-  explicit Ref(const T &value) : value(value) {}
+  explicit Ref(T const &value) : value(value) {}
 
-  operator const T &() const { return value; }
+  operator T const &() const { return value; }
 
  private:
-  const T &value;
+  T const &value;
 };
 }  // namespace utils
 // note! copy values
@@ -1810,7 +1810,7 @@ struct Bridge final : public roq::client::Handler {
 
  protected:
   template <typename T>
-  void dispatch(auto const &message_info, const T &value) {
+  void dispatch(auto const &message_info, T const &value) {
     auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
     auto arg1 = py::cast(utils::Ref<T>{value});
     handler_.callback(arg0, arg1);
@@ -1869,7 +1869,7 @@ struct Manager final {
 
  protected:
   template <typename T>
-  void dispatch(auto const &message_info, const T &value) {
+  void dispatch(auto const &message_info, T const &value) {
     auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
     auto arg1 = py::cast(utils::Ref<T>{value});
     handler_(arg0, arg1);
@@ -1958,7 +1958,7 @@ struct EventLogReader final {
 
    protected:
     template <typename T>
-    void dispatch(auto const &message_info, const T &value) {
+    void dispatch(auto const &message_info, T const &value) {
       auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
       auto arg1 = py::cast(utils::Ref<T>{value});
       callback_(arg0, arg1);
@@ -2038,7 +2038,7 @@ struct EventLogMultiplexer final {
 
    protected:
     template <typename T>
-    void dispatch(auto const &message_info, const T &value) {
+    void dispatch(auto const &message_info, T const &value) {
       auto arg0 = py::cast(utils::Ref<MessageInfo>{message_info});
       auto arg1 = py::cast(utils::Ref<T>{value});
       callback_(arg0, arg1);
@@ -2297,7 +2297,7 @@ struct MarketByPrice final {
       : market_by_price_(roq::client::MarketByPriceFactory::create(exchange, symbol)) {}
 
   template <typename T>
-  void operator()(const T &value) {
+  void operator()(T const &value) {
     (*market_by_price_)(value);
   }
 
