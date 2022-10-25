@@ -1940,7 +1940,7 @@ void set_flags(py::dict const &key_value_pairs) {
   std::vector<char *> args;
   args.emplace_back(&buffer[0]);
   bool insert = true;
-  for (auto i = 1; i < std::size(buffer); ++i) {
+  for (size_t i = 1; i < std::size(buffer); ++i) {
     if (insert) {
       args.emplace_back(&buffer[i]);
       insert = false;
