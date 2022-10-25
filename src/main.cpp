@@ -68,7 +68,7 @@ void create_enum(auto &context) {
 template <typename T>
 struct Ref final {
   Ref() = delete;  // not allowed
-  explicit Ref(T const &value) : value(value) {}
+  explicit Ref(T const &value) : value{value} {}
 
   operator T const &() const { return value; }
 
@@ -1767,7 +1767,7 @@ struct Config final : public roq::client::Config {
       roq::client::Settings const &settings,
       std::set<std::string> const &accounts,
       std::map<std::string, std::set<std::string>> const &symbols)
-      : settings_(settings), accounts_(accounts), symbols_(symbols) {}
+      : settings_{settings}, accounts_{accounts}, symbols_{symbols} {}
   void dispatch(Handler &handler) const override {
     handler(settings_);
     for (auto &regex : accounts_) {
@@ -1787,9 +1787,9 @@ struct Config final : public roq::client::Config {
   }
 
  private:
-  const roq::client::Settings settings_;
-  const std::set<std::string> accounts_;
-  const std::map<std::string, std::set<std::string>> symbols_;
+  roq::client::Settings const settings_;
+  std::set<std::string> const accounts_;
+  std::map<std::string, std::set<std::string>> const symbols_;
 };
 // base class as callback handler
 struct Handler : public roq::client::Handler {
@@ -1806,7 +1806,7 @@ struct PyHandler : public Handler {
 };
 namespace {
 struct Bridge final : public roq::client::Handler {
-  explicit Bridge(roq::client::Dispatcher &, python::client::Handler &handler) : handler_(handler) {}
+  explicit Bridge(roq::client::Dispatcher &, python::client::Handler &handler) : handler_{handler} {}
 
  protected:
   template <typename T>
@@ -1815,7 +1815,7 @@ struct Bridge final : public roq::client::Handler {
     auto arg1 = py::cast(utils::Ref<T>{value});
     handler_.callback(arg0, arg1);
     if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
-      throw std::runtime_error("Objects must not be stored"s);
+      throw std::runtime_error{"Objects must not be stored"s};
   }
 
  protected:
@@ -1863,7 +1863,7 @@ struct Bridge final : public roq::client::Handler {
 }  // namespace
 struct Manager final {
   Manager(py::object handler, python::client::Config const &config, std::vector<std::string> const &connections)
-      : config_(config), connections_(connections), handler_(handler(123)) {
+      : config_{config}, connections_{connections}, handler_{handler(123)} {
     py::cast<python::client::Handler &>(handler_);  // will throw exception if not inherited from
   }
 
@@ -1874,7 +1874,7 @@ struct Manager final {
     auto arg1 = py::cast(utils::Ref<T>{value});
     handler_(arg0, arg1);
     if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
-      throw std::runtime_error("Objects must not be stored"s);
+      throw std::runtime_error{"Objects must not be stored"s};
   }
 
  public:
@@ -1914,8 +1914,8 @@ struct Manager final {
   }
 
  private:
-  const python::client::Config config_;
-  const std::vector<std::string> connections_;
+  python::client::Config const config_;
+  std::vector<std::string> const connections_;
   py::object handler_;
 };
 void set_flags(py::dict const &key_value_pairs) {
@@ -1954,7 +1954,7 @@ void set_flags(py::dict const &key_value_pairs) {
 struct EventLogReader final {
   template <typename Callback>
   struct Handler final : public roq::client::EventLogReader::Handler {
-    explicit Handler(Callback const &callback) : callback_(callback) {}
+    explicit Handler(Callback const &callback) : callback_{callback} {}
 
    protected:
     template <typename T>
@@ -1963,7 +1963,7 @@ struct EventLogReader final {
       auto arg1 = py::cast(utils::Ref<T>{value});
       callback_(arg0, arg1);
       if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
-        throw std::runtime_error("Objects must not be stored"s);
+        throw std::runtime_error{"Objects must not be stored"s};
     }
 
    protected:
@@ -2034,7 +2034,7 @@ struct EventLogReader final {
 struct EventLogMultiplexer final {
   template <typename Callback>
   struct Handler final : public roq::client::EventLogMultiplexer::Handler {
-    explicit Handler(Callback const &callback) : callback_(callback) {}
+    explicit Handler(Callback const &callback) : callback_{callback} {}
 
    protected:
     template <typename T>
@@ -2043,7 +2043,7 @@ struct EventLogMultiplexer final {
       auto arg1 = py::cast(utils::Ref<T>{value});
       callback_(arg0, arg1);
       if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
-        throw std::runtime_error("Objects must not be stored"s);
+        throw std::runtime_error{"Objects must not be stored"s};
     }
 
    protected:
@@ -2294,7 +2294,7 @@ void create_struct<client::EventLogMultiplexer>(py::module_ &context) {
 namespace cache {
 struct MarketByPrice final {
   MarketByPrice(std::string_view const &exchange, std::string_view const &symbol)
-      : market_by_price_(roq::client::MarketByPriceFactory::create(exchange, symbol)) {}
+      : market_by_price_{roq::client::MarketByPriceFactory::create(exchange, symbol)} {}
 
   template <typename T>
   void operator()(T const &value) {
