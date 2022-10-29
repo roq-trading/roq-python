@@ -1853,7 +1853,7 @@ struct Bridge final : public roq::client::Handler {
 
   void operator()(Event<roq::CustomMetricsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
-  void operator()(Event<roq::ParameterUpdate> const &) override {
+  void operator()(Event<roq::ParametersUpdate> const &) override {
     // XXX TODO
   }
 
@@ -2001,7 +2001,7 @@ struct EventLogReader final {
       dispatch(event.message_info, event.value);
     }
 
-    void operator()(Event<roq::ParameterUpdate> const &) override {
+    void operator()(Event<roq::ParametersUpdate> const &) override {
       // XXX TODO
     }
 
@@ -2081,7 +2081,7 @@ struct EventLogMultiplexer final {
       dispatch(event.message_info, event.value);
     }
 
-    void operator()(Event<roq::ParameterUpdate> const &) override {
+    void operator()(Event<roq::ParametersUpdate> const &) override {
       // XXX TODO
     }
 
