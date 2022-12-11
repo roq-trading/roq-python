@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Copyright (c) 2017-2022, Hans Erik Thrane
+Copyright (c) 2017-2023, Hans Erik Thrane
 
 Demonstrates how to replay an event-log.
 """
