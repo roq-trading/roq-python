@@ -1,6 +1,5 @@
 import os
 import sys
-import sysconfig
 
 from pybind11 import get_cmake_dir
 
@@ -23,7 +22,7 @@ ext_modules = [
             "roq-client",
             "fmt",
         ],
-    extra_compile_args=extra_compile_args,
+        extra_compile_args=extra_compile_args,
     ),
 ]
 
