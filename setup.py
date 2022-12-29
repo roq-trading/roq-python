@@ -1,5 +1,6 @@
 import os
 import sys
+import sysconfig
 
 from pybind11 import get_cmake_dir
 
