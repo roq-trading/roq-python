@@ -14,9 +14,17 @@ ext_modules = [
         ["src/main.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
         cxx_std=20,
-        libraries=["roq-client", "fmt",],
+        libraries=[
+            "roq-client",
+            "fmt",
+        ],
     ),
 ]
+
+extra_compile_args = sysconfig.get_config_var("CFLAGS").split()
+
+if sys.platform == "darwin":
+    extra_compile_args += ["-DFMT_USE_NONTYPE_TEMPLATE_ARGS=1"]
 
 setup(
     name="roq",
@@ -31,4 +39,5 @@ setup(
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
     python_requires=">=3.8",
+    extra_compile_args=extra_compile_args,
 )
