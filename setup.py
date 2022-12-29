@@ -9,6 +9,10 @@ from setuptools import setup
 
 __version__ = os.environ.get("GIT_DESCRIBE_TAG", "0.0.0")
 
+extra_compile_args = []
+if sys.platform == "darwin":
+    extra_compile_args += ["-DFMT_USE_NONTYPE_TEMPLATE_ARGS=1"]
+
 ext_modules = [
     Pybind11Extension(
         "roq",
@@ -19,13 +23,9 @@ ext_modules = [
             "roq-client",
             "fmt",
         ],
+    extra_compile_args=extra_compile_args,
     ),
 ]
-
-extra_compile_args = sysconfig.get_config_var("CFLAGS").split()
-
-if sys.platform == "darwin":
-    extra_compile_args += ["-DFMT_USE_NONTYPE_TEMPLATE_ARGS=1"]
 
 setup(
     name="roq",
@@ -40,5 +40,4 @@ setup(
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
     python_requires=">=3.8",
-    extra_compile_args=extra_compile_args,
 )
