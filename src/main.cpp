@@ -1050,10 +1050,10 @@ void create_ref_struct<roq::CreateOrder>(py::module_ &context) {
             return utils::to_int_flag(value.execution_instructions);
           })
       .def_property_readonly(
-          "order_template",
+          "request_template",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.order_template;
+            return value.request_template;
           })
       .def_property_readonly(
           "quantity",
@@ -1101,6 +1101,12 @@ void create_ref_struct<roq::ModifyOrder>(py::module_ &context) {
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.order_id;
+          })
+      .def_property_readonly(
+          "request_template",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.request_template;
           })
       .def_property_readonly(
           "quantity",
@@ -1154,6 +1160,12 @@ void create_ref_struct<roq::CancelOrder>(py::module_ &context) {
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.order_id;
+          })
+      .def_property_readonly(
+          "request_template",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.request_template;
           })
       .def_property_readonly(
           "routing_id",
@@ -2161,7 +2173,7 @@ void create_struct<client::Manager>(py::module_ &context) {
              roq::OrderType order_type,
              roq::TimeInForce time_in_force,
              roq::Mask<roq::ExecutionInstruction> const &execution_instructions,
-             std::string_view const &order_template,
+             std::string_view const &request_template,
              double quantity,
              double price,
              double stop_price,
@@ -2178,7 +2190,7 @@ void create_struct<client::Manager>(py::module_ &context) {
                 .order_type = order_type,
                 .time_in_force = time_in_force,
                 .execution_instructions = execution_instructions,
-                .order_template = order_template,
+                .request_template = request_template,
                 .quantity = quantity,
                 .price = price,
                 .stop_price = stop_price,
@@ -2196,7 +2208,7 @@ void create_struct<client::Manager>(py::module_ &context) {
           py::arg("order_type"),
           py::arg("time_in_force") = roq::TimeInForce::UNDEFINED,
           py::arg("execution_instructions"),  // = roq::Mask<roq::ExecutionInstruction>{},
-          py::arg("order_template") = "",
+          py::arg("request_template") = "",
           py::arg("quantity"),
           py::arg("price") = NaN,
           py::arg("stop_price") = NaN,
