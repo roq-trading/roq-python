@@ -1394,12 +1394,6 @@ void create_ref_struct<roq::OrderUpdate>(py::module_ &context) {
             return utils::to_int_flag(value.execution_instructions);
           })
       .def_property_readonly(
-          "order_template",
-          [](ref_type const &obj) {
-            auto &value = static_cast<const value_type &>(obj);
-            return value.order_template;
-          })
-      .def_property_readonly(
           "create_time_utc",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
