@@ -19,11 +19,8 @@ lib/
 external/
 external-prefix/
 
-# cpack
-_CPack_Packages/
-
-# debian
-*.deb
-
 # pip
 *.egg-info
+
+# setup.py
+dist/

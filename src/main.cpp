@@ -125,6 +125,20 @@ void create_struct<roq::MBPUpdate>(py::module_ &context) {
       .def("__repr__", [](value_type const &value) { return fmt::format("{}"sv, value); });
 }
 template <>
+void create_struct<roq::MBOUpdate>(py::module_ &context) {
+  using value_type = roq::MBOUpdate;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def_property_readonly("price", [](value_type const &value) { return value.price; })
+      .def_property_readonly("quantity", [](value_type const &value) { return value.quantity; })
+      .def_property_readonly("priority", [](value_type const &value) { return value.priority; })
+      .def_property_readonly("order_id", [](value_type const &value) { return value.order_id; })
+      .def_property_readonly("side", [](value_type const &value) { return value.side; })
+      .def_property_readonly("action", [](value_type const &value) { return value.action; })
+      .def_property_readonly("reason", [](value_type const &value) { return value.reason; })
+      .def("__repr__", [](value_type const &value) { return fmt::format("{}"sv, value); });
+}
+template <>
 void create_struct<roq::Measurement>(py::module_ &context) {
   using value_type = roq::Measurement;
   std::string name{nameof::nameof_short_type<value_type>()};
@@ -523,6 +537,89 @@ void create_ref_struct<roq::MarketByPriceUpdate>(py::module_ &context) {
             return value.exchange_sequence;
           })
       .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
+          })
+      .def_property_readonly(
+          "price_decimals",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.price_decimals;
+          })
+      .def_property_readonly(
+          "quantity_decimals",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.quantity_decimals;
+          })
+      .def_property_readonly(
+          "max_depth",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.max_depth;
+          })
+      .def_property_readonly(
+          "checksum",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.checksum;
+          })
+      .def("__repr__", [](ref_type const &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+template <>
+void create_ref_struct<roq::MarketByOrderUpdate>(py::module_ &context) {
+  using value_type = roq::MarketByOrderUpdate;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<ref_type>(context, name.c_str())
+      .def_property_readonly(
+          "exchange",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange;
+          })
+      .def_property_readonly(
+          "symbol",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.symbol;
+          })
+      .def_property_readonly(
+          "orders",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return utils::to_list(value.orders);
+          })
+      .def_property_readonly(
+          "update_type",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_type;
+          })
+      .def_property_readonly(
+          "exchange_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_time_utc;
+          })
+      .def_property_readonly(
+          "exchange_sequence",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_sequence;
+          })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
+          })
+      .def_property_readonly(
           "price_decimals",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
@@ -830,6 +927,18 @@ void create_ref_struct<roq::StatisticsUpdate>(py::module_ &context) {
             auto &value = static_cast<const value_type &>(obj);
             return value.exchange_time_utc;
           })
+      .def_property_readonly(
+          "exchange_sequence",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_sequence;
+          })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
+          })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
         return fmt::format("{}"sv, value);
@@ -935,6 +1044,12 @@ void create_ref_struct<roq::TopOfBook>(py::module_ &context) {
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.exchange_sequence;
+          })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
           })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
@@ -1846,7 +1961,7 @@ struct Bridge final : public roq::client::Handler {
   void operator()(Event<roq::MarketStatus> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::TopOfBook> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::MarketByPriceUpdate> const &event) override { dispatch(event.message_info, event.value); }
-  void operator()(Event<roq::MarketByOrderUpdate> const &) override {}
+  void operator()(Event<roq::MarketByOrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
@@ -1987,7 +2102,9 @@ struct EventLogReader final {
     void operator()(Event<roq::MarketByPriceUpdate> const &event) override {
       dispatch(event.message_info, event.value);
     }
-    void operator()(Event<roq::MarketByOrderUpdate> const &) override {}
+    void operator()(Event<roq::MarketByOrderUpdate> const &event) override {
+      dispatch(event.message_info, event.value);
+    }
     void operator()(Event<roq::TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
@@ -2067,7 +2184,9 @@ struct EventLogMultiplexer final {
     void operator()(Event<roq::MarketByPriceUpdate> const &event) override {
       dispatch(event.message_info, event.value);
     }
-    void operator()(Event<roq::MarketByOrderUpdate> const &) override {}
+    void operator()(Event<roq::MarketByOrderUpdate> const &event) override {
+      dispatch(event.message_info, event.value);
+    }
     void operator()(Event<roq::TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
@@ -2319,8 +2438,45 @@ struct MarketByPrice final {
     return utils::to_list(tmp);
   }
 
+  auto print() const {
+    std::string result;
+    std::vector<MBPUpdate> bids, asks;
+    (*market_by_price_).create_snapshot(bids, asks, [&result](auto &market_by_price_update) {
+      result = fmt::format("{}"sv, market_by_price_update);
+    });
+    return result;
+  }
+
  private:
   std::unique_ptr<roq::cache::MarketByPrice> market_by_price_;
+};
+struct MarketByOrder final {
+  MarketByOrder(std::string_view const &exchange, std::string_view const &symbol)
+      : market_by_order_{roq::client::MarketByOrderFactory::create(
+            roq::client::MarketByOrderFactory::Type::SIMPLE_2, {}, exchange, symbol)} {}
+
+  template <typename T>
+  void operator()(T const &value) {
+    (*market_by_order_)(value);
+  }
+
+  auto extract(size_t depth) const {
+    std::vector<Layer> tmp(depth);
+    (*market_by_order_).extract(tmp);
+    return utils::to_list(tmp);
+  }
+
+  auto print() const {
+    std::string result;
+    std::vector<MBOUpdate> orders;
+    (*market_by_order_).create_snapshot(orders, [&result](auto &market_by_order_update) {
+      result = fmt::format("{}"sv, market_by_order_update);
+    });
+    return result;
+  }
+
+ private:
+  std::unique_ptr<roq::cache::MarketByOrder> market_by_order_;
 };
 }  // namespace cache
 template <>
@@ -2334,7 +2490,22 @@ void create_struct<cache::MarketByPrice>(py::module_ &context) {
           [](value_type &value, utils::Ref<MarketByPriceUpdate> const &market_by_price_update) {
             value(market_by_price_update);
           })
-      .def("extract", [](value_type const &value, size_t depth) { return value.extract(depth); });
+      .def("extract", [](value_type const &value, size_t depth) { return value.extract(depth); })
+      .def("__repr__", [](value_type const &value) { return value.print(); });
+}
+template <>
+void create_struct<cache::MarketByOrder>(py::module_ &context) {
+  using value_type = cache::MarketByOrder;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def(py::init<std::string_view const &, std::string_view const &>(), py::arg("exchange") = "", py::arg("symbol"))
+      .def(
+          "apply",
+          [](value_type &value, utils::Ref<MarketByOrderUpdate> const &market_by_order_update) {
+            value(market_by_order_update);
+          })
+      .def("extract", [](value_type const &value, size_t depth) { return value.extract(depth); })
+      .def("__repr__", [](value_type const &value) { return value.print(); });
 }
 }  // namespace python
 }  // namespace roq
@@ -2378,6 +2549,7 @@ PYBIND11_MODULE(roq, m) {
   roq::python::create_struct<roq::Fill>(m);
   roq::python::create_struct<roq::Layer>(m);
   roq::python::create_struct<roq::MBPUpdate>(m);
+  roq::python::create_struct<roq::MBOUpdate>(m);
   roq::python::create_struct<roq::Measurement>(m);
   roq::python::create_struct<roq::Statistics>(m);
   roq::python::create_struct<roq::Trade>(m);
@@ -2410,6 +2582,7 @@ PYBIND11_MODULE(roq, m) {
   roq::python::create_ref_struct<roq::MarketStatus>(m);
   roq::python::create_ref_struct<roq::TopOfBook>(m);
   roq::python::create_ref_struct<roq::MarketByPriceUpdate>(m);
+  roq::python::create_ref_struct<roq::MarketByOrderUpdate>(m);
   roq::python::create_ref_struct<roq::TradeSummary>(m);
   roq::python::create_ref_struct<roq::StatisticsUpdate>(m);
 
@@ -2445,6 +2618,7 @@ PYBIND11_MODULE(roq, m) {
   auto cache = m.def_submodule("cache");
 
   roq::python::create_struct<roq::python::cache::MarketByPrice>(cache);
+  roq::python::create_struct<roq::python::cache::MarketByOrder>(cache);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
