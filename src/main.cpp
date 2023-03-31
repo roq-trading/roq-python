@@ -998,6 +998,30 @@ void create_ref_struct<roq::StreamStatus>(py::module_ &context) {
             auto &value = static_cast<const value_type &>(obj);
             return value.connection_status;
           })
+      .def_property_readonly(
+          "interface",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.interface;
+          })
+      .def_property_readonly(
+          "authority",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.authority;
+          })
+      .def_property_readonly(
+          "path",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.path;
+          })
+      .def_property_readonly(
+          "proxy",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.proxy;
+          })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
         return fmt::format("{}"sv, value);
