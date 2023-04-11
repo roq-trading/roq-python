@@ -1646,6 +1646,18 @@ void create_ref_struct<roq::OrderUpdate>(py::module_ &context) {
             auto &value = static_cast<const value_type &>(obj);
             return value.update_type;
           })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
+          })
+      .def_property_readonly(
+          "user",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.user;
+          })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
         return fmt::format("{}"sv, value);
@@ -1741,6 +1753,18 @@ void create_ref_struct<roq::TradeUpdate>(py::module_ &context) {
             auto &value = static_cast<const value_type &>(obj);
             return value.update_type;
           })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
+          })
+      .def_property_readonly(
+          "user",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.user;
+          })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
         return fmt::format("{}"sv, value);
@@ -1795,16 +1819,22 @@ void create_ref_struct<roq::PositionUpdate>(py::module_ &context) {
             return value.short_quantity;
           })
       .def_property_readonly(
-          "long_quantity_begin",
+          "update_type",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.long_quantity_begin;
+            return value.update_type;
           })
       .def_property_readonly(
-          "short_quantity_begin",
+          "exchange_time_utc",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.short_quantity_begin;
+            return value.exchange_time_utc;
+          })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
           })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
@@ -1852,6 +1882,24 @@ void create_ref_struct<roq::FundsUpdate>(py::module_ &context) {
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.external_account;
+          })
+      .def_property_readonly(
+          "update_type",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.update_type;
+          })
+      .def_property_readonly(
+          "exchange_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.exchange_time_utc;
+          })
+      .def_property_readonly(
+          "sending_time_utc",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.sending_time_utc;
           })
       .def("__repr__", [](ref_type const &obj) {
         auto &value = static_cast<const value_type &>(obj);
