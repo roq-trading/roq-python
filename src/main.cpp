@@ -2050,6 +2050,10 @@ struct Bridge final : public roq::client::Handler {
     // XXX TODO
   }
 
+  void operator()(Event<roq::PortfolioUpdate> const &) override {
+    // XXX TODO
+  }
+
  private:
   python::client::Handler &handler_;
 };
@@ -2200,6 +2204,10 @@ struct EventLogReader final {
       // XXX TODO
     }
 
+    void operator()(Event<roq::PortfolioUpdate> const &) override {
+      // XXX TODO
+    }
+
    private:
     Callback const &callback_;
   };
@@ -2279,6 +2287,10 @@ struct EventLogMultiplexer final {
     }
 
     void operator()(Event<roq::ParametersUpdate> const &) override {
+      // XXX TODO
+    }
+
+    void operator()(Event<roq::PortfolioUpdate> const &) override {
       // XXX TODO
     }
 
