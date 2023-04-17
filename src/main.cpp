@@ -2199,6 +2199,9 @@ struct EventLogReader final {
     void operator()(Event<roq::CustomMetricsUpdate> const &event) override {
       dispatch(event.message_info, event.value);
     }
+    void operator()(Event<roq::CustomMatrixUpdate> const &) override {
+      // XXX TODO
+    }
 
     void operator()(Event<roq::ParametersUpdate> const &) override {
       // XXX TODO
@@ -2284,6 +2287,10 @@ struct EventLogMultiplexer final {
 
     void operator()(Event<roq::CustomMetricsUpdate> const &event) override {
       dispatch(event.message_info, event.value);
+    }
+
+    void operator()(Event<roq::CustomMatrixUpdate> const &) override {
+      // XXX TODO
     }
 
     void operator()(Event<roq::ParametersUpdate> const &) override {
