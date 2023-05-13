@@ -21,7 +21,7 @@ requirements:
     - rsync                                  # [build_platform != target_platform]
   host:
     - python {{ python }}
-    - fmt
+    - fmt==9.1
     - pybind11
     - roq-client
     - abseil-cpp
