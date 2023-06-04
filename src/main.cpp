@@ -1557,6 +1557,12 @@ void create_ref_struct<roq::OrderUpdate>(py::module_ &context) {
             return value.external_order_id;
           })
       .def_property_readonly(
+          "client_order_id",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.client_order_id;
+          })
+      .def_property_readonly(
           "status",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
