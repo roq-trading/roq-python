@@ -2060,6 +2060,10 @@ struct Bridge final : public roq::client::Handler {
     // XXX TODO
   }
 
+  void operator()(Event<roq::RiskLimitsUpdate> const &) override {
+    // XXX TODO
+  }
+
  private:
   python::client::Handler &handler_;
 };
@@ -2202,6 +2206,9 @@ struct EventLogReader final {
     void operator()(Event<roq::PositionUpdate> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::FundsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
+    void operator()(Event<roq::RiskLimits> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::RiskLimitsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
     void operator()(Event<roq::CustomMetricsUpdate> const &event) override {
       dispatch(event.message_info, event.value);
     }
@@ -2304,6 +2311,13 @@ struct EventLogMultiplexer final {
     }
 
     void operator()(Event<roq::PortfolioUpdate> const &) override {
+      // XXX TODO
+    }
+
+    void operator()(Event<roq::RiskLimits> const &) override {
+      // XXX TODO
+    }
+    void operator()(Event<roq::RiskLimitsUpdate> const &) override {
       // XXX TODO
     }
 
