@@ -2093,7 +2093,8 @@ struct Manager final {
       for (auto &connection : connections_)
         connections.emplace_back(connection);
       auto &handler = py::cast<python::client::Handler &>(handler_);
-      roq::client::Trader(config_, std::span{connections}).dispatch<Bridge>(handler);
+      roq::client::Settings2 settings;  // XXX TODO proper
+      roq::client::Trader(settings, config_, std::span{connections}).dispatch<Bridge>(handler);
     } catch (py::error_already_set &) {
       /*
       log::warn("caught exception!"sv);
