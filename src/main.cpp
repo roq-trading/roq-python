@@ -84,6 +84,9 @@ void create_struct(py::module_ &context);
 // note! reference to an underlying object (user is therefore not allowed to keep handles)
 template <typename T>
 void create_ref_struct(py::module_ &context);
+// note! derived
+template <typename T, typename U>
+void create_struct_2(py::module_ &context);
 // helpers
 template <>
 void create_struct<roq::Fill>(py::module_ &context) {
@@ -2623,23 +2626,32 @@ void create_struct<cache::MarketByOrder>(py::module_ &context) {
 }
 // EXPERIMENT
 namespace fix {
+struct Encoder;
+struct Encodeable {
+  virtual ~Encodeable() = default;
+  virtual std::string encode(Encoder &, std::chrono::nanoseconds sending_time) const = 0;
+};
 struct Encoder final {
   Encoder(std::string_view const &sender_comp_id, std::string_view const &target_comp_id)
       : sender_comp_id_{sender_comp_id}, target_comp_id_{target_comp_id}, buffer_(4096) {}
 
   template <typename T>
-  std::string encode(T const &value, std::chrono::system_clock::time_point sending_time) {
+  std::string encode(T const &value, std::chrono::nanoseconds sending_time) {
     auto header = roq::fix::Header{
         .version = roq::fix::Version::FIX_44,
         .msg_type = T::MSG_TYPE,
         .sender_comp_id = sender_comp_id_,
         .target_comp_id = target_comp_id_,
         .msg_seq_num = ++msg_seq_num_,
-        .sending_time = sending_time.time_since_epoch(),
+        .sending_time = sending_time,
     };
     auto message = value.encode(header, buffer_);
     std::string result{reinterpret_cast<char const *>(std::data(message)), std::size(message)};
     return result;
+  }
+
+  std::string encode(Encodeable const &encodeable, std::chrono::system_clock::time_point sending_time) {
+    return encodeable.encode(*this, sending_time.time_since_epoch());
   }
 
  private:
@@ -2648,23 +2660,21 @@ struct Encoder final {
   std::vector<std::byte> buffer_;
   uint64_t msg_seq_num_ = {};
 };
-struct Logon final {
+struct Logon final : public Encodeable {
   explicit Logon(roq::fix::Message const &) {}
 
   Logon(std::string const &username, std::string const &password) : username_{username}, password_{password} {}
-
-  auto encode(
-      auto &buffer,
-      std::string_view const &sender_comp_id,
-      std::string_view const &target_comp_id,
-      uint64_t msg_seq_num,
-      std::chrono::system_clock::time_point sending_time) const {}
 
   operator roq::codec::fix::Logon() const {
     return {
         .username = username_,
         .password = password_,
     };
+  }
+
+ protected:
+  std::string encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<roq::codec::fix::Logon>(*this), sending_time);
   }
 
  private:
@@ -2677,14 +2687,29 @@ void create_struct<roq::python::fix::Encoder>(py::module_ &context) {
   using value_type = roq::python::fix::Encoder;
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type>(context, name.c_str())
-      .def(py::init<std::string_view, std::string_view>(), py::arg("sender_comp_id"), py::arg("target_comp_id"));
+      .def(py::init<std::string_view, std::string_view>(), py::arg("sender_comp_id"), py::arg("target_comp_id"))
+      .def(
+          "encode",
+          [](value_type &self,
+             roq::python::fix::Encodeable &encodeable,
+             std::chrono::system_clock::time_point sending_time) { return self.encode(encodeable, sending_time); },
+          py::arg("encodeable"),
+          py::arg("sending_time"));
 }
 template <>
-void create_struct<roq::python::fix::Logon>(py::module_ &context) {
-  using value_type = roq::python::fix::Logon;
+void create_struct<roq::python::fix::Encodeable>(py::module_ &context) {
+  using value_type = roq::python::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
-  py::class_<value_type>(context, name.c_str())
+  py::class_<value_type>(context, name.c_str());
+}
+template <>
+void create_struct_2<roq::python::fix::Logon, roq::python::fix::Encodeable>(py::module_ &context) {
+  using value_type = roq::python::fix::Logon;
+  using base_type = roq::python::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type, base_type>(context, name.c_str())
       .def(py::init<std::string, std::string>(), py::arg("username"), py::arg("password"))
+      /*
       .def(
           "encode",
           [](value_type const &value,
@@ -2694,6 +2719,7 @@ void create_struct<roq::python::fix::Logon>(py::module_ &context) {
           },
           py::arg("encoder"),
           py::arg("sending_time"))
+      */
       .def("__repr__", [](value_type const &value) {
         return fmt::format("{}"sv, static_cast<roq::codec::fix::Logon>(value));
       });
@@ -2815,8 +2841,9 @@ PYBIND11_MODULE(roq, m) {
 
   auto fix = m.def_submodule("fix");
 
+  roq::python::create_struct<roq::python::fix::Encodeable>(fix);
   roq::python::create_struct<roq::python::fix::Encoder>(fix);
-  roq::python::create_struct<roq::python::fix::Logon>(fix);
+  roq::python::create_struct_2<roq::python::fix::Logon, roq::python::fix::Encodeable>(fix);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
