@@ -24,12 +24,14 @@ requirements:
     - fmt
     - pybind11
     - roq-client
+    - roq-fix-codec
     - abseil-cpp
     - roq-oss-magic_enum
     - roq-oss-nameof
   run:
     - python
     - roq-client
+    - roq-fix-codec
 
 about:
   home: https://roq-trading.com
