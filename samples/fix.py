@@ -30,5 +30,5 @@ def callback(header: roq.fix.Header, logout: roq.fix.Logout):
 
 
 decoder = roq.fix.Decoder()
-decoder.dispatch(callback, message)
-#print("length={}".format(length))
+length = decoder.dispatch(callback, message)
+print("length={}".format(length))
