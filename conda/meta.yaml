@@ -24,6 +24,7 @@ requirements:
     - fmt
     - pybind11
     - roq-client
+    - roq-fix
     - roq-fix-codec
     - abseil-cpp
     - roq-oss-magic_enum

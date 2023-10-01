@@ -20,6 +20,7 @@ ext_modules = [
         cxx_std=20,
         libraries=[
             "roq-client",
+            "roq-fix",
             "roq-fix-codec",
             "fmt",
         ],

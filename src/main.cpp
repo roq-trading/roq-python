@@ -20,7 +20,10 @@
 
 #include "roq/client.hpp"
 
+#include "roq/fix/reader.hpp"
+
 #include "roq/codec/fix/logon.hpp"
+#include "roq/codec/fix/logout.hpp"
 
 #include "roq/logging.hpp"
 
@@ -2626,6 +2629,7 @@ void create_struct<cache::MarketByOrder>(py::module_ &context) {
 }
 // EXPERIMENT
 namespace fix {
+// - encode
 struct Encoder;
 struct Encodeable {
   virtual ~Encodeable() = default;
@@ -2661,7 +2665,9 @@ struct Encoder final {
   uint64_t msg_seq_num_ = {};
 };
 struct Logon final : public Encodeable {
-  explicit Logon(roq::fix::Message const &) {}
+  using value_type = roq::codec::fix::Logon;
+
+  explicit Logon(roq::codec::fix::Logon const &logon) : username_{logon.username}, password_{logon.password} {}
 
   Logon(std::string const &username, std::string const &password) : username_{username}, password_{password} {}
 
@@ -2680,6 +2686,109 @@ struct Logon final : public Encodeable {
  private:
   std::string const username_;
   std::string const password_;
+};
+struct Logout final : public Encodeable {
+  using value_type = roq::codec::fix::Logout;
+
+  explicit Logout(roq::codec::fix::Logout const &logout) : text_{logout.text} {}
+
+  Logout(std::string const &text) : text_{text} {}
+
+  operator roq::codec::fix::Logout() const {
+    return {
+        .text = text_,
+    };
+  }
+
+ protected:
+  std::string encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<roq::codec::fix::Logout>(*this), sending_time);
+  }
+
+ private:
+  std::string const text_;
+};
+// - decode
+struct Header final {
+  explicit Header(roq::fix::Header const &header)
+      : msg_type_{header.msg_type}, sender_comp_id_{header.sender_comp_id}, target_comp_id_{header.target_comp_id},
+        msg_seq_num_{header.msg_seq_num}, sending_time_{header.sending_time} {}
+
+  operator roq::fix::Header() const {
+    return {
+        .version = roq::fix::Version::FIX_44,
+        .msg_type = msg_type_,
+        .sender_comp_id = sender_comp_id_,
+        .target_comp_id = target_comp_id_,
+        .msg_seq_num = msg_seq_num_,
+        .sending_time = sending_time_,
+    };
+  }
+
+ private:
+  roq::fix::MsgType const msg_type_;
+  std::string const sender_comp_id_;
+  std::string const target_comp_id_;
+  uint64_t const msg_seq_num_;
+  std::chrono::nanoseconds const sending_time_;
+};
+struct Decoder final {
+  template <typename Callback>
+  struct Handler final {
+    explicit Handler(Callback const &callback) : callback_{callback} {}
+
+    template <typename T>
+    void dispatch(auto const &fix_message) {
+      Header header{fix_message.header};
+      T value{T::value_type::create(fix_message)};
+      auto arg0 = py::cast(utils::Ref<Header>{header});
+      auto arg1 = py::cast(utils::Ref<T>{value});
+      callback_(arg0, arg1);
+      if (arg0.ref_count() > 1 || arg1.ref_count() > 1)
+        throw std::runtime_error{"Objects must not be stored"s};
+    }
+
+   private:
+    Callback const &callback_;
+  };
+
+  Decoder() : buffer_(4096) {}
+
+  template <typename Callback>
+  size_t dispatch(Callback const &callback, std::string_view const &message) {
+    size_t result = {};
+    try {
+      Handler handler{callback};
+      std::span buffer{reinterpret_cast<std::byte const *>(std::data(message)), std::size(message)};
+      auto process = [&](auto &fix_message) {
+        switch (fix_message.header.msg_type) {
+          using enum roq::fix::MsgType;
+          case LOGON: {
+            handler.template dispatch<Logon>(fix_message);
+            break;
+          }
+          case LOGOUT: {
+            handler.template dispatch<Logout>(fix_message);
+            break;
+          }
+          default:
+            break;
+        }
+      };
+      auto debug = [&]([[maybe_unused]] auto &fix_message) {};
+      result = roq::fix::Reader<roq::fix::Version::FIX_44>::dispatch(buffer, process, debug);
+    } catch (py::error_already_set &) {  // XXX ???
+      /*
+      log::warn("caught exception!"sv);
+      return false;  // break
+      */
+      throw;
+    }
+    return result;
+  }
+
+ private:
+  std::vector<std::byte> buffer_;
 };
 }  // namespace fix
 template <>
@@ -2709,20 +2818,43 @@ void create_struct_2<roq::python::fix::Logon, roq::python::fix::Encodeable>(py::
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type, base_type>(context, name.c_str())
       .def(py::init<std::string, std::string>(), py::arg("username"), py::arg("password"))
-      /*
-      .def(
-          "encode",
-          [](value_type const &value,
-             roq::python::fix::Encoder &encoder,
-             std::chrono::system_clock::time_point sending_time) {
-            return encoder.encode(static_cast<roq::codec::fix::Logon>(value), sending_time);
-          },
-          py::arg("encoder"),
-          py::arg("sending_time"))
-      */
       .def("__repr__", [](value_type const &value) {
         return fmt::format("{}"sv, static_cast<roq::codec::fix::Logon>(value));
       });
+}
+template <>
+void create_struct_2<roq::python::fix::Logout, roq::python::fix::Encodeable>(py::module_ &context) {
+  using value_type = roq::python::fix::Logout;
+  using base_type = roq::python::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type, base_type>(context, name.c_str())
+      .def(py::init<std::string>(), py::arg("text"))
+      .def("__repr__", [](value_type const &value) {
+        return fmt::format("{}"sv, static_cast<roq::codec::fix::Logout>(value));
+      });
+}
+template <>
+void create_struct<roq::python::fix::Header>(py::module_ &context) {
+  using value_type = roq::python::fix::Header;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str()).def("__repr__", [](value_type const &value) {
+    return fmt::format("{}"sv, static_cast<roq::fix::Header>(value));
+  });
+}
+template <>
+void create_struct<roq::python::fix::Decoder>(py::module_ &context) {
+  using value_type = roq::python::fix::Decoder;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  py::class_<value_type>(context, name.c_str())
+      .def(py::init<>())
+      // note! the callback signature **MUST** be py::object so we can verify the reference count hasn't increased
+      .def(
+          "dispatch",
+          [](value_type &self, std::function<void(py::object, py::object)> &callback, std::string const &message) {
+            return self.dispatch(callback, message);
+          },
+          py::arg("callback"),
+          py::arg("message"));
 }
 }  // namespace python
 }  // namespace roq
@@ -2843,7 +2975,12 @@ PYBIND11_MODULE(roq, m) {
 
   roq::python::create_struct<roq::python::fix::Encodeable>(fix);
   roq::python::create_struct<roq::python::fix::Encoder>(fix);
+
   roq::python::create_struct_2<roq::python::fix::Logon, roq::python::fix::Encodeable>(fix);
+  roq::python::create_struct_2<roq::python::fix::Logout, roq::python::fix::Encodeable>(fix);
+
+  roq::python::create_struct<roq::python::fix::Header>(fix);
+  roq::python::create_struct<roq::python::fix::Decoder>(fix);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
