@@ -2669,14 +2669,19 @@ struct Logon final : public Encodeable {
   using value_type = roq::codec::fix::Logon;
 
   explicit Logon(roq::codec::fix::Logon const &logon)
-      : heart_bt_int_{logon.heart_bt_int}, username_{logon.username}, password_{logon.password} {}
+      : encrypt_method_{logon.encrypt_method}, heart_bt_int_{logon.heart_bt_int}, username_{logon.username},
+        password_{logon.password} {}
 
-  Logon(std::chrono::seconds heart_bt_int, std::string_view const &username, std::string_view const &password)
-      : heart_bt_int_{heart_bt_int}, username_{username}, password_{password} {}
+  Logon(
+      roq::fix::EncryptMethod encrypt_method,
+      std::chrono::seconds heart_bt_int,
+      std::string_view const &username,
+      std::string_view const &password)
+      : encrypt_method_{encrypt_method}, heart_bt_int_{heart_bt_int}, username_{username}, password_{password} {}
 
   operator roq::codec::fix::Logon() const {
     return {
-        .encrypt_method = roq::fix::EncryptMethod::NONE,
+        .encrypt_method = encrypt_method_,
         .heart_bt_int = static_cast<uint16_t>(heart_bt_int_.count()),
         .reset_seq_num_flag = {},
         .next_expected_msg_seq_num = {},
@@ -2691,7 +2696,8 @@ struct Logon final : public Encodeable {
   }
 
  private:
-  std::chrono::seconds heart_bt_int_;
+  roq::fix::EncryptMethod const encrypt_method_;
+  std::chrono::seconds const heart_bt_int_;
   std::string const username_;
   std::string const password_;
 };
@@ -2821,7 +2827,8 @@ void create_ref_struct_2<roq::python::fix::Logon, roq::python::fix::Encodeable>(
   std::string name{nameof::nameof_short_type<value_type>()};
   py::class_<value_type, base_type>(context, name.c_str())
       .def(
-          py::init<std::chrono::seconds, std::string_view, std::string_view>(),
+          py::init<roq::fix::EncryptMethod, std::chrono::seconds, std::string_view, std::string_view>(),
+          py::arg("encrypt_method") = roq::fix::EncryptMethod::NONE,
           py::arg("heart_bt_int"),
           py::arg("username"),
           py::arg("password") = std::string_view{})
@@ -2979,6 +2986,8 @@ PYBIND11_MODULE(roq, m) {
   // TEST
 
   auto fix = m.def_submodule("fix");
+
+  roq::python::utils::create_enum<roq::fix::EncryptMethod>(fix);
 
   roq::python::create_struct<roq::python::fix::Encodeable>(fix);
   roq::python::create_struct<roq::python::fix::Encoder>(fix);
