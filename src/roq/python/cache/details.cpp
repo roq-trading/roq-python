@@ -14,10 +14,10 @@ namespace roq {
 namespace python {
 
 template <>
-void utils::create_struct<cache::MarketByPrice>(pybind11::module_ &context) {
+void utils::create_struct<cache::MarketByPrice>(pybind11::module_ &module) {
   using value_type = cache::MarketByPrice;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(
           pybind11::init<std::string_view const &, std::string_view const &>(),
           pybind11::arg("exchange") = "",
@@ -32,10 +32,10 @@ void utils::create_struct<cache::MarketByPrice>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<cache::MarketByOrder>(pybind11::module_ &context) {
+void utils::create_struct<cache::MarketByOrder>(pybind11::module_ &module) {
   using value_type = cache::MarketByOrder;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(
           pybind11::init<std::string_view const &, std::string_view const &>(),
           pybind11::arg("exchange") = "",

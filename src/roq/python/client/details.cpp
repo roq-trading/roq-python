@@ -14,10 +14,10 @@ namespace roq {
 namespace python {
 
 template <>
-void utils::create_struct<roq::client::Settings>(pybind11::module_ &context) {
+void utils::create_struct<roq::client::Settings>(pybind11::module_ &module) {
   using value_type = roq::client::Settings;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(
           pybind11::init<OrderCancelPolicy, OrderManagement>(),
           pybind11::arg("order_cancel_policy") = OrderCancelPolicy::UNDEFINED,
@@ -28,10 +28,10 @@ void utils::create_struct<roq::client::Settings>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<client::Config>(pybind11::module_ &context) {
+void utils::create_struct<client::Config>(pybind11::module_ &module) {
   using value_type = client::Config;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(
           pybind11::init<roq::client::Settings, std::set<std::string>, std::map<std::string, std::set<std::string>>>(),
           pybind11::arg("settings") = roq::client::Settings(),
@@ -40,10 +40,10 @@ void utils::create_struct<client::Config>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<client::Manager>(pybind11::module_ &context) {
+void utils::create_struct<client::Manager>(pybind11::module_ &module) {
   using value_type = client::Manager;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(
           pybind11::init<pybind11::object, python::client::Config const &, std::vector<std::string> const &>(),
           pybind11::arg("handler"),
@@ -177,10 +177,10 @@ void utils::create_struct<client::Manager>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<client::EventLogReader>(pybind11::module_ &context) {
+void utils::create_struct<client::EventLogReader>(pybind11::module_ &module) {
   using value_type = client::EventLogReader;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(pybind11::init<std::string_view const &>(), pybind11::arg("path"))
       // note! the callback signature **MUST** be pybind11::object so we can verify the reference count hasn't increased
       .def(
@@ -192,10 +192,10 @@ void utils::create_struct<client::EventLogReader>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<client::EventLogMultiplexer>(pybind11::module_ &context) {
+void utils::create_struct<client::EventLogMultiplexer>(pybind11::module_ &module) {
   using value_type = client::EventLogMultiplexer;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def(pybind11::init<std::vector<std::string_view> const &>(), pybind11::arg("paths"))
       // note! the callback signature **MUST** be pybind11::object so we can verify the reference count hasn't increased
       .def(

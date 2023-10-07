@@ -12,10 +12,10 @@ namespace python {
 // helpers
 
 template <>
-void utils::create_struct<roq::Fill>(pybind11::module_ &context) {
+void utils::create_struct<roq::Fill>(pybind11::module_ &module) {
   using value_type = roq::Fill;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("external_trade_id", [](value_type const &value) { return value.external_trade_id; })
       .def_property_readonly("quantity", [](value_type const &value) { return value.quantity; })
       .def_property_readonly("price", [](value_type const &value) { return value.price; })
@@ -28,10 +28,10 @@ void utils::create_struct<roq::Fill>(pybind11::module_ &context) {
 
 // XXX it would be very convenient here to return tuple for unpack
 template <>
-void utils::create_struct<roq::Layer>(pybind11::module_ &context) {
+void utils::create_struct<roq::Layer>(pybind11::module_ &module) {
   using value_type = roq::Layer;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("bid_price", [](value_type const &value) { return value.bid_price; })
       .def_property_readonly("bid_quantity", [](value_type const &value) { return value.bid_quantity; })
       .def_property_readonly("ask_price", [](value_type const &value) { return value.ask_price; })
@@ -48,10 +48,10 @@ void utils::create_struct<roq::Layer>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<roq::MBPUpdate>(pybind11::module_ &context) {
+void utils::create_struct<roq::MBPUpdate>(pybind11::module_ &module) {
   using value_type = roq::MBPUpdate;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("price", [](value_type const &value) { return value.price; })
       .def_property_readonly("quantity", [](value_type const &value) { return value.quantity; })
       .def_property_readonly("implied_quantity", [](value_type const &value) { return value.implied_quantity; })
@@ -65,10 +65,10 @@ void utils::create_struct<roq::MBPUpdate>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<roq::MBOUpdate>(pybind11::module_ &context) {
+void utils::create_struct<roq::MBOUpdate>(pybind11::module_ &module) {
   using value_type = roq::MBOUpdate;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("price", [](value_type const &value) { return value.price; })
       .def_property_readonly("quantity", [](value_type const &value) { return value.quantity; })
       .def_property_readonly("priority", [](value_type const &value) { return value.priority; })
@@ -83,10 +83,10 @@ void utils::create_struct<roq::MBOUpdate>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<roq::Measurement>(pybind11::module_ &context) {
+void utils::create_struct<roq::Measurement>(pybind11::module_ &module) {
   using value_type = roq::Measurement;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("name", [](value_type const &value) { return value.name; })
       .def_property_readonly("value", [](value_type const &value) { return value.value; })
       .def("__repr__", [](value_type const &value) {
@@ -96,10 +96,10 @@ void utils::create_struct<roq::Measurement>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<roq::Statistics>(pybind11::module_ &context) {
+void utils::create_struct<roq::Statistics>(pybind11::module_ &module) {
   using value_type = roq::Statistics;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("type", [](value_type const &value) { return value.type; })
       .def_property_readonly("value", [](value_type const &value) { return value.value; })
       .def_property_readonly("begin_time_utc", [](value_type const &value) { return value.begin_time_utc; })
@@ -111,10 +111,10 @@ void utils::create_struct<roq::Statistics>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<roq::Trade>(pybind11::module_ &context) {
+void utils::create_struct<roq::Trade>(pybind11::module_ &module) {
   using value_type = roq::Trade;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str())
       .def_property_readonly("side", [](value_type const &value) { return value.side; })
       .def_property_readonly("price", [](value_type const &value) { return value.price; })
       .def_property_readonly("quantity", [](value_type const &value) { return value.quantity; })
@@ -126,10 +126,10 @@ void utils::create_struct<roq::Trade>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_struct<roq::UUID>(pybind11::module_ &context) {
+void utils::create_struct<roq::UUID>(pybind11::module_ &module) {
   using value_type = roq::UUID;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(context, name.c_str()).def("__repr__", [](value_type const &obj) {
+  pybind11::class_<value_type>(module, name.c_str()).def("__repr__", [](value_type const &obj) {
     using namespace std::literals;
     return fmt::format("{}"sv, obj);
   });
@@ -138,11 +138,11 @@ void utils::create_struct<roq::UUID>(pybind11::module_ &context) {
 // transport
 
 template <>
-void utils::create_ref_struct<roq::MessageInfo>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::MessageInfo>(pybind11::module_ &module) {
   using value_type = roq::MessageInfo;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "source",
           [](ref_type const &obj) {
@@ -225,11 +225,11 @@ void utils::create_ref_struct<roq::MessageInfo>(pybind11::module_ &context) {
 // messages
 
 template <>
-void utils::create_ref_struct<roq::Start>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::Start>(pybind11::module_ &module) {
   using value_type = roq::Start;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str()).def("__repr__", [](ref_type const &obj) {
+  pybind11::class_<ref_type>(module, name.c_str()).def("__repr__", [](ref_type const &obj) {
     using namespace std::literals;
     auto &value = static_cast<const value_type &>(obj);
     return fmt::format("{}"sv, value);
@@ -237,11 +237,11 @@ void utils::create_ref_struct<roq::Start>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::Stop>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::Stop>(pybind11::module_ &module) {
   using value_type = roq::Stop;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str()).def("__repr__", [](ref_type const &obj) {
+  pybind11::class_<ref_type>(module, name.c_str()).def("__repr__", [](ref_type const &obj) {
     using namespace std::literals;
     auto &value = static_cast<const value_type &>(obj);
     return fmt::format("{}"sv, value);
@@ -249,11 +249,11 @@ void utils::create_ref_struct<roq::Stop>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::Timer>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::Timer>(pybind11::module_ &module) {
   using value_type = roq::Timer;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "now",
           [](ref_type const &obj) {
@@ -268,11 +268,11 @@ void utils::create_ref_struct<roq::Timer>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::Connected>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::Connected>(pybind11::module_ &module) {
   using value_type = roq::Connected;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str()).def("__repr__", [](ref_type const &obj) {
+  pybind11::class_<ref_type>(module, name.c_str()).def("__repr__", [](ref_type const &obj) {
     using namespace std::literals;
     auto &value = static_cast<const value_type &>(obj);
     return fmt::format("{}"sv, value);
@@ -280,11 +280,11 @@ void utils::create_ref_struct<roq::Connected>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::Disconnected>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::Disconnected>(pybind11::module_ &module) {
   using value_type = roq::Disconnected;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str()).def("__repr__", [](ref_type const &obj) {
+  pybind11::class_<ref_type>(module, name.c_str()).def("__repr__", [](ref_type const &obj) {
     using namespace std::literals;
     auto &value = static_cast<const value_type &>(obj);
     return fmt::format("{}"sv, value);
@@ -292,11 +292,11 @@ void utils::create_ref_struct<roq::Disconnected>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::DownloadBegin>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::DownloadBegin>(pybind11::module_ &module) {
   using value_type = roq::DownloadBegin;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -311,11 +311,11 @@ void utils::create_ref_struct<roq::DownloadBegin>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::DownloadEnd>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::DownloadEnd>(pybind11::module_ &module) {
   using value_type = roq::DownloadEnd;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -336,11 +336,11 @@ void utils::create_ref_struct<roq::DownloadEnd>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::ExternalLatency>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::ExternalLatency>(pybind11::module_ &module) {
   using value_type = roq::ExternalLatency;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -367,11 +367,11 @@ void utils::create_ref_struct<roq::ExternalLatency>(pybind11::module_ &context) 
 }
 
 template <>
-void utils::create_ref_struct<roq::GatewaySettings>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::GatewaySettings>(pybind11::module_ &module) {
   using value_type = roq::GatewaySettings;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "supports",
           [](ref_type const &obj) {
@@ -434,11 +434,11 @@ void utils::create_ref_struct<roq::GatewaySettings>(pybind11::module_ &context) 
 }
 
 template <>
-void utils::create_ref_struct<roq::GatewayStatus>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::GatewayStatus>(pybind11::module_ &module) {
   using value_type = roq::GatewayStatus;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -471,11 +471,11 @@ void utils::create_ref_struct<roq::GatewayStatus>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::MarketByPriceUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::MarketByPriceUpdate>(pybind11::module_ &module) {
   using value_type = roq::MarketByPriceUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "exchange",
           [](ref_type const &obj) {
@@ -556,11 +556,11 @@ void utils::create_ref_struct<roq::MarketByPriceUpdate>(pybind11::module_ &conte
 }
 
 template <>
-void utils::create_ref_struct<roq::MarketByOrderUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::MarketByOrderUpdate>(pybind11::module_ &module) {
   using value_type = roq::MarketByOrderUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "exchange",
           [](ref_type const &obj) {
@@ -635,11 +635,11 @@ void utils::create_ref_struct<roq::MarketByOrderUpdate>(pybind11::module_ &conte
 }
 
 template <>
-void utils::create_ref_struct<roq::MarketStatus>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::MarketStatus>(pybind11::module_ &module) {
   using value_type = roq::MarketStatus;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -672,11 +672,11 @@ void utils::create_ref_struct<roq::MarketStatus>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::RateLimitTrigger>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::RateLimitTrigger>(pybind11::module_ &module) {
   using value_type = roq::RateLimitTrigger;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "name",
           [](ref_type const &obj) {
@@ -727,11 +727,11 @@ void utils::create_ref_struct<roq::RateLimitTrigger>(pybind11::module_ &context)
 }
 
 template <>
-void utils::create_ref_struct<roq::ReferenceData>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::ReferenceData>(pybind11::module_ &module) {
   using value_type = roq::ReferenceData;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "exchange",
           [](ref_type const &obj) {
@@ -878,11 +878,11 @@ void utils::create_ref_struct<roq::ReferenceData>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::StatisticsUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::StatisticsUpdate>(pybind11::module_ &module) {
   using value_type = roq::StatisticsUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -939,11 +939,11 @@ void utils::create_ref_struct<roq::StatisticsUpdate>(pybind11::module_ &context)
 }
 
 template <>
-void utils::create_ref_struct<roq::StreamStatus>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::StreamStatus>(pybind11::module_ &module) {
   using value_type = roq::StreamStatus;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1024,11 +1024,11 @@ void utils::create_ref_struct<roq::StreamStatus>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::TopOfBook>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::TopOfBook>(pybind11::module_ &module) {
   using value_type = roq::TopOfBook;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "exchange",
           [](ref_type const &obj) {
@@ -1079,11 +1079,11 @@ void utils::create_ref_struct<roq::TopOfBook>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::TradeSummary>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::TradeSummary>(pybind11::module_ &module) {
   using value_type = roq::TradeSummary;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1124,11 +1124,11 @@ void utils::create_ref_struct<roq::TradeSummary>(pybind11::module_ &context) {
 // ...
 
 template <>
-void utils::create_ref_struct<roq::CreateOrder>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::CreateOrder>(pybind11::module_ &module) {
   using value_type = roq::CreateOrder;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -1227,11 +1227,11 @@ void utils::create_ref_struct<roq::CreateOrder>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::ModifyOrder>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::ModifyOrder>(pybind11::module_ &module) {
   using value_type = roq::ModifyOrder;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -1288,11 +1288,11 @@ void utils::create_ref_struct<roq::ModifyOrder>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::CancelOrder>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::CancelOrder>(pybind11::module_ &module) {
   using value_type = roq::CancelOrder;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -1337,11 +1337,11 @@ void utils::create_ref_struct<roq::CancelOrder>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::CancelAllOrders>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::CancelAllOrders>(pybind11::module_ &module) {
   using value_type = roq::CancelAllOrders;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "account",
           [](ref_type const &obj) {
@@ -1358,11 +1358,11 @@ void utils::create_ref_struct<roq::CancelAllOrders>(pybind11::module_ &context) 
 // ...
 
 template <>
-void utils::create_ref_struct<roq::OrderAck>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::OrderAck>(pybind11::module_ &module) {
   using value_type = roq::OrderAck;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1473,11 +1473,11 @@ void utils::create_ref_struct<roq::OrderAck>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::OrderUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::OrderUpdate>(pybind11::module_ &module) {
   using value_type = roq::OrderUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1684,11 +1684,11 @@ void utils::create_ref_struct<roq::OrderUpdate>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::TradeUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::TradeUpdate>(pybind11::module_ &module) {
   using value_type = roq::TradeUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1793,11 +1793,11 @@ void utils::create_ref_struct<roq::TradeUpdate>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::PositionUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::PositionUpdate>(pybind11::module_ &module) {
   using value_type = roq::PositionUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1866,11 +1866,11 @@ void utils::create_ref_struct<roq::PositionUpdate>(pybind11::module_ &context) {
 }
 
 template <>
-void utils::create_ref_struct<roq::FundsUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::FundsUpdate>(pybind11::module_ &module) {
   using value_type = roq::FundsUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "stream_id",
           [](ref_type const &obj) {
@@ -1935,11 +1935,11 @@ void utils::create_ref_struct<roq::FundsUpdate>(pybind11::module_ &context) {
 //
 
 template <>
-void utils::create_ref_struct<roq::CustomMetricsUpdate>(pybind11::module_ &context) {
+void utils::create_ref_struct<roq::CustomMetricsUpdate>(pybind11::module_ &module) {
   using value_type = roq::CustomMetricsUpdate;
   using ref_type = utils::Ref<value_type>;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<ref_type>(context, name.c_str())
+  pybind11::class_<ref_type>(module, name.c_str())
       .def_property_readonly(
           "user",
           [](ref_type const &obj) {
