@@ -21,17 +21,24 @@ if sys.platform == "darwin":
 ext_modules = [
     Pybind11Extension(
         "roq",
-        sorted(glob("src/**/*.cpp", recursive=True)),
-        define_macros=[("VERSION_INFO", __version__)],
+        sorted(
+            glob(
+                "src/**/*.cpp",
+                recursive=True,
+            )
+        ),
+        define_macros=[
+            ("VERSION_INFO", __version__),
+        ],
         cxx_std=20,
         include_dirs=[
             "src/",
         ],
         libraries=[
+            "fmt",
             "roq-client",
             "roq-fix",
             "roq-fix-codec",
-            "fmt",
         ],
         extra_compile_args=extra_compile_args,
     ),
@@ -46,8 +53,12 @@ setup(
     description="Roq Python Tools",
     long_description="",
     ext_modules=ext_modules,
-    extras_require={"test": "pytest"},
-    cmdclass={"build_ext": build_ext},
+    extras_require={
+        "test": "pytest",
+    },
+    cmdclass={
+        "build_ext": build_ext,
+    },
     zip_safe=False,
     python_requires=">=3.10",
 )
