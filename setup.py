@@ -4,8 +4,8 @@ import sys
 from glob import glob
 
 from pybind11 import get_cmake_dir
-from pybind11.setup_helpers import Pybind11Extension, build_ext
-from pybind11.setup_helpers import ParallelCompile
+
+from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, build_ext
 
 from setuptools import setup
 
@@ -49,5 +49,5 @@ setup(
     extras_require={"test": "pytest"},
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    python_requires=">=3.8",
+    python_requires=">=3.10",
 )

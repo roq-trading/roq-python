@@ -10,7 +10,9 @@
 
 #include "roq/python/utils.hpp"
 
+#include "roq/python/fix/decoder.hpp"
 #include "roq/python/fix/details.hpp"
+#include "roq/python/fix/header.hpp"
 
 using namespace std::literals;
 

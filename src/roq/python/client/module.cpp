@@ -1,0 +1,32 @@
+/* Copyright (c) 2017-2023, Hans Erik Thrane */
+
+#define PYBIND11_DETAILED_ERROR_MESSAGES
+
+#include "roq/python/client/module.hpp"
+
+#include "roq/python/client/details.hpp"
+
+using namespace std::literals;
+
+namespace roq {
+namespace python {
+namespace client {
+
+void Module::create(pybind11::module_ &module) {
+  pybind11::class_<roq::python::client::Handler, roq::python::client::PyHandler>(module, "Handler")
+      .def(pybind11::init<>())
+      .def("callback", &roq::python::client::Handler::callback);
+
+  utils::create_struct<roq::client::Settings>(module);
+  utils::create_struct<roq::python::client::Config>(module);
+  utils::create_struct<roq::python::client::Manager>(module);
+
+  module.def("set_flags", &roq::python::client::set_flags, "WORKAROUND", pybind11::arg("flags"));
+
+  utils::create_struct<roq::python::client::EventLogReader>(module);
+  utils::create_struct<roq::python::client::EventLogMultiplexer>(module);
+}
+
+}  // namespace client
+}  // namespace python
+}  // namespace roq

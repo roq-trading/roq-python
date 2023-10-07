@@ -2,52 +2,26 @@
 
 #pragma once
 
-#include <pybind11/pybind11.h>
+#include "roq/codec/fix/business_message_reject.hpp"
+#include "roq/codec/fix/heartbeat.hpp"
+#include "roq/codec/fix/logon.hpp"
+#include "roq/codec/fix/logout.hpp"
+#include "roq/codec/fix/reject.hpp"
+#include "roq/codec/fix/resend_request.hpp"
+#include "roq/codec/fix/security_list.hpp"
+#include "roq/codec/fix/security_list_request.hpp"
+#include "roq/codec/fix/test_request.hpp"
+#include "roq/codec/fix/trading_session_status.hpp"
+#include "roq/codec/fix/trading_session_status_request.hpp"
+#include "roq/codec/fix/user_request.hpp"
+#include "roq/codec/fix/user_response.hpp"
 
-#include "roq/fix/reader.hpp"
-
-#include "roq/codec/fix/decoder.hpp"
-#include "roq/codec/fix/encoder.hpp"
+#include "roq/python/fix/encodeable.hpp"
+#include "roq/python/fix/encoder.hpp"
 
 namespace roq {
 namespace python {
 namespace fix {
-
-struct Encoder;
-
-struct Encodeable {
-  virtual ~Encodeable() = default;
-  virtual std::span<std::byte const> encode(Encoder &, std::chrono::nanoseconds sending_time) const = 0;
-};
-
-struct Encoder final {
-  Encoder(std::string_view const &sender_comp_id, std::string_view const &target_comp_id)
-      : encoder_{roq::codec::fix::Encoder::create()}, sender_comp_id_{sender_comp_id}, target_comp_id_{target_comp_id} {
-  }
-
-  template <typename T>
-  std::span<std::byte const> encode(T const &value, std::chrono::nanoseconds sending_time) {
-    auto header = roq::fix::Header{
-        .version = roq::fix::Version::FIX_44,
-        .msg_type = T::MSG_TYPE,
-        .sender_comp_id = sender_comp_id_,
-        .target_comp_id = target_comp_id_,
-        .msg_seq_num = ++msg_seq_num_,
-        .sending_time = sending_time,
-    };
-    return (*encoder_).encode(header, value);
-  }
-
-  std::span<std::byte const> encode(Encodeable const &encodeable, std::chrono::system_clock::time_point sending_time) {
-    return encodeable.encode(*this, sending_time.time_since_epoch());
-  }
-
- private:
-  std::unique_ptr<roq::codec::fix::Encoder> encoder_;
-  std::string const sender_comp_id_;
-  std::string const target_comp_id_;
-  uint64_t msg_seq_num_ = {};
-};
 
 struct Logon final : public Encodeable {
   using value_type = roq::codec::fix::Logon;
@@ -460,6 +434,20 @@ struct SecurityListRequest final : public Encodeable {
 struct SecListGrp final {
   using value_type = roq::codec::fix::SecListGrp;
 
+  explicit SecListGrp(value_type const &value)
+      : symbol{value.symbol}, contract_multiplier{value.contract_multiplier.value},
+        security_exchange{value.security_exchange}, min_trade_vol{value.min_trade_vol.value},
+        trading_session_id{value.trading_session_id} {}
+
+  SecListGrp(
+      std::string_view const &symbol,
+      double contract_multiplier,
+      std::string_view const &security_exchange,
+      double min_trade_vol,
+      std::string_view const &trading_session_id)
+      : symbol{symbol}, contract_multiplier{contract_multiplier}, security_exchange{security_exchange},
+        min_trade_vol{min_trade_vol}, trading_session_id{trading_session_id} {}
+
   operator value_type() const {
     return {
         .symbol = symbol,
@@ -511,42 +499,25 @@ struct SecurityList final : public Encodeable {
   }
 
   template <typename R>
-  static R create(auto const &no_related_sym) {
+  static R create(auto const &value) {
     using result_type = std::remove_cvref<R>::type;
     result_type result;
-    auto convert = []<typename U>(U const &value) -> double {
-      if constexpr (std::is_same<U, roq::utils::Number>::value) {
-        return value.value;
-      } else {
-        return value;
-      }
-    };
-    for (auto &item : no_related_sym) {
-      auto sec_list_grp = SecListGrp{
-          .symbol = std::string{item.symbol},
-          .contract_multiplier = convert(item.contract_multiplier),
-          .security_exchange = std::string{item.security_exchange},
-          .min_trade_vol = convert(item.min_trade_vol),
-          .trading_session_id = std::string{item.trading_session_id},
-      };
-      result.emplace_back(std::move(sec_list_grp));
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      value_type item_2{item};
+      result.emplace_back(std::move(item_2));
     }
     return result;
   }
 
   template <typename R>
-  static R create_2(auto const &no_related_sym) {
+  static R create_2(auto const &value) {
     using result_type = std::remove_cvref<R>::type;
     result_type result;
-    for (auto &item : no_related_sym) {
-      auto sec_list_grp = roq::codec::fix::SecListGrp{
-          .symbol = item.symbol,
-          .contract_multiplier = {item.contract_multiplier, Decimals{}},
-          .security_exchange = item.security_exchange,
-          .min_trade_vol = {item.min_trade_vol, Decimals{}},
-          .trading_session_id = item.trading_session_id,
-      };
-      result.emplace_back(std::move(sec_list_grp));
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      auto item_2 = static_cast<value_type>(item);
+      result.emplace_back(std::move(item_2));
     }
     return result;
   }
@@ -557,142 +528,6 @@ struct SecurityList final : public Encodeable {
   roq::fix::SecurityRequestResult const security_request_result_;
   std::vector<SecListGrp> const no_related_sym_;
   std::vector<roq::codec::fix::SecListGrp> const no_related_sym_2_;
-};
-
-struct Header final {
-  using value_type = roq::fix::Header;
-
-  explicit Header(value_type const &header)
-      : msg_type_{header.msg_type}, sender_comp_id_{header.sender_comp_id}, target_comp_id_{header.target_comp_id},
-        msg_seq_num_{header.msg_seq_num}, sending_time_{header.sending_time} {}
-
-  operator value_type() const {
-    return {
-        .version = roq::fix::Version::FIX_44,
-        .msg_type = msg_type_,
-        .sender_comp_id = sender_comp_id_,
-        .target_comp_id = target_comp_id_,
-        .msg_seq_num = msg_seq_num_,
-        .sending_time = sending_time_,
-    };
-  }
-
- private:
-  roq::fix::MsgType const msg_type_;
-  std::string const sender_comp_id_;
-  std::string const target_comp_id_;
-  uint64_t const msg_seq_num_;
-  std::chrono::nanoseconds const sending_time_;
-};
-
-struct Decoder final {
-  template <typename Callback>
-  struct Handler final : public roq::codec::fix::Decoder::Handler {
-    explicit Handler(Callback const &callback) : callback_{callback} {}
-
-    template <typename T>
-    void dispatch(auto &header, auto &value) {
-      Header header_2{header};
-      T value_2{value};
-      auto arg0 = pybind11::cast(header_2);
-      auto arg1 = pybind11::cast(value_2);
-      callback_(arg0, arg1);
-    }
-
-    void operator()(roq::fix::Header const &header, roq::codec::fix::Logon const &value) override {
-      dispatch<Logon>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::Logout const &value) override {
-      dispatch<Logout>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::TestRequest const &value) override {
-      dispatch<TestRequest>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::Heartbeat const &value) override {
-      dispatch<Heartbeat>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::ResendRequest const &value) override {
-      dispatch<ResendRequest>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::Reject const &value) override {
-      dispatch<Reject>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::BusinessMessageReject const &value) override {
-      dispatch<BusinessMessageReject>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::UserRequest const &value) override {
-      dispatch<UserRequest>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::UserResponse const &value) override {
-      dispatch<UserResponse>(header, value);
-    }
-    void operator()(
-        roq::fix::Header const &header, roq::codec::fix::TradingSessionStatusRequest const &value) override {
-      dispatch<TradingSessionStatusRequest>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::TradingSessionStatus const &value) override {
-      dispatch<TradingSessionStatus>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityListRequest const &value) override {
-      dispatch<SecurityListRequest>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityList const &value) override {
-      dispatch<SecurityList>(header, value);
-    }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityDefinitionRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityDefinition const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatusRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatus const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequestReject const &value) override {}
-    void operator()(
-        roq::fix::Header const &header, roq::codec::fix::MarketDataSnapshotFullRefresh const &value) override {}
-    void operator()(
-        roq::fix::Header const &header, roq::codec::fix::MarketDataIncrementalRefresh const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderStatusRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderMassStatusRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::NewOrderSingle const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderCancelRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderCancelReplaceRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderMassCancelRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderCancelReject const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::ExecutionReport const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::TradeCaptureReportRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::TradeCaptureReport const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::RequestForPositions const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::RequestForPositionsAck const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::PositionReport const &value) override {}
-
-   private:
-    Callback const &callback_;
-  };
-
-  Decoder() : decoder_{roq::codec::fix::Decoder::create()} {}
-
-  template <typename Callback>
-  size_t dispatch(Callback const &callback, std::string_view const &message) {
-    size_t result = {};
-    try {
-      Handler handler{callback};
-      std::span buffer{reinterpret_cast<std::byte const *>(std::data(message)), std::size(message)};
-      result = (*decoder_)(handler, buffer);
-    } catch (pybind11::error_already_set &) {
-      /*
-      log::warn("caught exception!"sv);
-      return false;  // break
-      */
-      throw;
-    } catch (...) {
-      using namespace std::literals;
-      fmt::print(stderr, "HERE\n"sv);
-    }
-    return result;
-  }
-
-  // XXX HANS tuple
-
- private:
-  std::unique_ptr<roq::codec::fix::Decoder> decoder_;
 };
 
 }  // namespace fix
