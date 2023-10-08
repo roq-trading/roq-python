@@ -39,6 +39,7 @@ ext_modules = [
             "roq-client",
             "roq-fix",
             "roq-fix-codec",
+            "roq-sbe-codec",
         ],
         extra_compile_args=extra_compile_args,
     ),

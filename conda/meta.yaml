@@ -20,19 +20,21 @@ requirements:
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
     - rsync                                  # [build_platform != target_platform]
   host:
-    - python {{ python }}
+    - abseil-cpp
     - fmt
     - pybind11
+    - python {{ python }}
     - roq-client
     - roq-fix
     - roq-fix-codec
-    - abseil-cpp
     - roq-oss-magic_enum
     - roq-oss-nameof
+    - roq-sbe-codec
   run:
     - python
     - roq-client
     - roq-fix-codec
+    - roq-sbe-codec
 
 about:
   home: https://roq-trading.com

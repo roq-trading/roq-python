@@ -14,6 +14,7 @@
 #include "roq/python/cache/module.hpp"
 #include "roq/python/client/module.hpp"
 #include "roq/python/fix/module.hpp"
+#include "roq/python/sbe/module.hpp"
 
 using namespace std::literals;
 
@@ -118,6 +119,9 @@ void Module::create(pybind11::module_ &module) {
 
   auto fix = module.def_submodule("fix");
   roq::python::fix::Module::create(fix);
+
+  auto sbe = module.def_submodule("sbe");
+  roq::python::sbe::Module::create(sbe);
 }
 
 }  // namespace python
