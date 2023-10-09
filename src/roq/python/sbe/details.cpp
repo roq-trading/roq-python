@@ -12,6 +12,8 @@
 
 #include "roq/api.hpp"
 
+#include "roq/python/sbe/decoder.hpp"
+
 using namespace std::literals;
 
 namespace roq {
@@ -33,6 +35,22 @@ void utils::create_struct<roq::python::sbe::Encoder>(pybind11::module_ &module) 
             return pybind11::bytes{result};
           },
           pybind11::arg("reference_data"));
+}
+
+template <>
+void utils::create_struct<roq::python::sbe::Decoder>(pybind11::module_ &module) {
+  using value_type = roq::python::sbe::Decoder;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type>(module, name.c_str())
+      .def(pybind11::init<>())
+      // note! the callback signature **MUST** be pybind11::object so we can verify the reference count hasn't increased
+      .def(
+          "dispatch",
+          [](value_type &self,
+             std::function<void(pybind11::object, pybind11::object)> &callback,
+             pybind11::bytes message) { return self.dispatch(callback, message); },
+          pybind11::arg("callback"),
+          pybind11::arg("message"));
 }
 
 }  // namespace python
