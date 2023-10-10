@@ -9,10 +9,11 @@
 
 #include "roq/codec/fix/encoder.hpp"
 
-#include "roq/python/fix/encodeable.hpp"
+#include "roq/python/codec/fix/encodeable.hpp"
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace fix {
 
 struct Encoder final {
@@ -45,5 +46,6 @@ struct Encoder final {
 };
 
 }  // namespace fix
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

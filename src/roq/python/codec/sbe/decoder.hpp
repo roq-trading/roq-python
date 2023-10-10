@@ -6,10 +6,11 @@
 
 #include "roq/codec/sbe/decoder.hpp"
 
-#include "roq/python/sbe/details.hpp"
+#include "roq/python/codec/sbe/details.hpp"
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace sbe {
 
 struct Decoder final {
@@ -73,5 +74,6 @@ struct Decoder final {
 };
 
 }  // namespace sbe
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

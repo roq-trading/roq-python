@@ -13,8 +13,8 @@
 
 #include "roq/python/cache/module.hpp"
 #include "roq/python/client/module.hpp"
-#include "roq/python/fix/module.hpp"
-#include "roq/python/sbe/module.hpp"
+#include "roq/python/codec/module.hpp"
+#include "roq/python/io/module.hpp"
 
 using namespace std::literals;
 
@@ -111,17 +111,14 @@ void Module::create(pybind11::module_ &module) {
 
   // sub-modules
 
-  auto client = module.def_submodule("client");
-  roq::python::client::Module::create(client);
-
   auto cache = module.def_submodule("cache");
   roq::python::cache::Module::create(cache);
 
-  auto fix = module.def_submodule("fix");
-  roq::python::fix::Module::create(fix);
+  auto codec = module.def_submodule("codec");
+  roq::python::codec::Module::create(codec);
 
-  auto sbe = module.def_submodule("sbe");
-  roq::python::sbe::Module::create(sbe);
+  auto client = module.def_submodule("client");
+  roq::python::client::Module::create(client);
 }
 
 }  // namespace python

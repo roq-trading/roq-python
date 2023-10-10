@@ -2,7 +2,7 @@
 
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 
-#include "roq/python/fix/details.hpp"
+#include "roq/python/codec/fix/details.hpp"
 
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
@@ -10,7 +10,7 @@
 
 #include "roq/python/utils.hpp"
 
-#include "roq/python/fix/decoder.hpp"
+#include "roq/python/codec/fix/decoder.hpp"
 
 using namespace std::literals;
 
@@ -18,8 +18,8 @@ namespace roq {
 namespace python {
 
 template <>
-void utils::create_struct<roq::python::fix::SecListGrp>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::SecListGrp;
+void utils::create_struct<roq::python::codec::fix::SecListGrp>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::SecListGrp;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(
@@ -35,8 +35,8 @@ void utils::create_struct<roq::python::fix::SecListGrp>(pybind11::module_ &modul
 }
 
 template <>
-void utils::create_struct<roq::python::fix::Encoder>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Encoder;
+void utils::create_struct<roq::python::codec::fix::Encoder>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Encoder;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(
@@ -46,7 +46,7 @@ void utils::create_struct<roq::python::fix::Encoder>(pybind11::module_ &module) 
       .def(
           "encode",
           [](value_type &self,
-             roq::python::fix::Encodeable &encodeable,
+             roq::python::codec::fix::Encodeable &encodeable,
              std::chrono::system_clock::time_point sending_time) {
             auto message = self.encode(encodeable, sending_time);
             std::string_view result{reinterpret_cast<char const *>(std::data(message)), std::size(message)};
@@ -57,16 +57,17 @@ void utils::create_struct<roq::python::fix::Encoder>(pybind11::module_ &module) 
 }
 
 template <>
-void utils::create_struct<roq::python::fix::Encodeable>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Encodeable;
+void utils::create_struct<roq::python::codec::fix::Encodeable>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str());
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::Logon, roq::python::fix::Encodeable>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Logon;
-  using base_type = roq::python::fix::Encodeable;
+void utils::create_ref_struct_2<roq::python::codec::fix::Logon, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Logon;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -84,9 +85,10 @@ void utils::create_ref_struct_2<roq::python::fix::Logon, roq::python::fix::Encod
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::Logout, roq::python::fix::Encodeable>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Logout;
-  using base_type = roq::python::fix::Encodeable;
+void utils::create_ref_struct_2<roq::python::codec::fix::Logout, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Logout;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(pybind11::init<std::string_view>(), pybind11::arg("text") = std::string_view{})
@@ -96,10 +98,10 @@ void utils::create_ref_struct_2<roq::python::fix::Logout, roq::python::fix::Enco
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::TestRequest, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::TestRequest, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::TestRequest;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::TestRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(pybind11::init<std::string_view>(), pybind11::arg("test_req_id") = std::string_view{})
@@ -109,9 +111,10 @@ void utils::create_ref_struct_2<roq::python::fix::TestRequest, roq::python::fix:
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::Heartbeat, roq::python::fix::Encodeable>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Heartbeat;
-  using base_type = roq::python::fix::Encodeable;
+void utils::create_ref_struct_2<roq::python::codec::fix::Heartbeat, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Heartbeat;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(pybind11::init<std::string_view>(), pybind11::arg("test_req_id") = std::string_view{})
@@ -121,10 +124,10 @@ void utils::create_ref_struct_2<roq::python::fix::Heartbeat, roq::python::fix::E
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::ResendRequest, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::ResendRequest, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::ResendRequest;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::ResendRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -137,9 +140,10 @@ void utils::create_ref_struct_2<roq::python::fix::ResendRequest, roq::python::fi
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::Reject, roq::python::fix::Encodeable>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Reject;
-  using base_type = roq::python::fix::Encodeable;
+void utils::create_ref_struct_2<roq::python::codec::fix::Reject, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Reject;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -155,10 +159,10 @@ void utils::create_ref_struct_2<roq::python::fix::Reject, roq::python::fix::Enco
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::BusinessMessageReject, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::BusinessMessageReject, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::BusinessMessageReject;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::BusinessMessageReject;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -175,10 +179,10 @@ void utils::create_ref_struct_2<roq::python::fix::BusinessMessageReject, roq::py
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::UserRequest, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::UserRequest, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::UserRequest;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::UserRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -195,10 +199,10 @@ void utils::create_ref_struct_2<roq::python::fix::UserRequest, roq::python::fix:
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::UserResponse, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::UserResponse, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::UserResponse;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::UserResponse;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -213,10 +217,11 @@ void utils::create_ref_struct_2<roq::python::fix::UserResponse, roq::python::fix
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::TradingSessionStatusRequest, roq::python::fix::Encodeable>(
-    pybind11::module_ &module) {
-  using value_type = roq::python::fix::TradingSessionStatusRequest;
-  using base_type = roq::python::fix::Encodeable;
+void utils::create_ref_struct_2<
+    roq::python::codec::fix::TradingSessionStatusRequest,
+    roq::python::codec::fix::Encodeable>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::TradingSessionStatusRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -230,10 +235,10 @@ void utils::create_ref_struct_2<roq::python::fix::TradingSessionStatusRequest, r
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::TradingSessionStatus, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::TradingSessionStatus, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::TradingSessionStatus;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::TradingSessionStatus;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -256,10 +261,10 @@ void utils::create_ref_struct_2<roq::python::fix::TradingSessionStatus, roq::pyt
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::SecurityListRequest, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::SecurityListRequest, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::SecurityListRequest;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::SecurityListRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -282,10 +287,10 @@ void utils::create_ref_struct_2<roq::python::fix::SecurityListRequest, roq::pyth
 }
 
 template <>
-void utils::create_ref_struct_2<roq::python::fix::SecurityList, roq::python::fix::Encodeable>(
+void utils::create_ref_struct_2<roq::python::codec::fix::SecurityList, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
-  using value_type = roq::python::fix::SecurityList;
-  using base_type = roq::python::fix::Encodeable;
+  using value_type = roq::python::codec::fix::SecurityList;
+  using base_type = roq::python::codec::fix::Encodeable;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
@@ -293,19 +298,19 @@ void utils::create_ref_struct_2<roq::python::fix::SecurityList, roq::python::fix
               std::string_view,
               std::string_view,
               roq::fix::SecurityRequestResult,
-              std::vector<roq::python::fix::SecListGrp>>(),
+              std::vector<roq::python::codec::fix::SecListGrp>>(),
           pybind11::arg("security_req_id") = std::string_view{},
           pybind11::arg("security_response_id") = std::string_view{},
           pybind11::arg("security_request_result") = roq::fix::SecurityRequestResult{},
-          pybind11::arg("no_related_sym") = std::vector<roq::python::fix::SecListGrp>{})
+          pybind11::arg("no_related_sym") = std::vector<roq::python::codec::fix::SecListGrp>{})
       .def("__repr__", [](value_type const &value) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
       });
 }
 
 template <>
-void utils::create_struct<roq::python::fix::Header>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Header;
+void utils::create_struct<roq::python::codec::fix::Header>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Header;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str()).def("__repr__", [](value_type const &value) {
     return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
@@ -313,8 +318,8 @@ void utils::create_struct<roq::python::fix::Header>(pybind11::module_ &module) {
 }
 
 template <>
-void utils::create_struct<roq::python::fix::Decoder>(pybind11::module_ &module) {
-  using value_type = roq::python::fix::Decoder;
+void utils::create_struct<roq::python::codec::fix::Decoder>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::Decoder;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(pybind11::init<>())

@@ -6,14 +6,15 @@
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace sbe {
 
 struct Encoder final {
   Encoder() : encoder_{roq::codec::sbe::Encoder::create()} {}
 
-  template <typename T>
-  std::span<std::byte const> encode(T const &value) {
-    return (*encoder_).encode(value);
+  std::span<std::byte const> operator()(MessageInfo const &message_info, auto const &value) {
+    Event event{message_info, value};
+    return (*encoder_)(event);
   }
 
  private:
@@ -21,5 +22,6 @@ struct Encoder final {
 };
 
 }  // namespace sbe
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

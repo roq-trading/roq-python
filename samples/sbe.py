@@ -58,7 +58,7 @@ def callback(header: roq.MessageInfo, logon: roq.OrderUpdate):
     print("order_update={}, header={}".format(order_update, header))
 
 
-decoder = roq.fix.Decoder()
+decoder = roq.codec.sbe.Decoder()
 
 message = b"hello"
 

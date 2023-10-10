@@ -16,11 +16,12 @@
 #include "roq/codec/fix/user_request.hpp"
 #include "roq/codec/fix/user_response.hpp"
 
-#include "roq/python/fix/encodeable.hpp"
-#include "roq/python/fix/encoder.hpp"
+#include "roq/python/codec/fix/encodeable.hpp"
+#include "roq/python/codec/fix/encoder.hpp"
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace fix {
 
 struct Logon final : public Encodeable {
@@ -531,5 +532,6 @@ struct SecurityList final : public Encodeable {
 };
 
 }  // namespace fix
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

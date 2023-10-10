@@ -2,7 +2,7 @@
 
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 
-#include "roq/python/sbe/module.hpp"
+#include "roq/python/codec/sbe/module.hpp"
 
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
@@ -10,18 +10,20 @@
 
 #include "roq/python/utils.hpp"
 
-#include "roq/python/sbe/encoder.hpp"
+#include "roq/python/codec/sbe/encoder.hpp"
 
 using namespace std::literals;
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace sbe {
 
 void Module::create(pybind11::module_ &module) {
-  utils::create_struct<roq::python::sbe::Encoder>(module);
+  utils::create_struct<roq::python::codec::sbe::Encoder>(module);
 }
 
 }  // namespace sbe
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

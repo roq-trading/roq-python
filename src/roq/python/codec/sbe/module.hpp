@@ -6,12 +6,14 @@
 
 namespace roq {
 namespace python {
-namespace fix {
+namespace codec {
+namespace sbe {
 
 struct Module final {
   static void create(pybind11::module_ &);
 };
 
-}  // namespace fix
+}  // namespace sbe
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

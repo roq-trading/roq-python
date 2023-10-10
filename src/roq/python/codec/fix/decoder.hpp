@@ -6,11 +6,12 @@
 
 #include "roq/codec/fix/decoder.hpp"
 
-#include "roq/python/fix/details.hpp"
-#include "roq/python/fix/header.hpp"
+#include "roq/python/codec/fix/details.hpp"
+#include "roq/python/codec/fix/header.hpp"
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace fix {
 
 struct Decoder final {
@@ -124,5 +125,6 @@ struct Decoder final {
 };
 
 }  // namespace fix
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

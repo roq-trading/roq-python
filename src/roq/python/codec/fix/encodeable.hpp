@@ -7,6 +7,7 @@
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace fix {
 
 struct Encoder;
@@ -17,5 +18,6 @@ struct Encodeable {
 };
 
 }  // namespace fix
+}  // namespace codec
 }  // namespace python
 }  // namespace roq

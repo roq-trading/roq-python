@@ -25,16 +25,14 @@ requirements:
     - pybind11
     - python {{ python }}
     - roq-client
+    - roq-codec
     - roq-fix
-    - roq-fix-codec
     - roq-oss-magic_enum
     - roq-oss-nameof
-    - roq-sbe-codec
   run:
     - python
     - roq-client
-    - roq-fix-codec
-    - roq-sbe-codec
+    - roq-codec
 
 about:
   home: https://roq-trading.com

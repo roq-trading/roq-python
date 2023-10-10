@@ -9,6 +9,7 @@
 
 namespace roq {
 namespace python {
+namespace codec {
 namespace fix {
 
 struct Header final {
@@ -38,5 +39,6 @@ struct Header final {
 };
 
 }  // namespace fix
+}  // namespace codec
 }  // namespace python
 }  // namespace roq
