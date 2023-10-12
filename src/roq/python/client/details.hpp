@@ -101,6 +101,7 @@ struct Bridge final : public roq::client::Handler {
   void operator()(Event<roq::TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
+  void operator()(Event<roq::CancelAllOrdersAck> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::OrderAck> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::OrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::TradeUpdate> const &event) override { dispatch(event.message_info, event.value); }
@@ -269,6 +270,7 @@ struct EventLogReader final {
     void operator()(Event<roq::CancelOrder> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::CancelAllOrders> const &event) override { dispatch(event.message_info, event.value); }
 
+    void operator()(Event<roq::CancelAllOrdersAck> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::OrderAck> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::OrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::TradeUpdate> const &event) override { dispatch(event.message_info, event.value); }
@@ -364,6 +366,7 @@ struct EventLogMultiplexer final {
     void operator()(Event<roq::CancelOrder> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::CancelAllOrders> const &event) override { dispatch(event.message_info, event.value); }
 
+    void operator()(Event<roq::CancelAllOrdersAck> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::OrderAck> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::OrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::TradeUpdate> const &event) override { dispatch(event.message_info, event.value); }

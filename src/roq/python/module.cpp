@@ -100,6 +100,7 @@ void Module::create(pybind11::module_ &module) {
   roq::python::utils::create_ref_struct<roq::CancelOrder>(module);
   roq::python::utils::create_ref_struct<roq::CancelAllOrders>(module);
 
+  roq::python::utils::create_ref_struct<roq::CancelAllOrdersAck>(module);
   roq::python::utils::create_ref_struct<roq::OrderAck>(module);
   roq::python::utils::create_ref_struct<roq::OrderUpdate>(module);
   roq::python::utils::create_ref_struct<roq::TradeUpdate>(module);

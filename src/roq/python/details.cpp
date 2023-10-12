@@ -1358,6 +1358,79 @@ void utils::create_ref_struct<roq::CancelAllOrders>(pybind11::module_ &module) {
 // ...
 
 template <>
+void utils::create_ref_struct<roq::CancelAllOrdersAck>(pybind11::module_ &module) {
+  using value_type = roq::CancelAllOrdersAck;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<ref_type>(module, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "order_id",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.order_id;
+          })
+      .def_property_readonly(
+          "origin",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.origin;
+          })
+      .def_property_readonly(
+          "status",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.status;
+          })
+      .def_property_readonly(
+          "error",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.error;
+          })
+      .def_property_readonly(
+          "text",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.text;
+          })
+      .def_property_readonly(
+          "request_id",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.request_id;
+          })
+      .def_property_readonly(
+          "external_account",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.external_account;
+          })
+      .def_property_readonly(
+          "round_trip_latency",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.round_trip_latency;
+          })
+      .def("__repr__", [](ref_type const &obj) {
+        using namespace std::literals;
+        auto &value = static_cast<const value_type &>(obj);
+        return fmt::format("{}"sv, value);
+      });
+}
+
+template <>
 void utils::create_ref_struct<roq::OrderAck>(pybind11::module_ &module) {
   using value_type = roq::OrderAck;
   using ref_type = utils::Ref<value_type>;
