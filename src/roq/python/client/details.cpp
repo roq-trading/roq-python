@@ -69,7 +69,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
              double stop_price,
              std::string_view const &routing_id,
              uint8_t source) {
-            roq::CreateOrder create_order{
+            auto create_order = roq::CreateOrder{
                 .account = account,
                 .order_id = order_id,
                 .exchange = exchange,
@@ -116,7 +116,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
              uint32_t version,
              uint32_t conditional_on_version,
              uint8_t source) {
-            roq::ModifyOrder modify_order{
+            auto modify_order = roq::ModifyOrder{
                 .account = account,
                 .order_id = order_id,
                 .request_template = request_template,
@@ -147,7 +147,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
              uint32_t version,
              uint32_t conditional_on_version,
              uint8_t source) {
-            roq::CancelOrder cancel_order{
+            auto cancel_order = roq::CancelOrder{
                 .account = account,
                 .order_id = order_id,
                 .request_template = request_template,
@@ -167,8 +167,13 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
       .def(
           "cancel_all_orders",
           [](value_type &obj, std::string_view const &account, uint8_t source) {
-            roq::CancelAllOrders cancel_all_orders{
+            auto cancel_all_orders = roq::CancelAllOrders{
                 .account = account,
+                .order_id = {},
+                .exchange = {},
+                .symbol = {},
+                .strategy_id = {},
+                .side = {},
             };
             obj.send(cancel_all_orders, source);
           },
