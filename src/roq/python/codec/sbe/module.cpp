@@ -10,6 +10,7 @@
 
 #include "roq/python/utils.hpp"
 
+#include "roq/python/codec/sbe/decoder.hpp"
 #include "roq/python/codec/sbe/encoder.hpp"
 
 using namespace std::literals;
@@ -20,6 +21,7 @@ namespace codec {
 namespace sbe {
 
 void Module::create(pybind11::module_ &module) {
+  utils::create_struct<roq::python::codec::sbe::Decoder>(module);
   utils::create_struct<roq::python::codec::sbe::Encoder>(module);
 }
 
