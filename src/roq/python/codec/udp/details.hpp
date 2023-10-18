@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <pybind11/pybind11.h>
+
 #include "roq/codec/udp/header.hpp"
 
 namespace roq {
@@ -13,6 +15,7 @@ struct Header final {
   using value_type = roq::codec::udp::Header;
 
   explicit Header(value_type const &value) : value_{value} {}
+  explicit Header(pybind11::bytes message);
 
   operator value_type() const { return value_; }
 
