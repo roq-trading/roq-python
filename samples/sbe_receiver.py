@@ -19,7 +19,7 @@ import roq
 
 LOCAL_INTERFACE = "192.168.188.64"
 MULTICAST_ADDRESS = "224.1.1.1"
-MULTICAST_PORT = 1234
+MULTICAST_PORT = 6789
 
 SENDER_COMP_ID = "test"
 TARGET_COMP_ID = "proxy"
@@ -35,17 +35,29 @@ SYMBOL = "BTC-PERPETUAL"
 class SbeReceiver:
     def __init__(self):
         self.decoder = roq.codec.sbe.Decoder()
+        self.decode_buffer = bytearray()
 
     def connection_made(self, transport):
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        print(addr)
+        # note! for now, assuming no drops and no re-ordering
         header = roq.codec.udp.Header(data)
-        print(header)
-        if header.fragment == 0 and header.fragment == header.fragment_max:
-            payload = data[header.sizeof() :]
-            self.decoder.dispatch(self._callback, payload)
+        payload = data[header.sizeof() :]
+        last = header.fragment == header.fragment_max
+        if last:
+            if len(self.decode_buffer) > 0:
+                self.decode_buffer += payload
+                self.decoder.dispatch(self._callback, self.decode_buffer)
+                self.decode_buffer = bytearray()
+            else:
+                self.decoder.dispatch(self._callback, payload)
+        else:
+            if header.fragment == 0:
+                assert len(self.decode_buffer) == 0, "internal error"
+                self.decode_buffer = data
+            else:
+                self.decode_buffer += data
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
