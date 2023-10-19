@@ -3,7 +3,7 @@
 """
 Copyright (c) 2017-2023, Hans Erik Thrane
 
-Demonstrates asyncio with codec
+Demonstrates how to decode a SBE multicast feed using asyncio
 """
 
 import asyncio
@@ -16,14 +16,6 @@ from datetime import datetime, timedelta
 from fastcore.all import typedispatch
 
 import roq
-
-LOCAL_INTERFACE = "192.168.188.64"
-
-MULTICAST_SNAPSHOT_ADDRESS = "224.1.1.1"
-MULTICAST_SNAPSHOT_PORT = 1234
-MULTICAST_INCREMENTAL_ADDRESS = "224.1.1.2"
-MULTICAST_INCREMENTAL_PORT = 6789
-USE_MULTICAST = True
 
 class Shared:
     def __init__(self):
@@ -197,15 +189,13 @@ class Incremental(IncrementalMixin, SbeReceiver):
 
 
 # note! using UDP when len(multicast_address) == 0
-def create_datagram_socket(local_interface, multicast_port, multicast_address, use_multicast):
+def create_datagram_socket(local_interface, multicast_port, multicast_address):
+    use_multicast = multicast_address is not None and len(multicast_address) >0
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-    if not use_multicast:
-        logging.debug(f"using UDP {local_interface} port {multicast_port}")
-        sock.bind((local_interface, multicast_port))
-    else:
-        logging.debug(f"using UDP multicast {multicast_address} port {multicast_port}")
+    if use_multicast:
+        logging.info(f"using multicast {multicast_address} port {multicast_port}")
         sock.bind(("", multicast_port))
         mreq = struct.pack(
             "4s4s",
@@ -217,41 +207,94 @@ def create_datagram_socket(local_interface, multicast_port, multicast_address, u
             socket.IP_ADD_MEMBERSHIP,
             mreq,
         )
+    else:
+        logging.info(f"using UDP {local_interface} port {multicast_port}")
+        sock.bind((local_interface, multicast_port))
     return sock
 
 
-loop = asyncio.get_event_loop()
+def main(
+    local_interface,
+    multicast_snapshot_address,
+    multicast_snapshot_port,
+    multicast_incremental_address,
+    multicast_incremental_port,
+):
+    loop = asyncio.get_event_loop()
 
-# loop.set_debug(True)
+    # loop.set_debug(True)
 
-logging.basicConfig(level=logging.INFO)
+    shared = Shared()
 
-shared = Shared()
+    snapshot = loop.create_datagram_endpoint(
+        lambda: Snapshot(shared),
+        sock=create_datagram_socket(
+            local_interface=local_interface,
+            multicast_port=multicast_snapshot_port,
+            multicast_address=multicast_snapshot_address,
+        ),
+    )
 
-snapshot = loop.create_datagram_endpoint(
-    lambda: Snapshot(shared),
-    sock=create_datagram_socket(
-        local_interface=LOCAL_INTERFACE,
-        multicast_port=MULTICAST_SNAPSHOT_PORT,
-        multicast_address=MULTICAST_SNAPSHOT_ADDRESS,
-        use_multicast=USE_MULTICAST,
-    ),
-)
+    incremental = loop.create_datagram_endpoint(
+        lambda: Incremental(shared),
+        sock=create_datagram_socket(
+            local_interface=local_interface,
+            multicast_port=multicast_incremental_port,
+            multicast_address=multicast_incremental_address,
+        ),
+    )
 
-incremental = loop.create_datagram_endpoint(
-    lambda: Incremental(shared),
-    sock=create_datagram_socket(
-        local_interface=LOCAL_INTERFACE,
-        multicast_port=MULTICAST_INCREMENTAL_PORT,
-        multicast_address=MULTICAST_INCREMENTAL_ADDRESS,
-        use_multicast=USE_MULTICAST,
-    ),
-)
+    tasks = asyncio.gather(snapshot, incremental)
 
-tasks = asyncio.gather(snapshot, incremental)
+    loop.run_until_complete(tasks)
 
-loop.run_until_complete(tasks)
+    loop.run_forever()
 
-loop.run_forever()
+    loop.close()
 
-loop.close()
+
+if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.INFO)
+
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog="SBE Receiver (TEST)",
+        description="Demonstrates how to decode a SBE multicast feed using asyncio",
+    )
+
+    parser.add_argument(
+        "--local_interface",
+        type=str,
+        required=True,
+        help="ipv4 address of a network interface",
+    )
+    parser.add_argument(
+        "--multicast_snapshot_address",
+        type=str,
+        required=False,
+        help="ipv4 address of a multicast group",
+    )
+    parser.add_argument(
+        "--multicast_snapshot_port",
+        type=int,
+        required=True,
+        help="multicast port",
+    )
+    parser.add_argument(
+        "--multicast_incremental_address",
+        type=str,
+        required=False,
+        help="ipv4 address of a multicast group",
+    )
+    parser.add_argument(
+        "--multicast_incremental_port",
+        type=int,
+        required=True,
+        help="multicast port",
+    )
+
+    args = parser.parse_args()
+
+    main(**vars(args))
