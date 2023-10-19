@@ -18,7 +18,8 @@ from fastcore.all import typedispatch
 import roq
 
 LOCAL_INTERFACE = "192.168.188.64"
-MULTICAST_ADDRESS = "224.1.1.1"
+MULTICAST_ADDRESS = ""
+#MULTICAST_ADDRESS = "224.1.1.1"
 MULTICAST_PORT = 1234
 
 SENDER_COMP_ID = "test"
@@ -51,10 +52,12 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
-if True:
+if len(MULTICAST_ADDRESS) == 0:
+    print('*** USING UDP ***')
     sock.bind((LOCAL_INTERFACE, MULTICAST_PORT))
 
 else:
+    print('*** USING MULTICAST ***')
     sock.bind(("", MULTICAST_PORT))
     mreq = struct.pack(
         "4s4s", socket.inet_aton(MULTICAST_ADDRESS), socket.inet_aton(LOCAL_INTERFACE)
