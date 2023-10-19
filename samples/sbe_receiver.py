@@ -19,7 +19,8 @@ import roq
 
 LOCAL_INTERFACE = "192.168.188.64"
 MULTICAST_ADDRESS = "224.1.1.1"
-MULTICAST_PORT = 6789
+MULTICAST_SNAPSHOT_PORT = 1234
+MULTICAST_INCREMENTAL_PORT = 6789
 
 SENDER_COMP_ID = "test"
 TARGET_COMP_ID = "proxy"
@@ -32,7 +33,7 @@ EXCHANGE = "deribit"
 SYMBOL = "BTC-PERPETUAL"
 
 
-class SbeReceiver:
+class Snapshot:
     def __init__(self):
         self.decoder = roq.codec.sbe.Decoder()
         self.decode_buffer = bytearray()
@@ -61,22 +62,22 @@ class SbeReceiver:
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
-        print("reference_data={}, message_info={}".format(reference_data, message_info))
+        print("[SNAPSHOT] reference_data={}, message_info={}".format(reference_data, message_info))
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, market_status: roq.MarketStatus):
-        print("market_status={}, message_info={}".format(market_status, message_info))
+        print("[SNAPSHOT] market_status={}, message_info={}".format(market_status, message_info))
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, top_of_book: roq.TopOfBook):
-        print("top_of_book={}, message_info={}".format(top_of_book, message_info))
+        print("[SNAPSHOT] top_of_book={}, message_info={}".format(top_of_book, message_info))
 
     @typedispatch
     def _callback(
         self, message_info: roq.MessageInfo, market_by_price_update: roq.MarketByPriceUpdate
     ):
         print(
-            "market_by_price_update={}, message_info={}".format(
+            "[SNAPSHOT] market_by_price_update={}, message_info={}".format(
                 market_by_price_update, message_info
             )
         )
@@ -86,26 +87,124 @@ class SbeReceiver:
         self, message_info: roq.MessageInfo, market_by_order_update: roq.MarketByOrderUpdate
     ):
         print(
-            "market_by_order_update={}, message_info={}".format(
+            "[SNAPSHOT] market_by_order_update={}, message_info={}".format(
                 market_by_order_update, message_info
             )
         )
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, trade_summary: roq.TradeSummary):
-        print("trade_summary={}, message_info={}".format(trade_summary, message_info))
+        print("[SNAPSHOT] trade_summary={}, message_info={}".format(trade_summary, message_info))
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
-        print("statistics_update={}, message_info={}".format(statistics_update, message_info))
+        print("[SNAPSHOT] statistics_update={}, message_info={}".format(statistics_update, message_info))
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, order_ack: roq.OrderAck):
-        print("order_ack={}, message_info={}".format(order_ack, message_info))
+        print("[SNAPSHOT] order_ack={}, message_info={}".format(order_ack, message_info))
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, order_update: roq.OrderUpdate):
-        print("order_update={}, message_info={}".format(order_update, message_info))
+        print("[SNAPSHOT] order_update={}, message_info={}".format(order_update, message_info))
+
+
+class Incremental:
+    def __init__(self):
+        self.decoder = roq.codec.sbe.Decoder()
+        self.decode_buffer = bytearray()
+
+    def connection_made(self, transport):
+        self.transport = transport
+
+    def datagram_received(self, data, addr):
+        # note! for now, assuming no drops and no re-ordering
+        header = roq.codec.udp.Header(data)
+        payload = data[header.sizeof() :]
+        last = header.fragment == header.fragment_max
+        if last:
+            if len(self.decode_buffer) > 0:
+                self.decode_buffer += payload
+                self.decoder.dispatch(self._callback, self.decode_buffer)
+                self.decode_buffer = bytearray()
+            else:
+                self.decoder.dispatch(self._callback, payload)
+        else:
+            if header.fragment == 0:
+                assert len(self.decode_buffer) == 0, "internal error"
+                self.decode_buffer = data
+            else:
+                self.decode_buffer += data
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
+        print("[INCREMENTAL] reference_data={}, message_info={}".format(reference_data, message_info))
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, market_status: roq.MarketStatus):
+        print("[INCREMENTAL] market_status={}, message_info={}".format(market_status, message_info))
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, top_of_book: roq.TopOfBook):
+        print("[INCREMENTAL] top_of_book={}, message_info={}".format(top_of_book, message_info))
+
+    @typedispatch
+    def _callback(
+        self, message_info: roq.MessageInfo, market_by_price_update: roq.MarketByPriceUpdate
+    ):
+        print(
+            "[INCREMENTAL] market_by_price_update={}, message_info={}".format(
+                market_by_price_update, message_info
+            )
+        )
+
+    @typedispatch
+    def _callback(
+        self, message_info: roq.MessageInfo, market_by_order_update: roq.MarketByOrderUpdate
+    ):
+        print(
+            "[INCREMENTAL] market_by_order_update={}, message_info={}".format(
+                market_by_order_update, message_info
+            )
+        )
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, trade_summary: roq.TradeSummary):
+        print("[INCREMENTAL] trade_summary={}, message_info={}".format(trade_summary, message_info))
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
+        print("[INCREMENTAL] statistics_update={}, message_info={}".format(statistics_update, message_info))
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, order_ack: roq.OrderAck):
+        print("[INCREMENTAL] order_ack={}, message_info={}".format(order_ack, message_info))
+
+    @typedispatch
+    def _callback(self, message_info: roq.MessageInfo, order_update: roq.OrderUpdate):
+        print("[INCREMENTAL] order_update={}, message_info={}".format(order_update, message_info))
+
+
+# note! using UDP when len(multicast_address) == 0
+def create_datagram_socket(local_interface, multicast_port, multicast_address):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    if len(multicast_address) == 0:
+        sock.bind((local_interface, multicast_port))
+    else:
+        sock.bind(("", multicast_port))
+        mreq = struct.pack(
+            "4s4s",
+            socket.inet_aton(multicast_address),
+            socket.inet_aton(local_interface),
+        )
+        sock.setsockopt(
+            socket.IPPROTO_IP,
+            socket.IP_ADD_MEMBERSHIP,
+            mreq,
+        )
+    return sock
 
 
 loop = asyncio.get_event_loop()
@@ -114,26 +213,27 @@ loop = asyncio.get_event_loop()
 
 logging.basicConfig(level=logging.INFO)
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+snapshot = loop.create_datagram_endpoint(
+    lambda: Snapshot(),
+    sock=create_datagram_socket(
+        local_interface=LOCAL_INTERFACE,
+        multicast_port=MULTICAST_SNAPSHOT_PORT,
+        multicast_address=MULTICAST_ADDRESS,
+    ),
+)
 
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+incremental = loop.create_datagram_endpoint(
+    lambda: Incremental(),
+    sock=create_datagram_socket(
+        local_interface=LOCAL_INTERFACE,
+        multicast_port=MULTICAST_INCREMENTAL_PORT,
+        multicast_address=MULTICAST_ADDRESS,
+    ),
+)
 
-if len(MULTICAST_ADDRESS) == 0:
-    print("*** USING UDP ***")
-    sock.bind((LOCAL_INTERFACE, MULTICAST_PORT))
+tasks = asyncio.gather(snapshot, incremental)
 
-else:
-    print("*** USING MULTICAST ***")
-    sock.bind(("", MULTICAST_PORT))
-    mreq = struct.pack(
-        "4s4s", socket.inet_aton(MULTICAST_ADDRESS), socket.inet_aton(LOCAL_INTERFACE)
-    )
-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-
-listen = loop.create_datagram_endpoint(lambda: SbeReceiver(), sock=sock)
-
-loop.run_until_complete(listen)
+loop.run_until_complete(tasks)
 
 loop.run_forever()
 
