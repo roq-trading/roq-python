@@ -17,10 +17,13 @@ from fastcore.all import typedispatch
 
 import roq
 
-LOCAL_INTERFACE = "192.168.188.64"
-MULTICAST_ADDRESS = "224.1.1.1"
-MULTICAST_SNAPSHOT_PORT = 1234
+LOCAL_INTERFACE = "192.168.128.195"
+
+MULTICAST_SNAPSHOT_ADDRESS = "224.1.1.1"
+MULTICAST_SNAPSHOT_PORT = 5678
+MULTICAST_INCREMENTAL_ADDRESS = "224.1.1.2"
 MULTICAST_INCREMENTAL_PORT = 6789
+USE_MULTICAST = True
 
 SENDER_COMP_ID = "test"
 TARGET_COMP_ID = "proxy"
@@ -98,7 +101,11 @@ class Snapshot:
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
-        print("[SNAPSHOT] statistics_update={}, message_info={}".format(statistics_update, message_info))
+        print(
+            "[SNAPSHOT] statistics_update={}, message_info={}".format(
+                statistics_update, message_info
+            )
+        )
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, order_ack: roq.OrderAck):
@@ -138,7 +145,9 @@ class Incremental:
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
-        print("[INCREMENTAL] reference_data={}, message_info={}".format(reference_data, message_info))
+        print(
+            "[INCREMENTAL] reference_data={}, message_info={}".format(reference_data, message_info)
+        )
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, market_status: roq.MarketStatus):
@@ -174,7 +183,11 @@ class Incremental:
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
-        print("[INCREMENTAL] statistics_update={}, message_info={}".format(statistics_update, message_info))
+        print(
+            "[INCREMENTAL] statistics_update={}, message_info={}".format(
+                statistics_update, message_info
+            )
+        )
 
     @typedispatch
     def _callback(self, message_info: roq.MessageInfo, order_ack: roq.OrderAck):
@@ -186,13 +199,15 @@ class Incremental:
 
 
 # note! using UDP when len(multicast_address) == 0
-def create_datagram_socket(local_interface, multicast_port, multicast_address):
+def create_datagram_socket(local_interface, multicast_port, multicast_address, use_multicast):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-    if len(multicast_address) == 0:
+    if not use_multicast:
+        print(f"using UDP {local_interface} port {multicast_port}")
         sock.bind((local_interface, multicast_port))
     else:
+        print(f"using UDP multicast {multicast_address} port {multicast_port}")
         sock.bind(("", multicast_port))
         mreq = struct.pack(
             "4s4s",
@@ -218,7 +233,8 @@ snapshot = loop.create_datagram_endpoint(
     sock=create_datagram_socket(
         local_interface=LOCAL_INTERFACE,
         multicast_port=MULTICAST_SNAPSHOT_PORT,
-        multicast_address=MULTICAST_ADDRESS,
+        multicast_address=MULTICAST_SNAPSHOT_ADDRESS,
+        use_multicast=USE_MULTICAST,
     ),
 )
 
@@ -227,7 +243,8 @@ incremental = loop.create_datagram_endpoint(
     sock=create_datagram_socket(
         local_interface=LOCAL_INTERFACE,
         multicast_port=MULTICAST_INCREMENTAL_PORT,
-        multicast_address=MULTICAST_ADDRESS,
+        multicast_address=MULTICAST_INCREMENTAL_ADDRESS,
+        use_multicast=USE_MULTICAST,
     ),
 )
 
