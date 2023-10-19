@@ -3,7 +3,7 @@
 """
 Copyright (c) 2017-2023, Hans Erik Thrane
 
-Demonstrates asyncio with codec
+Demonstrates how to maintain a FIX session using asyncio
 """
 
 import asyncio
@@ -15,42 +15,23 @@ from fastcore.all import typedispatch
 
 import roq
 
-LOCAL_RECVTERFACE = "192.168.188.64"
-MULTICAST_ADDRESS = "224.1.1.1"
-MULTICAST_PORT = 1234
 
-SENDER_COMP_ID = "test"
-TARGET_COMP_ID = "proxy"
-
-USERNAME = "trader"
-PASSWORD = "secret"
-
-ACCOUNT = "A1"
-EXCHANGE = "deribit"
-SYMBOL = "BTC-PERPETUAL"
-
-
-# timer
+# TODO timer
 
 
 class FixSession(asyncio.Protocol):
-    def __init__(self, sender_comp_id, target_comp_id):
+    def __init__(self, sender_comp_id, target_comp_id, username, password):
         self.encoder = roq.codec.fix.Encoder(
             sender_comp_id=sender_comp_id,
             target_comp_id=target_comp_id,
         )
         self.decoder = roq.codec.fix.Decoder()
         self.decode_buffer = bytearray()
+        self.username = username
+        self.password = password
 
     def connection_made(self, transport):
         self.transport = transport
-        logon = roq.codec.fix.Logon(
-            heart_bt_int=timedelta(seconds=30),
-            username=USERNAME,
-            password=PASSWORD,
-            encrypt_method=roq.codec.fix.EncryptMethod.NONE,
-        )
-        self._send(logon)
 
     def data_received(self, data):
         logging.debug("[RECV] {}".format(data.decode().replace(chr(1), "|")))
@@ -65,14 +46,90 @@ class FixSession(asyncio.Protocol):
                 break
 
     def connection_lost(self, exc):
-        print("The server closed the connection")
-        print("Stop the event loop")
-        # self.loop.stop()
+        pass
 
     def _send(self, obj):
         message = self.encoder.encode(obj, datetime.now())
         logging.debug("[SEND] {}".format(message.decode().replace(chr(1), "|")))
         self.transport.write(message)
+
+    @typedispatch
+    def _callback(self, header: roq.codec.fix.Header, logon: roq.codec.fix.Logon):
+        pass
+
+    @typedispatch
+    def _callback(self, header: roq.codec.fix.Header, logout: roq.codec.fix.Logout):
+        pass
+
+    @typedispatch
+    def _callback(self, header: roq.codec.fix.Header, test_request: roq.codec.fix.TestRequest):
+        pass
+
+    @typedispatch
+    def _callback(self, header: roq.codec.fix.Header, heartbeat: roq.codec.fix.Heartbeat):
+        pass
+
+    @typedispatch
+    def _callback(self, header: roq.codec.fix.Header, resend_request: roq.codec.fix.ResendRequest):
+        pass
+
+    @typedispatch
+    def _callback(self, header: roq.codec.fix.Header, reject: roq.codec.fix.Reject):
+        pass
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        business_message_reject: roq.codec.fix.BusinessMessageReject,
+    ):
+        pass
+
+    @typedispatch
+    def callback(self, header: roq.codec.fix.Header, user_request: roq.codec.fix.UserRequest):
+        pass
+
+    @typedispatch
+    def callback(self, header: roq.codec.fix.Header, user_response: roq.codec.fix.UserResponse):
+        pass
+
+    @typedispatch
+    def callback(
+        self,
+        header: roq.codec.fix.Header,
+        trading_session_status_request: roq.codec.fix.TradingSessionStatusRequest,
+    ):
+        pass
+
+    @typedispatch
+    def callback(
+        self,
+        header: roq.codec.fix.Header,
+        trading_session_status: roq.codec.fix.TradingSessionStatus,
+    ):
+        pass
+
+    @typedispatch
+    def callback(
+        self, header: roq.codec.fix.Header, security_list_request: roq.codec.fix.SecurityListRequest
+    ):
+        pass
+
+    @typedispatch
+    def callback(self, header: roq.codec.fix.Header, security_list: roq.codec.fix.SecurityList):
+        pass
+
+
+class MyMixin:
+    def connection_made(self, transport):
+        self.transport = transport
+        logon = roq.codec.fix.Logon(
+            heart_bt_int=timedelta(seconds=30),
+            username=self.username,
+            password=self.password,
+            encrypt_method=roq.codec.fix.EncryptMethod.NONE,
+        )
+        self._send(logon)
 
     @typedispatch
     def _callback(self, header: roq.codec.fix.Header, logon: roq.codec.fix.Logon):
@@ -102,10 +159,6 @@ class FixSession(asyncio.Protocol):
         logging.info("[EVENT] heartbeat={}, header={}".format(heartbeat, header))
 
     @typedispatch
-    def _callback(self, header: roq.codec.fix.Header, resend_request: roq.codec.fix.ResendRequest):
-        logging.info("[EVENT] resend_request={}, header={}".format(resend_request, header))
-
-    @typedispatch
     def _callback(self, header: roq.codec.fix.Header, reject: roq.codec.fix.Reject):
         logging.info("[EVENT] reject={}, header={}".format(reject, header))
 
@@ -120,26 +173,6 @@ class FixSession(asyncio.Protocol):
         )
 
     @typedispatch
-    def callback(self, header: roq.codec.fix.Header, user_request: roq.codec.fix.UserRequest):
-        logging.info("[EVENT] user_request={}, header={}".format(user_request, header))
-
-    @typedispatch
-    def callback(self, header: roq.codec.fix.Header, user_response: roq.codec.fix.UserResponse):
-        logging.info("[EVENT] user_response={}, header={}".format(user_response, header))
-
-    @typedispatch
-    def callback(
-        self,
-        header: roq.codec.fix.Header,
-        trading_session_status_request: roq.codec.fix.TradingSessionStatusRequest,
-    ):
-        logging.info(
-            "[EVENT] trading_session_status_request={}, header={}".format(
-                trading_session_status_request, header
-            )
-        )
-
-    @typedispatch
     def callback(
         self,
         header: roq.codec.fix.Header,
@@ -150,44 +183,86 @@ class FixSession(asyncio.Protocol):
         )
 
     @typedispatch
-    def callback(
-        self, header: roq.codec.fix.Header, security_list_request: roq.codec.fix.SecurityListRequest
-    ):
-        logging.info(
-            "[EVENT] security_list_request={}, header={}".format(security_list_request, header)
-        )
-
-    @typedispatch
     def callback(self, header: roq.codec.fix.Header, security_list: roq.codec.fix.SecurityList):
         logging.info("[EVENT] security_list={}, header={}".format(security_list, header))
 
 
-async def maintain_fix_session(loop):
-    while True:
-        try:
-            await loop.create_connection(
-                lambda: FixSession(
-                    sender_comp_id=SENDER_COMP_ID,
-                    target_comp_id=TARGET_COMP_ID,
-                ),
-                host="localhost",
-                port=1234,
-            )
-        except OSError:
-            print("Server not up retrying in 5 seconds...")
-            await asyncio.sleep(1)
-        else:
-            break
+class MySession(MyMixin, FixSession):
+    pass
 
 
-loop = asyncio.get_event_loop()
+def create_connection(loop, network_address, sender_comp_id, target_comp_id, username, password):
+    return loop.create_unix_connection(
+        lambda: MySession(
+            sender_comp_id=sender_comp_id,
+            target_comp_id=target_comp_id,
+            username=username,
+            password=password,
+        ),
+        path=network_address,
+    )
 
-# loop.set_debug(True)
 
-logging.basicConfig(level=logging.INFO)
+def main(network_address, sender_comp_id, target_comp_id, username, password):
+    loop = asyncio.get_event_loop()
 
-loop.run_until_complete(maintain_fix_session(loop))
+    # loop.set_debug(True)
 
-loop.run_forever()
+    logging.basicConfig(level=logging.INFO)
 
-loop.close()
+    task = create_connection(
+        loop, network_address, sender_comp_id, target_comp_id, username, password
+    )
+
+    loop.run_until_complete(task)
+
+    loop.run_forever()
+
+    loop.close()
+
+
+if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.INFO)
+
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog="FIX Session (TEST)",
+        description="Demonstrates how to maintain a FIX session using asyncio",
+    )
+
+    parser.add_argument(
+        "--network_address",
+        type=str,
+        required=True,
+        help="network address of a fix server (ipv4 or path)",
+    )
+    parser.add_argument(
+        "--sender_comp_id",
+        type=str,
+        required=True,
+        help="sender component identifier",
+    )
+    parser.add_argument(
+        "--target_comp_id",
+        type=str,
+        required=True,
+        help="target component identifier",
+    )
+    parser.add_argument(
+        "--username",
+        type=str,
+        required=True,
+        help="username",
+    )
+    parser.add_argument(
+        "--password",
+        type=str,
+        required=False,
+        help="password",
+    )
+
+    args = parser.parse_args()
+
+    main(**vars(args))
