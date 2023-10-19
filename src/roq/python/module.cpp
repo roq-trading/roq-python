@@ -11,10 +11,10 @@
 #include "roq/python/details.hpp"
 #include "roq/python/utils.hpp"
 
-#include "roq/python/cache/module.hpp"
 #include "roq/python/client/module.hpp"
 #include "roq/python/codec/module.hpp"
 #include "roq/python/io/module.hpp"
+#include "roq/python/utils/module.hpp"
 
 using namespace std::literals;
 
@@ -112,11 +112,11 @@ void Module::create(pybind11::module_ &module) {
 
   // sub-modules
 
-  auto cache = module.def_submodule("cache");
-  roq::python::cache::Module::create(cache);
-
   auto codec = module.def_submodule("codec");
   roq::python::codec::Module::create(codec);
+
+  auto utils = module.def_submodule("utils");
+  roq::python::utils::Module::create(utils);
 
   auto client = module.def_submodule("client");
   roq::python::client::Module::create(client);

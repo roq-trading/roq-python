@@ -29,10 +29,12 @@ requirements:
     - roq-fix
     - roq-oss-magic_enum
     - roq-oss-nameof
+    - roq-utils
   run:
     - python
     - roq-client
     - roq-codec
+    - roq-utils
 
 about:
   home: https://roq-trading.com

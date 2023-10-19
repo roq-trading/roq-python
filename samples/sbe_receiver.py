@@ -26,7 +26,7 @@ class Shared:
         key = (market_by_price_update.exchange, market_by_price_update.symbol)
         mbp = self.mbp.get(key)
         if mbp is None:
-            mbp = roq.cache.MarketByPrice(*key)
+            mbp = roq.utils.mbp.MarketByPrice(*key)
             self.mbp[key] = mbp
         mbp.apply(market_by_price_update)
         depth = mbp.extract(2)
