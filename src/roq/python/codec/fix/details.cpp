@@ -29,8 +29,8 @@ void utils::create_struct<roq::python::codec::fix::SecListGrp>(pybind11::module_
           pybind11::arg("security_exchange"),
           pybind11::arg("min_trade_vol") = NaN,
           pybind11::arg("trading_session_id") = std::string{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::print("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::print("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -79,8 +79,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::Logon, roq::python::cod
           pybind11::arg("next_expected_msg_seq_num") = uint64_t{},
           pybind11::arg("username"),
           pybind11::arg("password") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -92,8 +92,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::Logout, roq::python::co
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(pybind11::init<std::string_view>(), pybind11::arg("text") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -105,8 +105,10 @@ void utils::create_ref_struct_2<roq::python::codec::fix::TestRequest, roq::pytho
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(pybind11::init<std::string_view>(), pybind11::arg("test_req_id") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def_property_readonly(
+          "test_req_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).test_req_id; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -118,8 +120,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::Heartbeat, roq::python:
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(pybind11::init<std::string_view>(), pybind11::arg("test_req_id") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -134,8 +136,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::ResendRequest, roq::pyt
           pybind11::init<uint64_t, uint64_t>(),
           pybind11::arg("begin_seq_no") = uint64_t{},
           pybind11::arg("end_seq_no") = uint64_t{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -153,8 +155,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::Reject, roq::python::co
           pybind11::arg("ref_tag_id") = uint32_t{},
           pybind11::arg("ref_msg_type") = roq::fix::MsgType{},
           pybind11::arg("session_reject_reason") = roq::fix::SessionRejectReason{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -173,8 +175,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::BusinessMessageReject, 
           pybind11::arg("business_reject_ref_id") = std::string_view{},
           pybind11::arg("business_reject_reason") = roq::fix::BusinessRejectReason{},
           pybind11::arg("text") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -193,8 +195,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::UserRequest, roq::pytho
           pybind11::arg("username") = std::string_view{},
           pybind11::arg("password") = std::string_view{},
           pybind11::arg("new_password") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -211,8 +213,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::UserResponse, roq::pyth
           pybind11::arg("username") = std::string_view{},
           pybind11::arg("user_status") = roq::fix::UserStatus{},
           pybind11::arg("user_status_text") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -229,8 +231,8 @@ void utils::create_ref_struct_2<
           pybind11::arg("trad_ses_req_id") = std::string_view{},
           pybind11::arg("trading_session_id") = std::string_view{},
           pybind11::arg("subscription_request_type") = roq::fix::SubscriptionRequestType{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -255,8 +257,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::TradingSessionStatus, r
           pybind11::arg("trad_ses_status") = roq::fix::TradSesStatus{},
           pybind11::arg("trad_ses_status_rej_reason") = roq::fix::TradSesStatusRejReason{},
           pybind11::arg("text") = std::string_view{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -281,8 +283,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::SecurityListRequest, ro
           pybind11::arg("security_exchange") = std::string_view{},
           pybind11::arg("trading_session_id") = std::string_view{},
           pybind11::arg("subscription_request_type") = roq::fix::SubscriptionRequestType{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -303,8 +305,8 @@ void utils::create_ref_struct_2<roq::python::codec::fix::SecurityList, roq::pyth
           pybind11::arg("security_response_id") = std::string_view{},
           pybind11::arg("security_request_result") = roq::fix::SecurityRequestResult{},
           pybind11::arg("no_related_sym") = std::vector<roq::python::codec::fix::SecListGrp>{})
-      .def("__repr__", [](value_type const &value) {
-        return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 
@@ -312,8 +314,8 @@ template <>
 void utils::create_struct<roq::python::codec::fix::Header>(pybind11::module_ &module) {
   using value_type = roq::python::codec::fix::Header;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(module, name.c_str()).def("__repr__", [](value_type const &value) {
-    return fmt::format("{}"sv, static_cast<value_type::value_type>(value));
+  pybind11::class_<value_type>(module, name.c_str()).def("__repr__", [](value_type const &self) {
+    return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
   });
 }
 

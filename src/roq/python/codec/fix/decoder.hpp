@@ -114,6 +114,7 @@ struct Decoder final {
     } catch (...) {
       using namespace std::literals;
       fmt::print(stderr, "HERE\n"sv);
+      throw;
     }
     return result;
   }

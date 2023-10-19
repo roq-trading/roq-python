@@ -3,7 +3,7 @@
 """
 Copyright (c) 2017-2023, Hans Erik Thrane
 
-Demonstrates FIX message encoding/decoding
+Demonstrates UDP message decoding
 """
 
 import roq
