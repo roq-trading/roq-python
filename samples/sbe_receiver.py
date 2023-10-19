@@ -51,11 +51,15 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
-sock.bind(("", MULTICAST_PORT))
+if True:
+    sock.bind((LOCAL_INTERFACE, MULTICAST_PORT))
 
-mreq = struct.pack("4s4s", socket.inet_aton(MULTICAST_ADDRESS), socket.inet_aton(LOCAL_INTERFACE))
-
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+else:
+    sock.bind(("", MULTICAST_PORT))
+    mreq = struct.pack(
+        "4s4s", socket.inet_aton(MULTICAST_ADDRESS), socket.inet_aton(LOCAL_INTERFACE)
+    )
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 listen = loop.create_datagram_endpoint(MulticastServerProtocol, sock=sock)
 
