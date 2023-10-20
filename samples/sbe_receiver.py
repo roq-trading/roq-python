@@ -88,6 +88,7 @@ class Shared:
 
 class SbeReceiver:
     def __init__(self, shared):
+        self.reorder_buffer = roq.io.net.ReorderBuffer()
         self.decoder = roq.codec.sbe.Decoder()
         self.decode_buffer = bytearray()
         self.shared = shared
@@ -97,7 +98,21 @@ class SbeReceiver:
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        # FIXME for now, assuming no drops and no re-ordering
+        # note!
+        #   datagrams can arrive out of order or not at all
+        #   the re-order buffer will ensure proper sequencing and detect drops
+        sequence_number = roq.codec.udp.Header.get_sequence_number(data)
+        self.reorder_buffer.dispatch(
+            data,
+            sequence_number,
+            self._parse,
+            self._reset,
+        )
+
+    def _parse(self, data):
+        # note!
+        #   callback from the re-order buffer
+        #   datagrams are ordered by sequence number
         self.header = roq.codec.udp.Header(data)
         last = self.header.fragment == self.header.fragment_max
         payload = data[SIZE_OF_UDP_HEADER:]
@@ -116,6 +131,12 @@ class SbeReceiver:
                 self.decode_buffer = payload
             else:
                 self.decode_buffer += payload
+
+    def _reset(self):
+        # note!
+        #  callback from re-order buffer
+        #  sequence numbers are missing if you get notified here
+        pass
 
     @typedispatch
     def _callback(

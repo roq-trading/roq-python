@@ -118,6 +118,9 @@ void Module::create(pybind11::module_ &module) {
   auto utils = module.def_submodule("utils");
   roq::python::utils::Module::create(utils);
 
+  auto io = module.def_submodule("io");
+  roq::python::io::Module::create(io);
+
   auto client = module.def_submodule("client");
   roq::python::client::Module::create(client);
 }
