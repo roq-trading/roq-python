@@ -44,19 +44,14 @@ void sequence_helper(auto &sequencer, auto &market_by_price_update, auto &header
     }
   };
   auto publish_update = [&](auto &bids, auto &asks) {
-    // assert(!mbp_wait_for_snapshot_);
     auto mbp_update = create(bids, asks, UpdateType::INCREMENTAL);
     dispatch(mbp_update);
   };
   auto publish_snapshot = [&](auto &bids, auto &asks, [[maybe_unused]] auto sequence) {
     auto mbp_update = create(bids, asks, UpdateType::SNAPSHOT);
     dispatch(mbp_update);
-    // mbp_wait_for_snapshot_ = false;  // note! now we could leave the snapshot channel
   };
-  auto request_snapshot = [&](auto retries) {
-    reset(retries);
-    // mbp_wait_for_snapshot_ = true;  // note! now we must join the snapshot channel
-  };
+  auto request_snapshot = [&](auto retries) { reset(retries); };
   switch (market_by_price_update.update_type) {
     using enum UpdateType;
     case UNDEFINED:

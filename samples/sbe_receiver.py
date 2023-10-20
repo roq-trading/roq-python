@@ -23,8 +23,13 @@ SIZE_OF_UDP_HEADER = roq.codec.udp.Header.sizeof()
 
 class Instrument:
     def __init__(self, exchange, symbol):
+        self.exchange = exchange
+        self.symbol = symbol
         self.sequencer = roq.utils.mbp.Sequencer()
-        self.market_by_price = roq.utils.mbp.MarketByPrice(exchange=exchange, symbol=symbol)
+        self.market_by_price = roq.utils.mbp.MarketByPrice(
+            exchange=self.exchange,
+            symbol=self.symbol,
+        )
 
     def apply(
         self,
@@ -44,10 +49,18 @@ class Instrument:
     ):
         self.market_by_price.apply(market_by_price_update)
         depth = self.market_by_price.extract(2)
-        print(f"DEPTH: {depth}")
+        logging.info(
+            "DEPTH: exchange={}, symbol={}, depth={}".format(
+                self.exchange,
+                self.symbol,
+                depth,
+            )
+        )
 
     def _reset(self, retries):
-        print("RESET retries={}".format(retries))
+        logging.info(
+            "RESET: exchange={}, symbol={}, retries={}".format(self.exchange, self.symbol, retries)
+        )
 
 
 class Shared:
@@ -84,7 +97,7 @@ class SbeReceiver:
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        # note! for now, assuming no drops and no re-ordering
+        # FIXME for now, assuming no drops and no re-ordering
         self.header = roq.codec.udp.Header(data)
         last = self.header.fragment == self.header.fragment_max
         payload = data[SIZE_OF_UDP_HEADER:]
@@ -321,7 +334,6 @@ class Incremental(IncrementalMixin, SbeReceiver):
     pass
 
 
-# note! using UDP when len(multicast_address) == 0
 def create_datagram_socket(local_interface, multicast_port, multicast_address):
     use_multicast = multicast_address is not None and len(multicast_address) > 0
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
