@@ -26,32 +26,42 @@ class Instrument:
         self.sequencer = roq.utils.mbp.Sequencer()
         self.market_by_price = roq.utils.mbp.MarketByPrice(exchange=exchange, symbol=symbol)
 
-    def apply(self, market_by_price_update: roq.MarketByPriceUpdate, header: roq.codec.udp.Header):
-        print(
-            "APPLY update_type={}, sequence_number={}, last_sequence_number={}".format(
-                market_by_price_update.update_type,
-                header.sequence_number,
-                header.last_sequence_number,
-            )
+    def apply(
+        self,
+        market_by_price_update: roq.MarketByPriceUpdate,
+        header: roq.codec.udp.Header,
+    ):
+        self.sequencer.apply(
+            market_by_price_update,
+            header,
+            self._apply,
+            self._reset,
         )
-        self.sequencer.apply(market_by_price_update, header.sequence_number, header.last_sequence_number,self._apply, self._reset)
 
-    def _apply(self, market_by_price_update: roq.MarketByPriceUpdate):
+    def _apply(
+        self,
+        market_by_price_update: roq.MarketByPriceUpdate,
+    ):
         self.market_by_price.apply(market_by_price_update)
         depth = self.market_by_price.extract(2)
         print(f"DEPTH: {depth}")
 
-    def _reset(self):
-        print("REQUEST NEW SNAPSHOT")
+    def _reset(self, retries):
+        print("RESET retries={}".format(retries))
 
 
 class Shared:
     def __init__(self):
         self.instruments = dict()
 
-    def update(self, market_by_price_update: roq.MarketByPriceUpdate, last_sequence_number):
+    def update(
+        self,
+        market_by_price_update: roq.MarketByPriceUpdate,
+        header: roq.codec.udp.Header,
+    ):
         self._get_instrument(market_by_price_update).apply(
-            market_by_price_update, last_sequence_number
+            market_by_price_update,
+            header,
         )
 
     def _get_instrument(self, obj):
@@ -81,61 +91,99 @@ class SbeReceiver:
         if last:
             if len(self.decode_buffer) > 0:
                 self.decode_buffer += payload
-                self.decoder.dispatch(self._callback, self.decode_buffer)
+                length = self.decoder.dispatch(self._callback, self.decode_buffer)
+                assert length == len(self.decode_buffer), "internal error"
                 self.decode_buffer = bytearray()
             else:
-                self.decoder.dispatch(self._callback, payload)
+                length = self.decoder.dispatch(self._callback, payload)
+                assert length == len(payload), "internal error"
         else:
             if self.header.fragment == 0:
                 assert len(self.decode_buffer) == 0, "internal error"
-                self.decode_buffer = data
+                self.decode_buffer = payload
             else:
-                self.decode_buffer += data
-
-    @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
-        pass
-
-    @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, market_status: roq.MarketStatus):
-        pass
-
-    @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, top_of_book: roq.TopOfBook):
-        pass
+                self.decode_buffer += payload
 
     @typedispatch
     def _callback(
-        self, message_info: roq.MessageInfo, market_by_price_update: roq.MarketByPriceUpdate
+        self,
+        message_info: roq.MessageInfo,
+        reference_data: roq.ReferenceData,
     ):
         pass
 
     @typedispatch
     def _callback(
-        self, message_info: roq.MessageInfo, market_by_order_update: roq.MarketByOrderUpdate
+        self,
+        message_info: roq.MessageInfo,
+        market_status: roq.MarketStatus,
     ):
         pass
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, trade_summary: roq.TradeSummary):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        top_of_book: roq.TopOfBook,
+    ):
         pass
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        market_by_price_update: roq.MarketByPriceUpdate,
+    ):
         pass
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, order_ack: roq.OrderAck):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        market_by_order_update: roq.MarketByOrderUpdate,
+    ):
         pass
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, order_update: roq.OrderUpdate):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        trade_summary: roq.TradeSummary,
+    ):
+        pass
+
+    @typedispatch
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        statistics_update: roq.StatisticsUpdate,
+    ):
+        pass
+
+    @typedispatch
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        order_ack: roq.OrderAck,
+    ):
+        pass
+
+    @typedispatch
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        order_update: roq.OrderUpdate,
+    ):
         pass
 
 
 class SnapshotMixin:
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        reference_data: roq.ReferenceData,
+    ):
         logging.debug(
             "[SNAPSHOT] reference_data={}, message_info={}".format(
                 reference_data,
@@ -144,7 +192,11 @@ class SnapshotMixin:
         )
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, market_status: roq.MarketStatus):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        market_status: roq.MarketStatus,
+    ):
         logging.debug(
             "[SNAPSHOT] market_status={}, message_info={}".format(
                 market_status,
@@ -154,7 +206,9 @@ class SnapshotMixin:
 
     @typedispatch
     def _callback(
-        self, message_info: roq.MessageInfo, market_by_price_update: roq.MarketByPriceUpdate
+        self,
+        message_info: roq.MessageInfo,
+        market_by_price_update: roq.MarketByPriceUpdate,
     ):
         logging.debug(
             "[SNAPSHOT] market_by_price_update={}, message_info={}".format(
@@ -165,7 +219,11 @@ class SnapshotMixin:
         self.shared.update(market_by_price_update, self.header)
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        statistics_update: roq.StatisticsUpdate,
+    ):
         logging.debug(
             "[SNAPSHOT] statistics_update={}, message_info={}".format(
                 statistics_update,
@@ -176,7 +234,11 @@ class SnapshotMixin:
 
 class IncrementalMixin:
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, reference_data: roq.ReferenceData):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        reference_data: roq.ReferenceData,
+    ):
         logging.debug(
             "[INCREMENTAL] reference_data={}, message_info={}".format(
                 reference_data,
@@ -185,7 +247,11 @@ class IncrementalMixin:
         )
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, market_status: roq.MarketStatus):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        market_status: roq.MarketStatus,
+    ):
         logging.debug(
             "[INCREMENTAL] market_status={}, message_info={}".format(
                 market_status,
@@ -194,7 +260,11 @@ class IncrementalMixin:
         )
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, top_of_book: roq.TopOfBook):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        top_of_book: roq.TopOfBook,
+    ):
         logging.debug(
             "[INCREMENTAL] top_of_book={}, message_info={}".format(
                 top_of_book,
@@ -204,7 +274,9 @@ class IncrementalMixin:
 
     @typedispatch
     def _callback(
-        self, message_info: roq.MessageInfo, market_by_price_update: roq.MarketByPriceUpdate
+        self,
+        message_info: roq.MessageInfo,
+        market_by_price_update: roq.MarketByPriceUpdate,
     ):
         logging.debug(
             "[INCREMENTAL] market_by_price_update={}, message_info={}".format(
@@ -215,7 +287,11 @@ class IncrementalMixin:
         self.shared.update(market_by_price_update, self.header)
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, trade_summary: roq.TradeSummary):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        trade_summary: roq.TradeSummary,
+    ):
         logging.debug(
             "[INCREMENTAL] trade_summary={}, message_info={}".format(
                 trade_summary,
@@ -224,7 +300,11 @@ class IncrementalMixin:
         )
 
     @typedispatch
-    def _callback(self, message_info: roq.MessageInfo, statistics_update: roq.StatisticsUpdate):
+    def _callback(
+        self,
+        message_info: roq.MessageInfo,
+        statistics_update: roq.StatisticsUpdate,
+    ):
         logging.debug(
             "[INCREMENTAL] statistics_update={}, message_info={}".format(
                 statistics_update,

@@ -49,10 +49,10 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
           pybind11::arg("handler"),
           pybind11::arg("config"),
           pybind11::arg("connections"))
-      .def("dispatch", [](value_type &obj) { return obj.dispatch(); })
+      .def("dispatch", [](value_type &self) { return self.dispatch(); })
       .def(
           "create_order",
-          [](value_type &obj,
+          [](value_type &self,
              std::string_view const &account,
              uint32_t order_id,
              std::string_view const &exchange,
@@ -86,7 +86,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
                 .stop_price = stop_price,
                 .routing_id = routing_id,
             };
-            obj.send(create_order, source);
+            self.send(create_order, source);
           },
           pybind11::arg("account"),
           pybind11::arg("order_id"),
@@ -106,7 +106,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
           pybind11::arg("source"))
       .def(
           "modify_order",
-          [](value_type &obj,
+          [](value_type &self,
              std::string_view const &account,
              uint32_t order_id,
              std::string_view const &request_template,
@@ -126,7 +126,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
                 .version = version,
                 .conditional_on_version = conditional_on_version,
             };
-            obj.send(modify_order, source);
+            self.send(modify_order, source);
           },
           pybind11::arg("account"),
           pybind11::arg("order_id"),
@@ -139,7 +139,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
           pybind11::arg("source"))
       .def(
           "cancel_order",
-          [](value_type &obj,
+          [](value_type &self,
              std::string_view const &account,
              uint32_t order_id,
              std::string_view const &request_template,
@@ -155,7 +155,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
                 .version = version,
                 .conditional_on_version = conditional_on_version,
             };
-            obj.send(cancel_order, source);
+            self.send(cancel_order, source);
           },
           pybind11::arg("account"),
           pybind11::arg("order_id"),
@@ -166,7 +166,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
           pybind11::arg("source"))
       .def(
           "cancel_all_orders",
-          [](value_type &obj, std::string_view const &account, uint8_t source) {
+          [](value_type &self, std::string_view const &account, uint8_t source) {
             auto cancel_all_orders = roq::CancelAllOrders{
                 .account = account,
                 .order_id = {},
@@ -175,7 +175,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
                 .strategy_id = {},
                 .side = {},
             };
-            obj.send(cancel_all_orders, source);
+            self.send(cancel_all_orders, source);
           },
           pybind11::arg("account") = "",
           pybind11::arg("source"));
@@ -190,8 +190,8 @@ void utils::create_struct<client::EventLogReader>(pybind11::module_ &module) {
       // note! the callback signature **MUST** be pybind11::object so we can verify the reference count hasn't increased
       .def(
           "dispatch",
-          [](value_type &obj, std::function<void(pybind11::object, pybind11::object)> &callback) {
-            return obj.dispatch(callback);
+          [](value_type &self, std::function<void(pybind11::object, pybind11::object)> &callback) {
+            return self.dispatch(callback);
           },
           pybind11::arg("callback"));
 }
@@ -205,8 +205,8 @@ void utils::create_struct<client::EventLogMultiplexer>(pybind11::module_ &module
       // note! the callback signature **MUST** be pybind11::object so we can verify the reference count hasn't increased
       .def(
           "dispatch",
-          [](value_type &obj, std::function<void(pybind11::object, pybind11::object)> &callback) {
-            return obj.dispatch(callback);
+          [](value_type &self, std::function<void(pybind11::object, pybind11::object)> &callback) {
+            return self.dispatch(callback);
           },
           pybind11::arg("callback"));
 }

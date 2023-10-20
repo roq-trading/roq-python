@@ -44,8 +44,7 @@ struct MarketByPrice final {
 };
 
 struct Sequencer final {
- private:
-  roq::utils::mbp::Sequencer sequencer_;
+  roq::utils::mbp::Sequencer sequencer;
 };
 
 }  // namespace mbp
