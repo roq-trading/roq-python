@@ -15,6 +15,7 @@ namespace mbp {
 
 void Module::create(pybind11::module_ &module) {
   roq::python::utils::create_struct<roq::python::utils::mbp::MarketByPrice>(module);
+  roq::python::utils::create_struct<roq::python::utils::mbp::Sequencer>(module);
 }
 
 }  // namespace mbp

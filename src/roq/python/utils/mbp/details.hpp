@@ -5,6 +5,7 @@
 #include "roq/cache/market_by_order.hpp"
 
 #include "roq/utils/mbp/factory.hpp"
+#include "roq/utils/mbp/sequencer.hpp"
 
 #include "roq/python/utils.hpp"
 
@@ -40,6 +41,11 @@ struct MarketByPrice final {
 
  private:
   std::unique_ptr<roq::cache::MarketByPrice> market_by_price_;
+};
+
+struct Sequencer final {
+ private:
+  roq::utils::mbp::Sequencer sequencer_;
 };
 
 }  // namespace mbp
