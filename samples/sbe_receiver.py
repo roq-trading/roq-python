@@ -129,8 +129,12 @@ class SbeReceiver:
             if self.header.fragment == 0:
                 assert len(self.decode_buffer) == 0, "internal error"
                 self.decode_buffer = payload
-            else:
+            elif len(self.decode_buffer) > 0:
                 self.decode_buffer += payload
+            else:
+                # note!
+                #   happens after packet loss and we re-join in the middle of a fragmented message
+                pass
 
     def _reset(self):
         # note!
