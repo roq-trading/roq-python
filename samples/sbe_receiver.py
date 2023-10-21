@@ -122,9 +122,13 @@ class SbeReceiver:
                 length = self.decoder.dispatch(self._callback, self.decode_buffer)
                 assert length == len(self.decode_buffer), "internal error"
                 self.decode_buffer = bytearray()
-            else:
+            elif self.header.fragment == 0:
                 length = self.decoder.dispatch(self._callback, payload)
                 assert length == len(payload), "internal error"
+            else:
+                # note!
+                #   after packet loss and we have re-joined in the middle of a fragmented message
+                pass
         else:
             if self.header.fragment == 0:
                 assert len(self.decode_buffer) == 0, "internal error"
@@ -133,7 +137,7 @@ class SbeReceiver:
                 self.decode_buffer += payload
             else:
                 # note!
-                #   happens after packet loss and we re-join in the middle of a fragmented message
+                #   after packet loss and we have re-joined in the middle of a fragmented message
                 pass
 
     def _reset(self):
