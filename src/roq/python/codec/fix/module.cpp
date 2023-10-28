@@ -50,6 +50,20 @@ void Module::create(pybind11::module_ &module) {
   utils::create_ref_struct_2<roq::python::codec::fix::SecurityListRequest, roq::python::codec::fix::Encodeable>(module);
   utils::create_ref_struct_2<roq::python::codec::fix::SecurityList, roq::python::codec::fix::Encodeable>(module);
 
+  utils::create_ref_struct_2<roq::python::codec::fix::SecurityDefinitionRequest, roq::python::codec::fix::Encodeable>(
+      module);
+  utils::create_ref_struct_2<roq::python::codec::fix::SecurityDefinition, roq::python::codec::fix::Encodeable>(module);
+
+  utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatusRequest, roq::python::codec::fix::Encodeable>(
+      module);
+  utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatus, roq::python::codec::fix::Encodeable>(module);
+
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderStatusRequest, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderMassStatusRequest, roq::python::codec::fix::Encodeable>(
+      module);
+  utils::create_ref_struct_2<roq::python::codec::fix::NewOrderSingle, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::ExecutionReport, roq::python::codec::fix::Encodeable>(module);
+
   utils::create_struct<roq::python::codec::fix::Header>(module);
   utils::create_struct<roq::python::codec::fix::Decoder>(module);
 }

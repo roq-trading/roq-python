@@ -233,6 +233,104 @@ class Client(asyncio.Protocol):
             header,
         )
 
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        security_definition_request: roq.codec.fix.SecurityDefinitionRequest,
+    ):
+        logging.debug(
+            "[EVENT] security_definition_request=%s, header=%s",
+            security_definition_request,
+            header,
+        )
+        logging.fatal("Unexpected: SecurityDefinitionRequest")
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        security_definition: roq.codec.fix.SecurityDefinition,
+    ):
+        logging.debug(
+            "[EVENT] security_definition=%s, header=%s",
+            security_definition,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        security_status_request: roq.codec.fix.SecurityStatusRequest,
+    ):
+        logging.debug(
+            "[EVENT] security_status_request=%s, header=%s",
+            security_status_request,
+            header,
+        )
+        logging.fatal("Unexpected: SecurityStatusRequest")
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        security_status: roq.codec.fix.SecurityStatus,
+    ):
+        logging.debug(
+            "[EVENT] security_status=%s, header=%s",
+            security_status,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_status_request: roq.codec.fix.OrderStatusRequest,
+    ):
+        logging.debug(
+            "[EVENT] order_status_request=%s, header=%s",
+            order_status_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_mass_status_request: roq.codec.fix.OrderMassStatusRequest,
+    ):
+        logging.debug(
+            "[EVENT] order_mass_status_request=%s, header=%s",
+            order_mass_status_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        new_order_single: roq.codec.fix.NewOrderSingle,
+    ):
+        logging.debug(
+            "[EVENT] new_order_single=%s, header=%s",
+            new_order_single,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        execution_report: roq.codec.fix.ExecutionReport,
+    ):
+        logging.debug(
+            "[EVENT] execution_report=%s, header=%s",
+            execution_report,
+            header,
+        )
+
 
 class MyMixin:
     """
@@ -357,12 +455,105 @@ class MyMixin:
             security_list,
             header,
         )
-        trading_session_status_request = roq.codec.fix.TradingSessionStatusRequest(
-            trad_ses_req_id="req1",
-            trading_session_id="deribit",
+        security_definition_request = roq.codec.fix.SecurityDefinitionRequest(
+            security_req_id="req1",
+            security_request_type=roq.fix.SecurityRequestType.REQUEST_SECURITY_IDENTITY_AND_SPECIFICATIONS,
+            symbol="BTC-PERPETUAL",
+            security_exchange="deribit",
             subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
         )
-        self._send(trading_session_status_request)
+        self._send(security_definition_request)
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        security_definition: roq.codec.fix.SecurityDefinition,
+    ):
+        logging.debug(
+            "[EVENT] security_definition=%s, header=%s",
+            security_definition,
+            header,
+        )
+        security_status_request = roq.codec.fix.SecurityStatusRequest(
+            security_status_req_id="req1",
+            symbol="BTC-PERPETUAL",
+            security_exchange="deribit",
+            subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
+            trading_session_id="deribit",
+        )
+        self._send(security_status_request)
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        security_status: roq.codec.fix.SecurityStatus,
+    ):
+        logging.debug(
+            "[EVENT] security_status=%s, header=%s",
+            security_status,
+            header,
+        )
+        order_status_request = roq.codec.fix.OrderStatusRequest(
+            ord_status_req_id="req1",
+        )
+        self._send(order_status_request)
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        execution_report: roq.codec.fix.ExecutionReport,
+    ):
+        logging.debug(
+            "[EVENT] execution_report=%s, header=%s",
+            execution_report,
+            header,
+        )
+        logging.info(
+            "order_id=%s, cl_ord_id=%s, orig_cl_ord_id=%s, ord_status_req_id=%s, mass_status_req_id=%s, "
+            "exec_type=%s, ord_status=%s, ord_rej_reason=%s, side=%s, ord_type=%s, time_in_force=%s",
+            execution_report.order_id,
+            execution_report.cl_ord_id,
+            execution_report.orig_cl_ord_id,
+            execution_report.ord_status_req_id,
+            execution_report.mass_status_req_id,
+            execution_report.exec_type,
+            execution_report.ord_status,
+            execution_report.ord_rej_reason,
+            execution_report.side,
+            execution_report.ord_type,
+            execution_report.time_in_force,
+        )
+        if len(execution_report.ord_status_req_id) > 0:
+            order_mass_status_request = roq.codec.fix.OrderMassStatusRequest(
+                mass_status_req_id="req1",
+                mass_status_req_type=roq.fix.MassStatusReqType.ORDERS,
+            )
+            self._send(order_mass_status_request)
+        if len(execution_report.mass_status_req_id) > 0:
+            new_order_single = roq.codec.fix.NewOrderSingle(
+                cl_ord_id="req1",
+                account="A1",
+                symbol="BTC-PERPETUAL",
+                security_exchange="deribit",
+                side=roq.fix.Side.BUY,
+                transact_time=datetime.now(),
+                order_qty=1,
+                ord_type=roq.fix.OrdType.LIMIT,
+                price=10000,
+                time_in_force=roq.fix.TimeInForce.GTC,
+            )
+            self._send(new_order_single)
+        else:
+            # TODO not yet functional
+            trading_session_status_request = roq.codec.fix.TradingSessionStatusRequest(
+                trad_ses_req_id="req1",
+                trading_session_id="deribit",
+                subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
+            )
+            self._send(trading_session_status_request)
 
 
 class MySession(

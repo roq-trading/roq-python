@@ -311,6 +311,316 @@ void utils::create_ref_struct_2<roq::python::codec::fix::SecurityList, roq::pyth
 }
 
 template <>
+void utils::create_ref_struct_2<
+    roq::python::codec::fix::SecurityDefinitionRequest,
+    roq::python::codec::fix::Encodeable>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::SecurityDefinitionRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              roq::fix::SecurityRequestType,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              roq::fix::SubscriptionRequestType>(),
+          pybind11::arg("security_req_id") = std::string_view{},
+          pybind11::arg("security_request_type") = roq::fix::SecurityRequestType{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{},
+          pybind11::arg("trading_session_id") = std::string_view{},
+          pybind11::arg("subscription_request_type") = roq::fix::SubscriptionRequestType{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::SecurityDefinition, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::SecurityDefinition;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              std::string_view,
+              roq::fix::SecurityResponseType,
+              std::string_view,
+              double,
+              std::string_view,
+              std::string_view,
+              double>(),
+          pybind11::arg("security_req_id") = std::string_view{},
+          pybind11::arg("security_response_id") = std::string_view{},
+          pybind11::arg("security_response_type") = roq::fix::SecurityResponseType{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("contract_multiplier") = std::numeric_limits<double>::quiet_NaN(),
+          pybind11::arg("security_exechange") = std::string_view{},
+          pybind11::arg("trading_session_id") = std::string_view{},
+          pybind11::arg("min_trade_vol") = std::numeric_limits<double>::quiet_NaN())
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatusRequest, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::SecurityStatusRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              roq::fix::SubscriptionRequestType,
+              std::string_view>(),
+          pybind11::arg("security_status_req_id") = std::string_view{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{},
+          pybind11::arg("subscription_request_type") = roq::fix::SubscriptionRequestType{},
+          pybind11::arg("trading_session_id") = std::string_view{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatus, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::SecurityStatus;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              bool,
+              roq::fix::SecurityTradingStatus>(),
+          pybind11::arg("security_status_req_id") = std::string_view{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{},
+          pybind11::arg("trading_session_id") = std::string_view{},
+          pybind11::arg("unsolicited_indicator,") = bool{},
+          pybind11::arg("security_trading_status") = roq::fix::SecurityTradingStatus{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::OrderStatusRequest, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::OrderStatusRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              roq::fix::Side>(),
+          pybind11::arg("order_id") = std::string_view{},
+          pybind11::arg("cl_ord_id") = std::string_view{},
+          pybind11::arg("ord_status_req_id") = std::string_view{},
+          pybind11::arg("account") = std::string_view{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{},
+          pybind11::arg("side") = roq::fix::Side{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::OrderMassStatusRequest, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::OrderMassStatusRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              roq::fix::MassStatusReqType,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              roq::fix::Side>(),
+          pybind11::arg("mass_status_req_id") = std::string_view{},
+          pybind11::arg("mass_status_req_type") = roq::fix::MassStatusReqType{},
+          pybind11::arg("account") = std::string_view{},
+          pybind11::arg("trading_session_id") = std::string_view{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{},
+          pybind11::arg("side") = roq::fix::Side{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::NewOrderSingle, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::NewOrderSingle;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              roq::fix::HandlInst,
+              std::string_view,
+              std::string_view,
+              std::string_view,
+              roq::fix::Side,
+              std::chrono::system_clock::time_point,
+              double,
+              roq::fix::OrdType,
+              double,
+              double,
+              roq::fix::TimeInForce,
+              std::string_view,
+              roq::fix::PositionEffect,
+              double>(),
+          pybind11::arg("cl_ord_id") = std::string_view{},
+          pybind11::arg("secondary_cl_ord_id") = std::string_view{},
+          pybind11::arg("account") = std::string_view{},
+          pybind11::arg("handl_inst") = roq::fix::HandlInst{},
+          pybind11::arg("exec_inst") = std::string_view{},
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{},
+          pybind11::arg("side") = roq::fix::Side{},
+          pybind11::arg("transact_time") = std::chrono::system_clock::time_point{},
+          pybind11::arg("order_qty") = std::numeric_limits<double>::quiet_NaN(),
+          pybind11::arg("ord_type") = roq::fix::OrdType{},
+          pybind11::arg("price") = std::numeric_limits<double>::quiet_NaN(),
+          pybind11::arg("stop_px") = std::numeric_limits<double>::quiet_NaN(),
+          pybind11::arg("time_in_force") = roq::fix::TimeInForce{},
+          pybind11::arg("text") = std::string_view{},
+          pybind11::arg("position_effect") = roq::fix::PositionEffect{},
+          pybind11::arg("max_show") = std::numeric_limits<double>::quiet_NaN())
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::ExecutionReport, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::ExecutionReport;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def_property_readonly(
+          "order_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).order_id; })
+      .def_property_readonly(
+          "secondary_cl_ord_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).secondary_cl_ord_id; })
+      .def_property_readonly(
+          "cl_ord_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).cl_ord_id; })
+      .def_property_readonly(
+          "orig_cl_ord_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).orig_cl_ord_id; })
+      .def_property_readonly(
+          "ord_status_req_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).ord_status_req_id; })
+      .def_property_readonly(
+          "mass_status_req_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).mass_status_req_id; })
+      .def_property_readonly(
+          "tot_num_reports",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).tot_num_reports; })
+      .def_property_readonly(
+          "last_rpt_requested",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).last_rpt_requested; })
+      .def_property_readonly(
+          "exec_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).exec_id; })
+      .def_property_readonly(
+          "exec_type", [](value_type const &self) { return static_cast<value_type::value_type>(self).exec_type; })
+      .def_property_readonly(
+          "ord_status", [](value_type const &self) { return static_cast<value_type::value_type>(self).ord_status; })
+      .def_property_readonly(
+          "working_indicator",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).working_indicator; })
+      .def_property_readonly(
+          "ord_rej_reason",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).ord_rej_reason; })
+      .def_property_readonly(
+          "account", [](value_type const &self) { return static_cast<value_type::value_type>(self).account; })
+      .def_property_readonly(
+          "account_type", [](value_type const &self) { return static_cast<value_type::value_type>(self).account_type; })
+      .def_property_readonly(
+          "symbol", [](value_type const &self) { return static_cast<value_type::value_type>(self).symbol; })
+      .def_property_readonly(
+          "security_exchange",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).security_exchange; })
+      .def_property_readonly(
+          "side", [](value_type const &self) { return static_cast<value_type::value_type>(self).side; })
+      .def_property_readonly(
+          "ord_type", [](value_type const &self) { return static_cast<value_type::value_type>(self).ord_type; })
+      .def_property_readonly(
+          "order_qty", [](value_type const &self) { return static_cast<value_type::value_type>(self).order_qty.value; })
+      .def_property_readonly(
+          "price", [](value_type const &self) { return static_cast<value_type::value_type>(self).price.value; })
+      .def_property_readonly(
+          "stop_px", [](value_type const &self) { return static_cast<value_type::value_type>(self).stop_px.value; })
+      .def_property_readonly(
+          "currency", [](value_type const &self) { return static_cast<value_type::value_type>(self).currency; })
+      .def_property_readonly(
+          "time_in_force",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).time_in_force; })
+      .def_property_readonly(
+          "exec_inst", [](value_type const &self) { return static_cast<value_type::value_type>(self).exec_inst; })
+      .def_property_readonly(
+          "last_qty", [](value_type const &self) { return static_cast<value_type::value_type>(self).last_qty.value; })
+      .def_property_readonly(
+          "last_px", [](value_type const &self) { return static_cast<value_type::value_type>(self).last_px.value; })
+      .def_property_readonly(
+          "trading_session_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).trading_session_id; })
+      .def_property_readonly(
+          "leaves_qty",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).leaves_qty.value; })
+      .def_property_readonly(
+          "cum_qty", [](value_type const &self) { return static_cast<value_type::value_type>(self).cum_qty.value; })
+      .def_property_readonly(
+          "avg_px", [](value_type const &self) { return static_cast<value_type::value_type>(self).avg_px.value; })
+      .def_property_readonly(
+          "transact_time",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).transact_time; })
+      .def_property_readonly(
+          "position_effect",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).position_effect; })
+      .def_property_readonly(
+          "max_show", [](value_type const &self) { return static_cast<value_type::value_type>(self).max_show; })
+      .def_property_readonly(
+          "text", [](value_type const &self) { return static_cast<value_type::value_type>(self).text; })
+      .def_property_readonly(
+          "last_liquidity_ind",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).last_liquidity_ind; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
 void utils::create_struct<roq::python::codec::fix::Header>(pybind11::module_ &module) {
   using value_type = roq::python::codec::fix::Header;
   std::string name{nameof::nameof_short_type<value_type>()};

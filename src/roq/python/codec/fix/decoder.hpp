@@ -68,24 +68,40 @@ struct Decoder final {
     void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityList const &value) override {
       dispatch<SecurityList>(header, value);
     }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityDefinitionRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityDefinition const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatusRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatus const &value) override {}
+    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityDefinitionRequest const &value) override {
+      dispatch<SecurityDefinitionRequest>(header, value);
+    }
+    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityDefinition const &value) override {
+      dispatch<SecurityDefinition>(header, value);
+    }
+    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatusRequest const &value) override {
+      dispatch<SecurityStatusRequest>(header, value);
+    }
+    void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatus const &value) override {
+      dispatch<SecurityStatus>(header, value);
+    }
     void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequest const &value) override {}
     void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequestReject const &value) override {}
     void operator()(
         roq::fix::Header const &header, roq::codec::fix::MarketDataSnapshotFullRefresh const &value) override {}
     void operator()(
         roq::fix::Header const &header, roq::codec::fix::MarketDataIncrementalRefresh const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderStatusRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderMassStatusRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::NewOrderSingle const &value) override {}
+    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderStatusRequest const &value) override {
+      dispatch<OrderStatusRequest>(header, value);
+    }
+    void operator()(roq::fix::Header const &header, roq::codec::fix::OrderMassStatusRequest const &value) override {
+      dispatch<OrderMassStatusRequest>(header, value);
+    }
+    void operator()(roq::fix::Header const &header, roq::codec::fix::NewOrderSingle const &value) override {
+      dispatch<NewOrderSingle>(header, value);
+    }
     void operator()(roq::fix::Header const &header, roq::codec::fix::OrderCancelRequest const &value) override {}
     void operator()(roq::fix::Header const &header, roq::codec::fix::OrderCancelReplaceRequest const &value) override {}
     void operator()(roq::fix::Header const &header, roq::codec::fix::OrderMassCancelRequest const &value) override {}
     void operator()(roq::fix::Header const &header, roq::codec::fix::OrderCancelReject const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::ExecutionReport const &value) override {}
+    void operator()(roq::fix::Header const &header, roq::codec::fix::ExecutionReport const &value) override {
+      dispatch<ExecutionReport>(header, value);
+    }
     void operator()(roq::fix::Header const &header, roq::codec::fix::TradeCaptureReportRequest const &value) override {}
     void operator()(roq::fix::Header const &header, roq::codec::fix::TradeCaptureReport const &value) override {}
     void operator()(roq::fix::Header const &header, roq::codec::fix::RequestForPositions const &value) override {}
