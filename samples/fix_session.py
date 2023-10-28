@@ -19,7 +19,7 @@ import roq
 # TODO timer
 
 
-class FixSession(asyncio.Protocol):
+class Client(asyncio.Protocol):
     def __init__(self, sender_comp_id, target_comp_id, username, password):
         self.encoder = roq.codec.fix.Encoder(
             sender_comp_id=sender_comp_id,
@@ -34,7 +34,11 @@ class FixSession(asyncio.Protocol):
         self.transport = transport
 
     def data_received(self, data):
-        logging.debug("[RECV] {}".format(data.decode().replace(chr(1), "|")))
+        logging.debug(
+            "[RECV] data={}".format(
+                data.decode().replace(chr(1), "|"),
+            )
+        )
         self.decode_buffer += data
         while True:
             length = self.decoder.dispatch(self._callback, bytes(self.decode_buffer))
@@ -50,7 +54,11 @@ class FixSession(asyncio.Protocol):
 
     def _send(self, obj):
         message = self.encoder.encode(obj, datetime.now())
-        logging.debug("[SEND] {}".format(message.decode().replace(chr(1), "|")))
+        logging.debug(
+            "[SEND] data={}".format(
+                message.decode().replace(chr(1), "|"),
+            )
+        )
         self.transport.write(message)
 
     @typedispatch
@@ -59,7 +67,7 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         logon: roq.codec.fix.Logon,
     ):
-        pass
+        logging.debug("[EVENT] logon={}, header={}".format(logon, header,))
 
     @typedispatch
     def _callback(
@@ -67,7 +75,7 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         logout: roq.codec.fix.Logout,
     ):
-        pass
+        logging.debug("[EVENT] logout={}, header={}".format(logout, header,))
 
     @typedispatch
     def _callback(
@@ -75,7 +83,7 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         test_request: roq.codec.fix.TestRequest,
     ):
-        pass
+        logging.debug("[EVENT] test_request={}, header={}".format(test_request, header,))
 
     @typedispatch
     def _callback(
@@ -83,7 +91,7 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         heartbeat: roq.codec.fix.Heartbeat,
     ):
-        pass
+        logging.debug("[EVENT] heartbeat={}, header={}".format(heartbeat, header,))
 
     @typedispatch
     def _callback(
@@ -91,7 +99,8 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         resend_request: roq.codec.fix.ResendRequest,
     ):
-        pass
+        logging.debug("[EVENT] resend_request={}, header={}".format(resend_request, header,))
+        logging.fatal("Unexpected: ResendRequest")
 
     @typedispatch
     def _callback(
@@ -99,7 +108,8 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         reject: roq.codec.fix.Reject,
     ):
-        pass
+        logging.debug("[EVENT] reject={}, header={}".format(reject, header,))
+        logging.fatal("Unexpected: Reject")
 
     @typedispatch
     def _callback(
@@ -107,7 +117,9 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         business_message_reject: roq.codec.fix.BusinessMessageReject,
     ):
-        pass
+        logging.debug(
+            "[EVENT] business_message_reject={}, header={}".format(business_message_reject, header,)
+        )
 
     @typedispatch
     def _callback(
@@ -115,7 +127,8 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         user_request: roq.codec.fix.UserRequest,
     ):
-        pass
+        logging.debug("[EVENT] user_request={}, header={}".format(user_request, header,))
+        logging.fatal("Unexpected: UserRequest")
 
     @typedispatch
     def _callback(
@@ -123,7 +136,7 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         user_response: roq.codec.fix.UserResponse,
     ):
-        pass
+        logging.debug("[EVENT] user_response={}, header={}".format(user_response, header,))
 
     @typedispatch
     def _callback(
@@ -131,7 +144,12 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         trading_session_status_request: roq.codec.fix.TradingSessionStatusRequest,
     ):
-        pass
+        logging.debug(
+            "[EVENT] trading_session_status_request={}, header={}".format(
+                trading_session_status_request, header,
+            )
+        )
+        logging.fatal("Unexpected: TradingSessionStatusRequest")
 
     @typedispatch
     def _callback(
@@ -139,7 +157,9 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         trading_session_status: roq.codec.fix.TradingSessionStatus,
     ):
-        pass
+        logging.debug(
+            "[EVENT] trading_session_status={}, header={}".format(trading_session_status, header,)
+        )
 
     @typedispatch
     def _callback(
@@ -147,7 +167,10 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         security_list_request: roq.codec.fix.SecurityListRequest,
     ):
-        pass
+        logging.debug(
+            "[EVENT] security_list_request={}, header={}".format(security_list_request, header,)
+        )
+        logging.fatal("Unexpected: SecurityListRequest")
 
     @typedispatch
     def _callback(
@@ -155,7 +178,7 @@ class FixSession(asyncio.Protocol):
         header: roq.codec.fix.Header,
         security_list: roq.codec.fix.SecurityList,
     ):
-        pass
+        logging.debug("[EVENT] security_list={}, header={}".format(security_list, header,))
 
 
 class MyMixin:
@@ -168,6 +191,7 @@ class MyMixin:
             encrypt_method=roq.fix.EncryptMethod.NONE,
         )
         self._send(logon)
+        logging.info("Sending logon...")
 
     @typedispatch
     def _callback(
@@ -175,8 +199,8 @@ class MyMixin:
         header: roq.codec.fix.Header,
         logon: roq.codec.fix.Logon,
     ):
-        logging.info("[EVENT] logon={}, header={}".format(logon, header))
-        logging.info("*** READY ***")
+        logging.debug("[EVENT] logon={}, header={}".format(logon, header,))
+        logging.info("Logon was successful")
         security_list_request = roq.codec.fix.SecurityListRequest(
             security_req_id="req1",
             security_list_request_type=roq.fix.SecurityListRequestType.ALL_SECURITIES,
@@ -196,7 +220,8 @@ class MyMixin:
         header: roq.codec.fix.Header,
         logout: roq.codec.fix.Logout,
     ):
-        logging.info("[EVENT] logout={}, header={}".format(logout, header))
+        logging.debug("[EVENT] logout={}, header={}".format(logout, header,))
+        logging.fatal("Logon failed!")
 
     @typedispatch
     def _callback(
@@ -204,7 +229,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         test_request: roq.codec.fix.TestRequest,
     ):
-        logging.info("[EVENT] test_request={}, header={}".format(test_request, header))
+        logging.debug("[EVENT] test_request={}, header={}".format(test_request, header,))
         heartbeat = roq.codec.fix.Heartbeat(
             test_req_id=test_request.test_req_id,
         )
@@ -216,7 +241,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         heartbeat: roq.codec.fix.Heartbeat,
     ):
-        logging.info("[EVENT] heartbeat={}, header={}".format(heartbeat, header))
+        logging.debug("[EVENT] heartbeat={}, header={}".format(heartbeat, header,))
 
     @typedispatch
     def _callback(
@@ -224,7 +249,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         reject: roq.codec.fix.Reject,
     ):
-        logging.info("[EVENT] reject={}, header={}".format(reject, header))
+        logging.debug("[EVENT] reject={}, header={}".format(reject, header,))
 
     @typedispatch
     def _callback(
@@ -232,8 +257,8 @@ class MyMixin:
         header: roq.codec.fix.Header,
         business_message_reject: roq.codec.fix.BusinessMessageReject,
     ):
-        logging.info(
-            "[EVENT] business_message_reject={}, header={}".format(business_message_reject, header)
+        logging.debug(
+            "[EVENT] business_message_reject={}, header={}".format(business_message_reject, header,)
         )
 
     @typedispatch
@@ -242,8 +267,8 @@ class MyMixin:
         header: roq.codec.fix.Header,
         trading_session_status: roq.codec.fix.TradingSessionStatus,
     ):
-        logging.info(
-            "[EVENT] trading_session_status={}, header={}".format(trading_session_status, header)
+        logging.debug(
+            "[EVENT] trading_session_status={}, header={}".format(trading_session_status, header,)
         )
 
     @typedispatch
@@ -252,12 +277,12 @@ class MyMixin:
         header: roq.codec.fix.Header,
         security_list: roq.codec.fix.SecurityList,
     ):
-        logging.info("[EVENT] security_list={}, header={}".format(security_list, header))
+        logging.debug("[EVENT] security_list={}, header={}".format(security_list, header,))
 
 
 class MySession(
     MyMixin,
-    FixSession,
+    Client,
 ):
     pass
 

@@ -59,7 +59,7 @@ class Instrument:
 
     def _reset(self, retries):
         logging.info(
-            "RESET: exchange={}, symbol={}, retries={}".format(self.exchange, self.symbol, retries)
+            "RESET: exchange={}, symbol={}, retries={}".format(self.exchange, self.symbol, retries,)
         )
 
 
@@ -86,7 +86,7 @@ class Shared:
         return instrument
 
 
-class SbeReceiver:
+class Receiver:
     def __init__(self, shared):
         self.reorder_buffer = roq.io.net.ReorderBuffer()
         self.decoder = roq.codec.sbe.Decoder()
@@ -152,7 +152,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         reference_data: roq.ReferenceData,
     ):
-        pass
+        logging.debug(
+            "[EVENT] reference_data={}, message_info={}".format(
+                reference_data,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -160,7 +165,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         market_status: roq.MarketStatus,
     ):
-        pass
+        logging.debug(
+            "[EVENT] market_status={}, message_info={}".format(
+                market_status,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -168,7 +178,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         top_of_book: roq.TopOfBook,
     ):
-        pass
+        logging.debug(
+            "[EVENT] top_of_book={}, message_info={}".format(
+                top_of_book,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -176,7 +191,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         market_by_price_update: roq.MarketByPriceUpdate,
     ):
-        pass
+        logging.debug(
+            "[EVENT] market_by_price_update={}, message_info={}".format(
+                market_by_price_update,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -184,7 +204,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         market_by_order_update: roq.MarketByOrderUpdate,
     ):
-        pass
+        logging.debug(
+            "[EVENT] market_by_order_update={}, message_info={}".format(
+                market_by_order_update,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -192,7 +217,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         trade_summary: roq.TradeSummary,
     ):
-        pass
+        logging.debug(
+            "[EVENT] trade_summary={}, message_info={}".format(
+                trade_summary,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -200,7 +230,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         statistics_update: roq.StatisticsUpdate,
     ):
-        pass
+        logging.debug(
+            "[EVENT] statistics_update={}, message_info={}".format(
+                statistics_update,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -208,7 +243,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         order_ack: roq.OrderAck,
     ):
-        pass
+        logging.debug(
+            "[EVENT] order_ack={}, message_info={}".format(
+                order_ack,
+                message_info,
+            )
+        )
 
     @typedispatch
     def _callback(
@@ -216,7 +256,12 @@ class SbeReceiver:
         message_info: roq.MessageInfo,
         order_update: roq.OrderUpdate,
     ):
-        pass
+        logging.debug(
+            "[EVENT] order_update={}, message_info={}".format(
+                order_update,
+                message_info,
+            )
+        )
 
 
 class SnapshotMixin:
@@ -357,14 +402,14 @@ class IncrementalMixin:
 
 class Snapshot(
     SnapshotMixin,
-    SbeReceiver,
+    Receiver,
 ):
     pass
 
 
 class Incremental(
     IncrementalMixin,
-    SbeReceiver,
+    Receiver,
 ):
     pass
 
