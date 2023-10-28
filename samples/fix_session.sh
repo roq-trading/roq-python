@@ -5,4 +5,5 @@ python fix_session.py \
   --sender_comp_id=test \
   --target_comp_id=proxy \
   --username=trader \
-  --password=secret
+  --password=secret \
+  $@

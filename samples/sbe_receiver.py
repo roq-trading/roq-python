@@ -142,8 +142,8 @@ class SbeReceiver:
 
     def _reset(self):
         # note!
-        #  callback from re-order buffer
-        #  sequence numbers are missing if you get notified here
+        #   callback from re-order buffer
+        #   sequence numbers are missing if you get notified here
         pass
 
     @typedispatch
@@ -355,11 +355,17 @@ class IncrementalMixin:
         )
 
 
-class Snapshot(SnapshotMixin, SbeReceiver,):
+class Snapshot(
+    SnapshotMixin,
+    SbeReceiver,
+):
     pass
 
 
-class Incremental(IncrementalMixin, SbeReceiver,):
+class Incremental(
+    IncrementalMixin,
+    SbeReceiver,
+):
     pass
 
 
@@ -436,13 +442,19 @@ def main(
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.INFO)
-
     import argparse
 
     parser = argparse.ArgumentParser(
         prog="SBE Receiver (TEST)",
         description="Demonstrates how to decode a SBE multicast feed using asyncio",
+    )
+
+    parser.add_argument(
+        "--loglevel",
+        type=str,
+        required=False,
+        default="info",
+        help="logging level",
     )
 
     parser.add_argument(
@@ -477,5 +489,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    logging.basicConfig(level=args.loglevel.upper())
+
+    del args.loglevel
 
     main(**vars(args))

@@ -308,13 +308,19 @@ def main(
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.INFO)
-
     import argparse
 
     parser = argparse.ArgumentParser(
         prog="FIX Session (TEST)",
         description="Demonstrates how to maintain a FIX session using asyncio",
+    )
+
+    parser.add_argument(
+        "--loglevel",
+        type=str,
+        required=False,
+        default="info",
+        help="logging level",
     )
 
     parser.add_argument(
@@ -349,5 +355,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    logging.basicConfig(level=args.loglevel.upper())
+
+    del args.loglevel
 
     main(**vars(args))
