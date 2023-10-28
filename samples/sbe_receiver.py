@@ -11,8 +11,6 @@ import logging
 import struct
 import socket
 
-from datetime import datetime, timedelta
-
 from fastcore.all import typedispatch
 
 import roq
@@ -36,17 +34,27 @@ class Instrument:
         market_by_price_update: roq.MarketByPriceUpdate,
         header: roq.codec.udp.Header,
     ):
+        # NOTE
+        #   MarketByPriceUpdate can arrive from either channel (incremental or snapshot).
+        #   The sequencer will collect incremental updates in memory until a snapshot is received
+        #   because a snapshot can be "old", any incremental updates collected *after* the snapshot
+        #   will be applied to the snapshot before a MarketByPriceUpdate is notified through the callback.
+        #   Any following MarketByPriceUpdate events will be pass through to the callback.
+        #   This procedure may restart if sequence numbers are lost.
         self.sequencer.apply(
-            market_by_price_update,
-            header,
-            self._apply,
-            self._reset,
+            market_by_price_update=market_by_price_update,
+            header=header,
+            apply=self._apply,
+            reset=self._reset,
         )
 
     def _apply(
         self,
         market_by_price_update: roq.MarketByPriceUpdate,
     ):
+        # NOTE
+        #   Apply a MarketByPriceUpdate event to the MarketByPrice object.
+        #   This will maintain a current state of an order book in memory.
         self.market_by_price.apply(market_by_price_update)
         depth = self.market_by_price.extract(2)
         logging.info(
@@ -102,9 +110,9 @@ class Receiver:
         self.transport = transport
 
     def datagram_received(self, data, addr):
-        # note!
-        #   datagrams can arrive out of order or not at all
-        #   the re-order buffer will ensure proper sequencing and detect drops
+        # NOTE
+        #   Datagrams can arrive out of order or not at all.
+        #   The re-order buffer will ensure proper sequencing and detect drops.
         sequence_number = roq.codec.udp.Header.get_sequence_number(data)
         self.reorder_buffer.dispatch(
             data,
@@ -114,9 +122,9 @@ class Receiver:
         )
 
     def _parse(self, data):
-        # note!
-        #   callback from the re-order buffer
-        #   datagrams are ordered by sequence number
+        # NOTE
+        #   Callback from the re-order buffer.
+        #   Datagrams are ordered by sequence number.
         self.header = roq.codec.udp.Header(data)
         last = self.header.fragment == self.header.fragment_max
         payload = data[SIZE_OF_UDP_HEADER:]
@@ -130,8 +138,8 @@ class Receiver:
                 length = self.decoder.dispatch(self._callback, payload)
                 assert length == len(payload), "internal error"
             else:
-                # note!
-                #   after packet loss and we have re-joined in the middle of a fragmented message
+                # NOTE
+                #   After packet loss and we have re-joined in the middle of a fragmented message.
                 pass
         else:
             if self.header.fragment == 0:
@@ -140,14 +148,14 @@ class Receiver:
             elif len(self.decode_buffer) > 0:
                 self.decode_buffer += payload
             else:
-                # note!
-                #   after packet loss and we have re-joined in the middle of a fragmented message
+                # NOTE
+                #   After packet loss and we have re-joined in the middle of a fragmented message.
                 pass
 
     def _reset(self):
-        # note!
-        #   callback from re-order buffer
-        #   sequence numbers are missing if you get notified here
+        # NOTE
+        #   Callback from re-order buffer.
+        #   Packet loss has been detected if this handler is called.
         pass
 
     @typedispatch

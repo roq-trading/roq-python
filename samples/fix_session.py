@@ -410,9 +410,7 @@ def main(
 
     # loop.set_debug(True)
 
-    task = create_connection(
-        loop, network_address, sender_comp_id, target_comp_id, username, password
-    )
+    task = create_connection(loop, network_address, sender_comp_id, target_comp_id, username, password)
 
     loop.run_until_complete(task)
 

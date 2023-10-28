@@ -57,9 +57,7 @@ def callback(header: roq.codec.fix.Header, reject: roq.codec.fix.Reject):
 
 
 @typedispatch
-def callback(
-    header: roq.codec.fix.Header, business_message_reject: roq.codec.fix.BusinessMessageReject
-):
+def callback(header: roq.codec.fix.Header, business_message_reject: roq.codec.fix.BusinessMessageReject):
     print("business_message_reject={}, header={}".format(business_message_reject, header))
 
 
@@ -78,24 +76,16 @@ def callback(
     header: roq.codec.fix.Header,
     trading_session_status_request: roq.codec.fix.TradingSessionStatusRequest,
 ):
-    print(
-        "trading_session_status_request={}, header={}".format(
-            trading_session_status_request, header
-        )
-    )
+    print("trading_session_status_request={}, header={}".format(trading_session_status_request, header))
 
 
 @typedispatch
-def callback(
-    header: roq.codec.fix.Header, trading_session_status: roq.codec.fix.TradingSessionStatus
-):
+def callback(header: roq.codec.fix.Header, trading_session_status: roq.codec.fix.TradingSessionStatus):
     print("trading_session_status={}, header={}".format(trading_session_status, header))
 
 
 @typedispatch
-def callback(
-    header: roq.codec.fix.Header, security_list_request: roq.codec.fix.SecurityListRequest
-):
+def callback(header: roq.codec.fix.Header, security_list_request: roq.codec.fix.SecurityListRequest):
     print("security_list_request={}, header={}".format(security_list_request, header))
 
 
