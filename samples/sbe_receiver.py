@@ -44,7 +44,7 @@ class Instrument:
         self.sequencer.apply(
             market_by_price_update=market_by_price_update,
             header=header,
-            apply=self._apply,
+            callback=self._apply,
             reset=self._reset,
         )
 
