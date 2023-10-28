@@ -268,12 +268,6 @@ class MyMixin:
             subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
         )
         self._send(security_list_request)
-        trading_session_status_request = roq.codec.fix.TradingSessionStatusRequest(
-            trad_ses_req_id="req1",
-            trading_session_id="deribit",
-            subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
-        )
-        self._send(trading_session_status_request)
 
     @typedispatch
     def _callback(
@@ -363,6 +357,12 @@ class MyMixin:
             security_list,
             header,
         )
+        trading_session_status_request = roq.codec.fix.TradingSessionStatusRequest(
+            trad_ses_req_id="req1",
+            trading_session_id="deribit",
+            subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
+        )
+        self._send(trading_session_status_request)
 
 
 class MySession(
