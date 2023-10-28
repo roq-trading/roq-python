@@ -355,15 +355,19 @@ class IncrementalMixin:
         )
 
 
-class Snapshot(SnapshotMixin, SbeReceiver):
+class Snapshot(SnapshotMixin, SbeReceiver,):
     pass
 
 
-class Incremental(IncrementalMixin, SbeReceiver):
+class Incremental(IncrementalMixin, SbeReceiver,):
     pass
 
 
-def create_datagram_socket(local_interface, multicast_port, multicast_address):
+def create_datagram_socket(
+    local_interface: str,
+    multicast_port: int,
+    multicast_address: str,
+):
     use_multicast = multicast_address is not None and len(multicast_address) > 0
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -388,13 +392,16 @@ def create_datagram_socket(local_interface, multicast_port, multicast_address):
 
 
 def main(
-    local_interface,
-    multicast_snapshot_address,
-    multicast_snapshot_port,
-    multicast_incremental_address,
-    multicast_incremental_port,
+    local_interface: str,
+    multicast_snapshot_address: str,
+    multicast_snapshot_port: str,
+    multicast_incremental_address: str,
+    multicast_incremental_port: str,
 ):
-    loop = asyncio.get_event_loop()
+
+    loop = asyncio.new_event_loop()
+
+    asyncio.set_event_loop(loop)
 
     # loop.set_debug(True)
 
@@ -428,6 +435,7 @@ def main(
 
 
 if __name__ == "__main__":
+
     logging.basicConfig(level=logging.INFO)
 
     import argparse

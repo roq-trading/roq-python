@@ -22,19 +22,6 @@ namespace codec {
 namespace fix {
 
 void Module::create(pybind11::module_ &module) {
-  utils::create_enum<roq::fix::MsgType>(module);
-
-  utils::create_enum<roq::fix::EncryptMethod>(module);
-  utils::create_enum<roq::fix::SessionRejectReason>(module);
-  utils::create_enum<roq::fix::BusinessRejectReason>(module);
-  utils::create_enum<roq::fix::UserRequestType>(module);
-  utils::create_enum<roq::fix::UserStatus>(module);
-  utils::create_enum<roq::fix::SubscriptionRequestType>(module);
-  utils::create_enum<roq::fix::TradSesStatus>(module);
-  utils::create_enum<roq::fix::TradSesStatusRejReason>(module);
-  utils::create_enum<roq::fix::SecurityListRequestType>(module);
-  utils::create_enum<roq::fix::SecurityRequestResult>(module);
-
   utils::create_struct<roq::python::codec::fix::SecListGrp>(module);
 
   utils::create_struct<roq::python::codec::fix::Encodeable>(module);

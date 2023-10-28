@@ -30,7 +30,7 @@ void utils::create_struct<roq::python::codec::fix::SecListGrp>(pybind11::module_
           pybind11::arg("min_trade_vol") = NaN,
           pybind11::arg("trading_session_id") = std::string{})
       .def("__repr__", [](value_type const &self) {
-        return fmt::print("{}"sv, static_cast<value_type::value_type>(self));
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
 }
 

@@ -13,6 +13,7 @@
 
 #include "roq/python/client/module.hpp"
 #include "roq/python/codec/module.hpp"
+#include "roq/python/fix/module.hpp"
 #include "roq/python/io/module.hpp"
 #include "roq/python/utils/module.hpp"
 
@@ -111,6 +112,9 @@ void Module::create(pybind11::module_ &module) {
   roq::python::utils::create_ref_struct<roq::CustomMetricsUpdate>(module);
 
   // sub-modules
+
+  auto fix = module.def_submodule("fix");
+  roq::python::fix::Module::create(fix);
 
   auto codec = module.def_submodule("codec");
   roq::python::codec::Module::create(codec);
