@@ -20,7 +20,16 @@ import roq
 
 
 class Client(asyncio.Protocol):
+    """
+    Manage FIX bi-directional connection.
+    """
+
     def __init__(self, sender_comp_id, target_comp_id, username, password):
+        """
+        Constructor.
+        """
+
+        self.transport = None
         self.encoder = roq.codec.fix.Encoder(
             sender_comp_id=sender_comp_id,
             target_comp_id=target_comp_id,
@@ -35,9 +44,8 @@ class Client(asyncio.Protocol):
 
     def data_received(self, data):
         logging.debug(
-            "[RECV] data={}".format(
-                data.decode().replace(chr(1), "|"),
-            )
+            "[RECV] data=%s",
+            data.decode().replace(chr(1), "|"),
         )
         self.decode_buffer += data
         while True:
@@ -53,11 +61,14 @@ class Client(asyncio.Protocol):
         pass
 
     def _send(self, obj):
+        """
+        Encode and send a FIX message.
+        """
+
         message = self.encoder.encode(obj, datetime.now())
         logging.debug(
-            "[SEND] data={}".format(
-                message.decode().replace(chr(1), "|"),
-            )
+            "[SEND] data=%s",
+            message.decode().replace(chr(1), "|"),
         )
         self.transport.write(message)
 
@@ -68,10 +79,9 @@ class Client(asyncio.Protocol):
         logon: roq.codec.fix.Logon,
     ):
         logging.debug(
-            "[EVENT] logon={}, header={}".format(
-                logon,
-                header,
-            )
+            "[EVENT] logon=%s, header=%s",
+            logon,
+            header,
         )
 
     @typedispatch
@@ -81,10 +91,9 @@ class Client(asyncio.Protocol):
         logout: roq.codec.fix.Logout,
     ):
         logging.debug(
-            "[EVENT] logout={}, header={}".format(
-                logout,
-                header,
-            )
+            "[EVENT] logout=%s, header=%s",
+            logout,
+            header,
         )
 
     @typedispatch
@@ -94,10 +103,9 @@ class Client(asyncio.Protocol):
         test_request: roq.codec.fix.TestRequest,
     ):
         logging.debug(
-            "[EVENT] test_request={}, header={}".format(
-                test_request,
-                header,
-            )
+            "[EVENT] test_request=%s, header=%s",
+            test_request,
+            header,
         )
 
     @typedispatch
@@ -107,10 +115,9 @@ class Client(asyncio.Protocol):
         heartbeat: roq.codec.fix.Heartbeat,
     ):
         logging.debug(
-            "[EVENT] heartbeat={}, header={}".format(
-                heartbeat,
-                header,
-            )
+            "[EVENT] heartbeat=%s, header=%s",
+            heartbeat,
+            header,
         )
 
     @typedispatch
@@ -120,10 +127,9 @@ class Client(asyncio.Protocol):
         resend_request: roq.codec.fix.ResendRequest,
     ):
         logging.debug(
-            "[EVENT] resend_request={}, header={}".format(
-                resend_request,
-                header,
-            )
+            "[EVENT] resend_request=%s, header=%s",
+            resend_request,
+            header,
         )
         logging.fatal("Unexpected: ResendRequest")
 
@@ -134,10 +140,9 @@ class Client(asyncio.Protocol):
         reject: roq.codec.fix.Reject,
     ):
         logging.debug(
-            "[EVENT] reject={}, header={}".format(
-                reject,
-                header,
-            )
+            "[EVENT] reject=%s, header=%s",
+            reject,
+            header,
         )
         logging.fatal("Unexpected: Reject")
 
@@ -148,10 +153,9 @@ class Client(asyncio.Protocol):
         business_message_reject: roq.codec.fix.BusinessMessageReject,
     ):
         logging.debug(
-            "[EVENT] business_message_reject={}, header={}".format(
-                business_message_reject,
-                header,
-            )
+            "[EVENT] business_message_reject=%s, header=%s",
+            business_message_reject,
+            header,
         )
 
     @typedispatch
@@ -161,10 +165,9 @@ class Client(asyncio.Protocol):
         user_request: roq.codec.fix.UserRequest,
     ):
         logging.debug(
-            "[EVENT] user_request={}, header={}".format(
-                user_request,
-                header,
-            )
+            "[EVENT] user_request=%s, header=%s",
+            user_request,
+            header,
         )
         logging.fatal("Unexpected: UserRequest")
 
@@ -175,10 +178,9 @@ class Client(asyncio.Protocol):
         user_response: roq.codec.fix.UserResponse,
     ):
         logging.debug(
-            "[EVENT] user_response={}, header={}".format(
-                user_response,
-                header,
-            )
+            "[EVENT] user_response=%s, header=%s",
+            user_response,
+            header,
         )
 
     @typedispatch
@@ -188,10 +190,9 @@ class Client(asyncio.Protocol):
         trading_session_status_request: roq.codec.fix.TradingSessionStatusRequest,
     ):
         logging.debug(
-            "[EVENT] trading_session_status_request={}, header={}".format(
-                trading_session_status_request,
-                header,
-            )
+            "[EVENT] trading_session_status_request=%s, header=%s",
+            trading_session_status_request,
+            header,
         )
         logging.fatal("Unexpected: TradingSessionStatusRequest")
 
@@ -202,10 +203,9 @@ class Client(asyncio.Protocol):
         trading_session_status: roq.codec.fix.TradingSessionStatus,
     ):
         logging.debug(
-            "[EVENT] trading_session_status={}, header={}".format(
-                trading_session_status,
-                header,
-            )
+            "[EVENT] trading_session_status=%s, header=%s",
+            trading_session_status,
+            header,
         )
 
     @typedispatch
@@ -215,10 +215,9 @@ class Client(asyncio.Protocol):
         security_list_request: roq.codec.fix.SecurityListRequest,
     ):
         logging.debug(
-            "[EVENT] security_list_request={}, header={}".format(
-                security_list_request,
-                header,
-            )
+            "[EVENT] security_list_request=%s, header=%s",
+            security_list_request,
+            header,
         )
         logging.fatal("Unexpected: SecurityListRequest")
 
@@ -229,14 +228,17 @@ class Client(asyncio.Protocol):
         security_list: roq.codec.fix.SecurityList,
     ):
         logging.debug(
-            "[EVENT] security_list={}, header={}".format(
-                security_list,
-                header,
-            )
+            "[EVENT] security_list=%s, header=%s",
+            security_list,
+            header,
         )
 
 
 class MyMixin:
+    """
+    Client mixin implementing our workflow.
+    """
+
     def connection_made(self, transport):
         self.transport = transport
         logon = roq.codec.fix.Logon(
@@ -255,10 +257,9 @@ class MyMixin:
         logon: roq.codec.fix.Logon,
     ):
         logging.debug(
-            "[EVENT] logon={}, header={}".format(
-                logon,
-                header,
-            )
+            "[EVENT] logon=%s, header=%s",
+            logon,
+            header,
         )
         logging.info("Logon was successful")
         security_list_request = roq.codec.fix.SecurityListRequest(
@@ -281,10 +282,9 @@ class MyMixin:
         logout: roq.codec.fix.Logout,
     ):
         logging.debug(
-            "[EVENT] logout={}, header={}".format(
-                logout,
-                header,
-            )
+            "[EVENT] logout=%s, header=%s",
+            logout,
+            header,
         )
         logging.fatal("Logon failed!")
 
@@ -295,10 +295,9 @@ class MyMixin:
         test_request: roq.codec.fix.TestRequest,
     ):
         logging.debug(
-            "[EVENT] test_request={}, header={}".format(
-                test_request,
-                header,
-            )
+            "[EVENT] test_request=%s, header=%s",
+            test_request,
+            header,
         )
         heartbeat = roq.codec.fix.Heartbeat(
             test_req_id=test_request.test_req_id,
@@ -312,10 +311,9 @@ class MyMixin:
         heartbeat: roq.codec.fix.Heartbeat,
     ):
         logging.debug(
-            "[EVENT] heartbeat={}, header={}".format(
-                heartbeat,
-                header,
-            )
+            "[EVENT] heartbeat=%s, header=%s",
+            heartbeat,
+            header,
         )
 
     @typedispatch
@@ -325,10 +323,9 @@ class MyMixin:
         reject: roq.codec.fix.Reject,
     ):
         logging.debug(
-            "[EVENT] reject={}, header={}".format(
-                reject,
-                header,
-            )
+            "[EVENT] reject=%s, header=%s",
+            reject,
+            header,
         )
 
     @typedispatch
@@ -338,10 +335,9 @@ class MyMixin:
         business_message_reject: roq.codec.fix.BusinessMessageReject,
     ):
         logging.debug(
-            "[EVENT] business_message_reject={}, header={}".format(
-                business_message_reject,
-                header,
-            )
+            "[EVENT] business_message_reject=%s, header=%s",
+            business_message_reject,
+            header,
         )
 
     @typedispatch
@@ -351,10 +347,9 @@ class MyMixin:
         trading_session_status: roq.codec.fix.TradingSessionStatus,
     ):
         logging.debug(
-            "[EVENT] trading_session_status={}, header={}".format(
-                trading_session_status,
-                header,
-            )
+            "[EVENT] trading_session_status=%s, header=%s",
+            trading_session_status,
+            header,
         )
 
     @typedispatch
@@ -364,10 +359,9 @@ class MyMixin:
         security_list: roq.codec.fix.SecurityList,
     ):
         logging.debug(
-            "[EVENT] security_list={}, header={}".format(
-                security_list,
-                header,
-            )
+            "[EVENT] security_list=%s, header=%s",
+            security_list,
+            header,
         )
 
 
@@ -375,7 +369,9 @@ class MySession(
     MyMixin,
     Client,
 ):
-    pass
+    """
+    Our workflow.
+    """
 
 
 def create_connection(
@@ -386,6 +382,10 @@ def create_connection(
     username: str,
     password: str,
 ):
+    """
+    Creates a bi-directional connection.
+    """
+
     return loop.create_unix_connection(
         lambda: MySession(
             sender_comp_id=sender_comp_id,
@@ -404,13 +404,24 @@ def main(
     username: str,
     password: str,
 ):
+    """
+    Main function.
+    """
+
     loop = asyncio.new_event_loop()
 
     asyncio.set_event_loop(loop)
 
     # loop.set_debug(True)
 
-    task = create_connection(loop, network_address, sender_comp_id, target_comp_id, username, password)
+    task = create_connection(
+        loop,
+        network_address,
+        sender_comp_id,
+        target_comp_id,
+        username,
+        password,
+    )
 
     loop.run_until_complete(task)
 

@@ -74,11 +74,10 @@ class Instrument:
         self.market_by_price.apply(market_by_price_update)
         depth = self.market_by_price.extract(2)
         logging.info(
-            "DEPTH: exchange={}, symbol={}, depth={}".format(
-                self.exchange,
-                self.symbol,
-                depth,
-            )
+            "DEPTH: exchange=%s, symbol=%s, depth=%s",
+            self.exchange,
+            self.symbol,
+            depth,
         )
 
     def _reset(self, retries: int):
@@ -87,11 +86,10 @@ class Instrument:
         """
 
         logging.warning(
-            "RESET: exchange={}, symbol={}, retries={}".format(
-                self.exchange,
-                self.symbol,
-                retries,
-            )
+            "RESET: exchange=%s, symbol=%s, retries=%d",
+            self.exchange,
+            self.symbol,
+            retries,
         )
         self.market_by_price.clear()
 
@@ -106,7 +104,7 @@ class Shared:
         Constructor.
         """
 
-        self.instruments = dict()
+        self.instruments = {}
 
     def update(
         self,
@@ -148,6 +146,7 @@ class Receiver:
         Constructor.
         """
 
+        self.transport = None
         self.reorder_buffer = roq.io.net.ReorderBuffer()
         self.decoder = roq.codec.sbe.Decoder()
         self.decode_buffer = bytearray()
@@ -215,10 +214,9 @@ class Receiver:
         reference_data: roq.ReferenceData,
     ):
         logging.debug(
-            "[EVENT] reference_data={}, message_info={}".format(
-                reference_data,
-                message_info,
-            )
+            "[EVENT] reference_data=%s, message_info=%s",
+            reference_data,
+            message_info,
         )
 
     @typedispatch
@@ -228,10 +226,9 @@ class Receiver:
         market_status: roq.MarketStatus,
     ):
         logging.debug(
-            "[EVENT] market_status={}, message_info={}".format(
-                market_status,
-                message_info,
-            )
+            "[EVENT] market_status=%s, message_info=%s",
+            market_status,
+            message_info,
         )
 
     @typedispatch
@@ -241,10 +238,9 @@ class Receiver:
         top_of_book: roq.TopOfBook,
     ):
         logging.debug(
-            "[EVENT] top_of_book={}, message_info={}".format(
-                top_of_book,
-                message_info,
-            )
+            "[EVENT] top_of_book=%s, message_info=%s",
+            top_of_book,
+            message_info,
         )
 
     @typedispatch
@@ -254,10 +250,9 @@ class Receiver:
         market_by_price_update: roq.MarketByPriceUpdate,
     ):
         logging.debug(
-            "[EVENT] market_by_price_update={}, message_info={}".format(
-                market_by_price_update,
-                message_info,
-            )
+            "[EVENT] market_by_price_update=%s, message_info=%s",
+            market_by_price_update,
+            message_info,
         )
 
     @typedispatch
@@ -267,10 +262,9 @@ class Receiver:
         market_by_order_update: roq.MarketByOrderUpdate,
     ):
         logging.debug(
-            "[EVENT] market_by_order_update={}, message_info={}".format(
-                market_by_order_update,
-                message_info,
-            )
+            "[EVENT] market_by_order_update=%s, message_info=%s",
+            market_by_order_update,
+            message_info,
         )
 
     @typedispatch
@@ -280,10 +274,9 @@ class Receiver:
         trade_summary: roq.TradeSummary,
     ):
         logging.debug(
-            "[EVENT] trade_summary={}, message_info={}".format(
-                trade_summary,
-                message_info,
-            )
+            "[EVENT] trade_summary=%s, message_info=%s",
+            trade_summary,
+            message_info,
         )
 
     @typedispatch
@@ -293,10 +286,9 @@ class Receiver:
         statistics_update: roq.StatisticsUpdate,
     ):
         logging.debug(
-            "[EVENT] statistics_update={}, message_info={}".format(
-                statistics_update,
-                message_info,
-            )
+            "[EVENT] statistics_update=%s, message_info=%s",
+            statistics_update,
+            message_info,
         )
 
     @typedispatch
@@ -306,10 +298,9 @@ class Receiver:
         order_ack: roq.OrderAck,
     ):
         logging.debug(
-            "[EVENT] order_ack={}, message_info={}".format(
-                order_ack,
-                message_info,
-            )
+            "[EVENT] order_ack=%s, message_info=%s",
+            order_ack,
+            message_info,
         )
 
     @typedispatch
@@ -319,10 +310,9 @@ class Receiver:
         order_update: roq.OrderUpdate,
     ):
         logging.debug(
-            "[EVENT] order_update={}, message_info={}".format(
-                order_update,
-                message_info,
-            )
+            "[EVENT] order_update=%s, message_info=%s",
+            order_update,
+            message_info,
         )
 
 
@@ -338,10 +328,9 @@ class SnapshotMixin:
         reference_data: roq.ReferenceData,
     ):
         logging.debug(
-            "[SNAPSHOT] reference_data={}, message_info={}".format(
-                reference_data,
-                message_info,
-            )
+            "[SNAPSHOT] reference_data=%s, message_info=%s",
+            reference_data,
+            message_info,
         )
 
     @typedispatch
@@ -351,10 +340,9 @@ class SnapshotMixin:
         market_status: roq.MarketStatus,
     ):
         logging.debug(
-            "[SNAPSHOT] market_status={}, message_info={}".format(
-                market_status,
-                message_info,
-            )
+            "[SNAPSHOT] market_status=%s, message_info=%s",
+            market_status,
+            message_info,
         )
 
     @typedispatch
@@ -364,10 +352,9 @@ class SnapshotMixin:
         market_by_price_update: roq.MarketByPriceUpdate,
     ):
         logging.debug(
-            "[SNAPSHOT] market_by_price_update={}, message_info={}".format(
-                market_by_price_update,
-                message_info,
-            )
+            "[SNAPSHOT] market_by_price_update=%s, message_info=%s",
+            market_by_price_update,
+            message_info,
         )
         self.shared.update(market_by_price_update, self.header)
 
@@ -378,10 +365,9 @@ class SnapshotMixin:
         statistics_update: roq.StatisticsUpdate,
     ):
         logging.debug(
-            "[SNAPSHOT] statistics_update={}, message_info={}".format(
-                statistics_update,
-                message_info,
-            )
+            "[SNAPSHOT] statistics_update=%s, message_info=%s",
+            statistics_update,
+            message_info,
         )
 
 
@@ -397,10 +383,9 @@ class IncrementalMixin:
         reference_data: roq.ReferenceData,
     ):
         logging.debug(
-            "[INCREMENTAL] reference_data={}, message_info={}".format(
-                reference_data,
-                message_info,
-            )
+            "[INCREMENTAL] reference_data=%s, message_info=%s",
+            reference_data,
+            message_info,
         )
 
     @typedispatch
@@ -410,10 +395,9 @@ class IncrementalMixin:
         market_status: roq.MarketStatus,
     ):
         logging.debug(
-            "[INCREMENTAL] market_status={}, message_info={}".format(
-                market_status,
-                message_info,
-            )
+            "[INCREMENTAL] market_status=%s, message_info=%s",
+            market_status,
+            message_info,
         )
 
     @typedispatch
@@ -423,10 +407,9 @@ class IncrementalMixin:
         top_of_book: roq.TopOfBook,
     ):
         logging.debug(
-            "[INCREMENTAL] top_of_book={}, message_info={}".format(
-                top_of_book,
-                message_info,
-            )
+            "[INCREMENTAL] top_of_book=%s, message_info=%s",
+            top_of_book,
+            message_info,
         )
 
     @typedispatch
@@ -436,10 +419,9 @@ class IncrementalMixin:
         market_by_price_update: roq.MarketByPriceUpdate,
     ):
         logging.debug(
-            "[INCREMENTAL] market_by_price_update={}, message_info={}".format(
-                market_by_price_update,
-                message_info,
-            )
+            "[INCREMENTAL] market_by_price_update=%s, message_info=%s",
+            market_by_price_update,
+            message_info,
         )
         self.shared.update(market_by_price_update, self.header)
 
@@ -450,10 +432,9 @@ class IncrementalMixin:
         trade_summary: roq.TradeSummary,
     ):
         logging.debug(
-            "[INCREMENTAL] trade_summary={}, message_info={}".format(
-                trade_summary,
-                message_info,
-            )
+            "[INCREMENTAL] trade_summary=%s, message_info=%s",
+            trade_summary,
+            message_info,
         )
 
     @typedispatch
@@ -463,10 +444,9 @@ class IncrementalMixin:
         statistics_update: roq.StatisticsUpdate,
     ):
         logging.debug(
-            "[INCREMENTAL] statistics_update={}, message_info={}".format(
-                statistics_update,
-                message_info,
-            )
+            "[INCREMENTAL] statistics_update=%s, message_info=%s",
+            statistics_update,
+            message_info,
         )
 
 
@@ -506,10 +486,9 @@ def create_datagram_socket(
 
     if use_multicast:
         logging.info(
-            "using multicast {} port {}".format(
-                multicast_address,
-                multicast_port,
-            )
+            "using multicast %s port %d",
+            multicast_address,
+            multicast_port,
         )
         sock.bind(("", multicast_port))
         mreq = struct.pack(
@@ -525,10 +504,9 @@ def create_datagram_socket(
 
     else:
         logging.info(
-            "using UDP {} port {}".format(
-                local_interface,
-                multicast_port,
-            )
+            "using UDP %s port %d",
+            local_interface,
+            multicast_port,
         )
         sock.bind((local_interface, multicast_port))
 
