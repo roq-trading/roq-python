@@ -47,10 +47,10 @@ class Instrument:
     ):
         """
         MarketByPriceUpdate can arrive from either channel (incremental or snapshot).
-        The sequencer will collect incremental updates in memory until a snapshot is received
-        because a snapshot can be "old", any incremental updates collected *after* the snapshot
-        will be applied to the snapshot before a MarketByPriceUpdate is notified through the
-        callback.
+        The sequencer will collect incremental updates in memory until a snapshot
+        is received because a snapshot can be "old", any incremental updates collected
+        *after* the snapshot will be applied to the snapshot before a MarketByPriceUpdate
+        is notified through the callback.
         Any following MarketByPriceUpdate events will be pass through to the callback.
         This procedure may restart if sequence numbers are lost.
         """
