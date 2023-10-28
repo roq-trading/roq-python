@@ -95,6 +95,7 @@ void utils::create_struct<utils::mbp::MarketByPrice>(pybind11::module_ &module) 
           pybind11::init<std::string_view const &, std::string_view const &>(),
           pybind11::arg("exchange") = "",
           pybind11::arg("symbol"))
+      .def("clear", [](value_type &self) { self.clear(); })
       .def(
           "apply",
           [](value_type &self, utils::Ref<MarketByPriceUpdate> const &market_by_price_update) {

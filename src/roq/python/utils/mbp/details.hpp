@@ -18,6 +18,8 @@ struct MarketByPrice final {
   MarketByPrice(std::string_view const &exchange, std::string_view const &symbol)
       : market_by_price_{roq::utils::mbp::Factory::create(exchange, symbol)} {}
 
+  void clear() { (*market_by_price_).clear(); }
+
   template <typename T>
   void operator()(T const &value) {
     (*market_by_price_)(value);

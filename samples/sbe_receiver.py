@@ -20,7 +20,18 @@ SIZE_OF_UDP_HEADER = roq.codec.udp.Header.sizeof()
 
 
 class Instrument:
-    def __init__(self, exchange, symbol):
+    """
+    Instrument state.
+    """
+
+    def __init__(
+        self,
+        exchange: str,
+        symbol: str,
+    ):
+        """
+        Constructor.
+        """
         self.exchange = exchange
         self.symbol = symbol
         self.sequencer = roq.utils.mbp.Sequencer()
@@ -34,13 +45,16 @@ class Instrument:
         market_by_price_update: roq.MarketByPriceUpdate,
         header: roq.codec.udp.Header,
     ):
-        # NOTE
-        #   MarketByPriceUpdate can arrive from either channel (incremental or snapshot).
-        #   The sequencer will collect incremental updates in memory until a snapshot is received
-        #   because a snapshot can be "old", any incremental updates collected *after* the snapshot
-        #   will be applied to the snapshot before a MarketByPriceUpdate is notified through the callback.
-        #   Any following MarketByPriceUpdate events will be pass through to the callback.
-        #   This procedure may restart if sequence numbers are lost.
+        """
+        MarketByPriceUpdate can arrive from either channel (incremental or snapshot).
+        The sequencer will collect incremental updates in memory until a snapshot is received
+        because a snapshot can be "old", any incremental updates collected *after* the snapshot
+        will be applied to the snapshot before a MarketByPriceUpdate is notified through the
+        callback.
+        Any following MarketByPriceUpdate events will be pass through to the callback.
+        This procedure may restart if sequence numbers are lost.
+        """
+
         self.sequencer.apply(
             market_by_price_update=market_by_price_update,
             header=header,
@@ -52,9 +66,11 @@ class Instrument:
         self,
         market_by_price_update: roq.MarketByPriceUpdate,
     ):
-        # NOTE
-        #   Apply a MarketByPriceUpdate event to the MarketByPrice object.
-        #   This will maintain a current state of an order book in memory.
+        """
+        Apply a MarketByPriceUpdate event to the MarketByPrice object.
+        This will maintain state of an order book in memory.
+        """
+
         self.market_by_price.apply(market_by_price_update)
         depth = self.market_by_price.extract(2)
         logging.info(
@@ -65,18 +81,31 @@ class Instrument:
             )
         )
 
-    def _reset(self, retries):
-        logging.info(
+    def _reset(self, retries: int):
+        """
+        Reset request.
+        """
+
+        logging.warning(
             "RESET: exchange={}, symbol={}, retries={}".format(
                 self.exchange,
                 self.symbol,
                 retries,
             )
         )
+        self.market_by_price.clear()
 
 
 class Shared:
+    """
+    Lookup table for shared objects.
+    """
+
     def __init__(self):
+        """
+        Constructor.
+        """
+
         self.instruments = dict()
 
     def update(
@@ -84,12 +113,19 @@ class Shared:
         market_by_price_update: roq.MarketByPriceUpdate,
         header: roq.codec.udp.Header,
     ):
+        """
+        Find instrument and apply update.
+        """
+
         self._get_instrument(market_by_price_update).apply(
             market_by_price_update,
             header,
         )
 
     def _get_instrument(self, obj):
+        """
+        Helper function to find or create instrument.
+        """
         key = (obj.exchange, obj.symbol)
         instrument = self.instruments.get(key)
         if instrument is None:
@@ -99,7 +135,19 @@ class Shared:
 
 
 class Receiver:
-    def __init__(self, shared):
+    """
+    Receive datagrams.
+    Re-order updates based on sequence numbers.
+    Detect and manage packet loss.
+    Assemble fragments.
+    Decode SBE messages.
+    """
+
+    def __init__(self, shared: Shared):
+        """
+        Constructor.
+        """
+
         self.reorder_buffer = roq.io.net.ReorderBuffer()
         self.decoder = roq.codec.sbe.Decoder()
         self.decode_buffer = bytearray()
@@ -115,16 +163,18 @@ class Receiver:
         #   The re-order buffer will ensure proper sequencing and detect drops.
         sequence_number = roq.codec.udp.Header.get_sequence_number(data)
         self.reorder_buffer.dispatch(
-            data,
-            sequence_number,
-            self._parse,
-            self._reset,
+            data=data,
+            sequence_number=sequence_number,
+            parse=self._parse,
+            reset=self._reset,
         )
 
     def _parse(self, data):
-        # NOTE
-        #   Callback from the re-order buffer.
-        #   Datagrams are ordered by sequence number.
+        """
+        Callback from the re-order buffer.
+        Datagrams are ordered by sequence number.
+        """
+
         self.header = roq.codec.udp.Header(data)
         last = self.header.fragment == self.header.fragment_max
         payload = data[SIZE_OF_UDP_HEADER:]
@@ -153,10 +203,10 @@ class Receiver:
                 pass
 
     def _reset(self):
-        # NOTE
-        #   Callback from re-order buffer.
-        #   Packet loss has been detected if this handler is called.
-        pass
+        """
+        Callback from re-order buffer.
+        Packet loss has been detected if this handler is called.
+        """
 
     @typedispatch
     def _callback(
@@ -277,6 +327,10 @@ class Receiver:
 
 
 class SnapshotMixin:
+    """
+    Receiver mixin for the snapshot channel.
+    """
+
     @typedispatch
     def _callback(
         self,
@@ -332,6 +386,10 @@ class SnapshotMixin:
 
 
 class IncrementalMixin:
+    """
+    Receiver mixin for the incremental channel.
+    """
+
     @typedispatch
     def _callback(
         self,
@@ -416,14 +474,18 @@ class Snapshot(
     SnapshotMixin,
     Receiver,
 ):
-    pass
+    """
+    Receiver for the snapshot channel.
+    """
 
 
 class Incremental(
     IncrementalMixin,
     Receiver,
 ):
-    pass
+    """
+    Receiver for the incremental channel.
+    """
 
 
 def create_datagram_socket(
@@ -431,12 +493,24 @@ def create_datagram_socket(
     multicast_port: int,
     multicast_address: str,
 ):
+    """
+    Creates a datagram receiver socket.
+    Supports both multicast and UDP.
+    """
+
     use_multicast = multicast_address is not None and len(multicast_address) > 0
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+
     if use_multicast:
-        logging.info(f"using multicast {multicast_address} port {multicast_port}")
+        logging.info(
+            "using multicast {} port {}".format(
+                multicast_address,
+                multicast_port,
+            )
+        )
         sock.bind(("", multicast_port))
         mreq = struct.pack(
             "4s4s",
@@ -448,9 +522,16 @@ def create_datagram_socket(
             socket.IP_ADD_MEMBERSHIP,
             mreq,
         )
+
     else:
-        logging.info(f"using UDP {local_interface} port {multicast_port}")
+        logging.info(
+            "using UDP {} port {}".format(
+                local_interface,
+                multicast_port,
+            )
+        )
         sock.bind((local_interface, multicast_port))
+
     return sock
 
 
@@ -461,6 +542,10 @@ def main(
     multicast_incremental_address: str,
     multicast_incremental_port: str,
 ):
+    """
+    Main function.
+    """
+
     loop = asyncio.new_event_loop()
 
     asyncio.set_event_loop(loop)
