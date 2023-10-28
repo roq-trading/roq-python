@@ -59,7 +59,11 @@ class Instrument:
 
     def _reset(self, retries):
         logging.info(
-            "RESET: exchange={}, symbol={}, retries={}".format(self.exchange, self.symbol, retries,)
+            "RESET: exchange={}, symbol={}, retries={}".format(
+                self.exchange,
+                self.symbol,
+                retries,
+            )
         )
 
 
@@ -449,7 +453,6 @@ def main(
     multicast_incremental_address: str,
     multicast_incremental_port: str,
 ):
-
     loop = asyncio.new_event_loop()
 
     asyncio.set_event_loop(loop)
@@ -486,7 +489,6 @@ def main(
 
 
 if __name__ == "__main__":
-
     import argparse
 
     parser = argparse.ArgumentParser(
