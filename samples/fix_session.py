@@ -239,7 +239,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         security_definition_request: roq.codec.fix.SecurityDefinitionRequest,
     ):
-        logging.debug(
+        logging.fatal(
             "[EVENT] security_definition_request=%s, header=%s",
             security_definition_request,
             header,
@@ -264,7 +264,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         security_status_request: roq.codec.fix.SecurityStatusRequest,
     ):
-        logging.debug(
+        logging.fatal(
             "[EVENT] security_status_request=%s, header=%s",
             security_status_request,
             header,
@@ -289,7 +289,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         order_status_request: roq.codec.fix.OrderStatusRequest,
     ):
-        logging.debug(
+        logging.fatal(
             "[EVENT] order_status_request=%s, header=%s",
             order_status_request,
             header,
@@ -301,7 +301,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         order_mass_status_request: roq.codec.fix.OrderMassStatusRequest,
     ):
-        logging.debug(
+        logging.fatal(
             "[EVENT] order_mass_status_request=%s, header=%s",
             order_mass_status_request,
             header,
@@ -313,9 +313,69 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         new_order_single: roq.codec.fix.NewOrderSingle,
     ):
-        logging.debug(
+        logging.fatal(
             "[EVENT] new_order_single=%s, header=%s",
             new_order_single,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_cancel_request: roq.codec.fix.OrderCancelRequest,
+    ):
+        logging.fatal(
+            "[EVENT] order_cancel_request=%s, header=%s",
+            order_cancel_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_cancel_replace_request: roq.codec.fix.OrderCancelReplaceRequest,
+    ):
+        logging.fatal(
+            "[EVENT] order_cancel_replace_request=%s, header=%s",
+            order_cancel_replace_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_mass_cancel_request: roq.codec.fix.OrderMassCancelRequest,
+    ):
+        logging.fatal(
+            "[EVENT] order_mass_cancel_request=%s, header=%s",
+            order_mass_cancel_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_cancel_reject: roq.codec.fix.OrderCancelReject,
+    ):
+        logging.debug(
+            "[EVENT] order_cancel_reject=%s, header=%s",
+            order_cancel_reject,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_mass_cancel_report: roq.codec.fix.OrderMassCancelReport,
+    ):
+        logging.debug(
+            "[EVENT] order_mass_cancel_report=%s, header=%s",
+            order_mass_cancel_report,
             header,
         )
 
@@ -328,6 +388,66 @@ class Client(asyncio.Protocol):
         logging.debug(
             "[EVENT] execution_report=%s, header=%s",
             execution_report,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        trade_capture_report_request: roq.codec.fix.TradeCaptureReportRequest,
+    ):
+        logging.fatal(
+            "[EVENT] trade_capture_report_request=%s, header=%s",
+            trade_capture_report_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        trade_capture_report: roq.codec.fix.TradeCaptureReport,
+    ):
+        logging.debug(
+            "[EVENT] trade_capture_report=%s, header=%s",
+            trade_capture_report,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        request_for_positions: roq.codec.fix.RequestForPositions,
+    ):
+        logging.fatal(
+            "[EVENT] request_for_positions=%s, header=%s",
+            request_for_positions,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        request_for_positions_ack: roq.codec.fix.RequestForPositionsAck,
+    ):
+        logging.debug(
+            "[EVENT] request_for_positions_ack=%s, header=%s",
+            request_for_positions_ack,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        position_report: roq.codec.fix.PositionReport,
+    ):
+        logging.debug(
+            "[EVENT] position_report=%s, header=%s",
+            position_report,
             header,
         )
 
@@ -504,6 +624,30 @@ class MyMixin:
     def _callback(
         self,
         header: roq.codec.fix.Header,
+        order_cancel_reject: roq.codec.fix.OrderCancelReject,
+    ):
+        logging.debug(
+            "[EVENT] order_cancel_reject=%s, header=%s",
+            order_cancel_reject,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        order_mass_cancel_report: roq.codec.fix.OrderMassCancelReport,
+    ):
+        logging.debug(
+            "[EVENT] order_mass_cancel_report=%s, header=%s",
+            order_mass_cancel_report,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
         execution_report: roq.codec.fix.ExecutionReport,
     ):
         logging.debug(
@@ -555,6 +699,41 @@ class MyMixin:
             )
             self._send(trading_session_status_request)
 
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        trade_capture_report: roq.codec.fix.TradeCaptureReport,
+    ):
+        logging.debug(
+            "[EVENT] trade_capture_report=%s, header=%s",
+            trade_capture_report,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        request_for_positions_ack: roq.codec.fix.RequestForPositionsAck,
+    ):
+        logging.debug(
+            "[EVENT] request_for_positions_ack=%s, header=%s",
+            request_for_positions_ack,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        position_report: roq.codec.fix.PositionReport,
+    ):
+        logging.debug(
+            "[EVENT] position_report=%s, header=%s",
+            position_report,
+            header,
+        )
 
 class MySession(
     MyMixin,

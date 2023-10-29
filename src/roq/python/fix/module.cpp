@@ -14,14 +14,22 @@
 
 #include "roq/fix/account_type.hpp"
 #include "roq/fix/business_reject_reason.hpp"
+#include "roq/fix/cxl_rej_reason.hpp"
+#include "roq/fix/cxl_rej_response_to.hpp"
 #include "roq/fix/encrypt_method.hpp"
 #include "roq/fix/exec_type.hpp"
 #include "roq/fix/handl_inst.hpp"
 #include "roq/fix/last_liquidity_ind.hpp"
+#include "roq/fix/mass_cancel_reject_reason.hpp"
+#include "roq/fix/mass_cancel_request_type.hpp"
+#include "roq/fix/mass_cancel_response.hpp"
 #include "roq/fix/mass_status_req_type.hpp"
 #include "roq/fix/ord_rej_reason.hpp"
 #include "roq/fix/ord_status.hpp"
 #include "roq/fix/ord_type.hpp"
+#include "roq/fix/pos_req_result.hpp"
+#include "roq/fix/pos_req_status.hpp"
+#include "roq/fix/pos_req_type.hpp"
 #include "roq/fix/position_effect.hpp"
 #include "roq/fix/security_list_request_type.hpp"
 #include "roq/fix/security_request_result.hpp"
@@ -34,6 +42,7 @@
 #include "roq/fix/time_in_force.hpp"
 #include "roq/fix/trad_ses_status.hpp"
 #include "roq/fix/trad_ses_status_rej_reason.hpp"
+#include "roq/fix/trade_request_type.hpp"
 #include "roq/fix/user_request_type.hpp"
 #include "roq/fix/user_status.hpp"
 
@@ -46,6 +55,9 @@ namespace fix {
 void Module::create(pybind11::module_ &module) {
   utils::create_enum<roq::fix::MsgType>(module);
 
+  utils::create_enum<roq::fix::TradeRequestType>(module);
+  utils::create_enum<roq::fix::CxlRejResponseTo>(module);
+  utils::create_enum<roq::fix::CxlRejReason>(module);
   utils::create_enum<roq::fix::BusinessRejectReason>(module);
   utils::create_enum<roq::fix::EncryptMethod>(module);
   utils::create_enum<roq::fix::SecurityListRequestType>(module);
@@ -70,6 +82,12 @@ void Module::create(pybind11::module_ &module) {
   utils::create_enum<roq::fix::LastLiquidityInd>(module);
   utils::create_enum<roq::fix::MassStatusReqType>(module);
   utils::create_enum<roq::fix::HandlInst>(module);
+  utils::create_enum<roq::fix::MassCancelRequestType>(module);
+  utils::create_enum<roq::fix::MassCancelResponse>(module);
+  utils::create_enum<roq::fix::MassCancelRejectReason>(module);
+  utils::create_enum<roq::fix::PosReqType>(module);
+  utils::create_enum<roq::fix::PosReqResult>(module);
+  utils::create_enum<roq::fix::PosReqStatus>(module);
 }
 
 }  // namespace fix

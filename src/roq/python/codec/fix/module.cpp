@@ -62,7 +62,24 @@ void Module::create(pybind11::module_ &module) {
   utils::create_ref_struct_2<roq::python::codec::fix::OrderMassStatusRequest, roq::python::codec::fix::Encodeable>(
       module);
   utils::create_ref_struct_2<roq::python::codec::fix::NewOrderSingle, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderCancelRequest, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderCancelReplaceRequest, roq::python::codec::fix::Encodeable>(
+      module);
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderMassCancelRequest, roq::python::codec::fix::Encodeable>(
+      module);
+
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderCancelReject, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::OrderMassCancelReport, roq::python::codec::fix::Encodeable>(
+      module);
   utils::create_ref_struct_2<roq::python::codec::fix::ExecutionReport, roq::python::codec::fix::Encodeable>(module);
+
+  utils::create_ref_struct_2<roq::python::codec::fix::TradeCaptureReportRequest, roq::python::codec::fix::Encodeable>(
+      module);
+  utils::create_ref_struct_2<roq::python::codec::fix::TradeCaptureReport, roq::python::codec::fix::Encodeable>(module);
+
+  utils::create_ref_struct_2<roq::python::codec::fix::RequestForPositions, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::RequestForPositionsAck, roq::python::codec::fix::Encodeable>(
+      module);
 
   utils::create_struct<roq::python::codec::fix::Header>(module);
   utils::create_struct<roq::python::codec::fix::Decoder>(module);

@@ -24,6 +24,22 @@ namespace python {
 namespace codec {
 namespace fix {
 
+namespace {
+struct DateTime final {
+  explicit DateTime(std::chrono::system_clock::time_point value) : value_{value} {}
+
+  operator std::chrono::milliseconds() const {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(value_.time_since_epoch());
+  }
+  operator std::chrono::year_month_day() const {
+    return {};  // XXX FIXME TODO
+  }
+
+ private:
+  std::chrono::system_clock::time_point const value_;
+};
+}  // namespace
+
 struct Logon final : public Encodeable {
   using value_type = roq::codec::fix::Logon;
 
@@ -882,7 +898,7 @@ struct NewOrderSingle final : public Encodeable {
       std::string_view const &symbol,
       std::string_view const &security_exchange,
       roq::fix::Side const &side,
-      std::chrono::system_clock::time_point transact_time,
+      std::chrono::system_clock::time_point transact_time,  // XXX
       double order_qty,
       roq::fix::OrdType const &ord_type,
       double price,
@@ -895,8 +911,7 @@ struct NewOrderSingle final : public Encodeable {
         // no_party_ids_{no_party_ids},
         account_{account}, handl_inst_{handl_inst}, exec_inst_{exec_inst},
         // no_trading_sessions_{no_trading_sessions},
-        symbol_{symbol}, security_exchange_{security_exchange}, side_{side},
-        transact_time_{std::chrono::duration_cast<std::chrono::milliseconds>(transact_time.time_since_epoch())},
+        symbol_{symbol}, security_exchange_{security_exchange}, side_{side}, transact_time_{DateTime{transact_time}},
         order_qty_{order_qty, {}}, ord_type_{ord_type}, price_{price, {}}, stop_px_{stop_px, {}},
         time_in_force_{time_in_force}, text_{text}, position_effect_{position_effect}, max_show_{max_show, {}} {}
 
@@ -949,6 +964,341 @@ struct NewOrderSingle final : public Encodeable {
   std::string const text_;
   roq::fix::PositionEffect const position_effect_;
   roq::utils::Number const max_show_;
+};
+
+struct OrderCancelRequest final : public Encodeable {
+  using value_type = roq::codec::fix::OrderCancelRequest;
+
+  explicit OrderCancelRequest(value_type const &value)
+      : orig_cl_ord_id_{value.orig_cl_ord_id}, order_id_{value.order_id}, cl_ord_id_{value.cl_ord_id},
+        secondary_cl_ord_id_{value.secondary_cl_ord_id}, account_{value.account},
+        // no_party_ids_{value.no_party_ids},
+        symbol_{value.symbol}, security_exchange_{value.security_exchange}, side_{value.side},
+        transact_time_{value.transact_time}, order_qty_{value.order_qty}, text_{value.text} {}
+
+  OrderCancelRequest(
+      std::string_view const &orig_cl_ord_id,
+      std::string_view const &order_id,
+      std::string_view const &cl_ord_id,
+      std::string_view const &secondary_cl_ord_id,
+      std::string_view const &account,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      roq::fix::Side const &side,
+      std::chrono::milliseconds const &transact_time,
+      roq::utils::Number const &order_qty,
+      std::string_view const &text)
+      : orig_cl_ord_id_{orig_cl_ord_id}, order_id_{order_id}, cl_ord_id_{cl_ord_id},
+        secondary_cl_ord_id_{secondary_cl_ord_id}, account_{account},
+        // no_party_ids_{no_party_ids},
+        symbol_{symbol}, security_exchange_{security_exchange}, side_{side}, transact_time_{transact_time},
+        order_qty_{order_qty}, text_{text} {}
+
+  // XXX
+  OrderCancelRequest(
+      std::string_view const &orig_cl_ord_id,
+      std::string_view const &order_id,
+      std::string_view const &cl_ord_id,
+      std::string_view const &secondary_cl_ord_id,
+      std::string_view const &account,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      roq::fix::Side const &side,
+      std::chrono::system_clock::time_point transact_time,  // XXX
+      double order_qty,
+      std::string_view const &text)
+      : orig_cl_ord_id_{orig_cl_ord_id}, order_id_{order_id}, cl_ord_id_{cl_ord_id},
+        secondary_cl_ord_id_{secondary_cl_ord_id}, account_{account},
+        // no_party_ids_{no_party_ids},
+        symbol_{symbol}, security_exchange_{security_exchange}, side_{side}, transact_time_{DateTime{transact_time}},
+        order_qty_{order_qty, {}}, text_{text} {}
+
+  operator value_type() const {
+    return {
+        .orig_cl_ord_id = orig_cl_ord_id_,
+        .order_id = order_id_,
+        .cl_ord_id = cl_ord_id_,
+        .secondary_cl_ord_id = secondary_cl_ord_id_,
+        .account = account_,
+        .no_party_ids = {},  // no_party_ids_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .side = side_,
+        .transact_time = transact_time_,
+        .order_qty = order_qty_,
+        .text = text_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const orig_cl_ord_id_;
+  std::string const order_id_;
+  std::string const cl_ord_id_;
+  std::string const secondary_cl_ord_id_;
+  std::string const account_;
+  // std::span<Party const> const no_party_ids_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  roq::fix::Side const side_;
+  std::chrono::milliseconds const transact_time_;
+  roq::utils::Number const order_qty_;
+  std::string const text_;
+};
+
+struct OrderCancelReplaceRequest final : public Encodeable {
+  using value_type = roq::codec::fix::OrderCancelReplaceRequest;
+
+  explicit OrderCancelReplaceRequest(value_type const &value)
+      : order_id_{value.order_id},
+        // no_party_ids_{value.no_party_ids},
+        orig_cl_ord_id_{value.orig_cl_ord_id}, cl_ord_id_{value.cl_ord_id},
+        secondary_cl_ord_id_{value.secondary_cl_ord_id}, account_{value.account}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, order_qty_{value.order_qty}, price_{value.price},
+        side_{value.side}, transact_time_{value.transact_time}, ord_type_{value.ord_type} {}
+
+  OrderCancelReplaceRequest(
+      std::string_view const &order_id,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &orig_cl_ord_id,
+      std::string_view const &cl_ord_id,
+      std::string_view const &secondary_cl_ord_id,
+      std::string_view const &account,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      roq::utils::Number const &order_qty,
+      roq::utils::Number const &price,
+      roq::fix::Side const &side,
+      std::chrono::milliseconds const &transact_time,
+      roq::fix::OrdType const &ord_type)
+      : order_id_{order_id},
+        // no_party_ids_{no_party_ids},
+        orig_cl_ord_id_{orig_cl_ord_id}, cl_ord_id_{cl_ord_id}, secondary_cl_ord_id_{secondary_cl_ord_id},
+        account_{account}, symbol_{symbol}, security_exchange_{security_exchange}, order_qty_{order_qty}, price_{price},
+        side_{side}, transact_time_{transact_time}, ord_type_{ord_type} {}
+
+  // XXX
+  OrderCancelReplaceRequest(
+      std::string_view const &order_id,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &orig_cl_ord_id,
+      std::string_view const &cl_ord_id,
+      std::string_view const &secondary_cl_ord_id,
+      std::string_view const &account,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      double order_qty,
+      double price,
+      roq::fix::Side const &side,
+      std::chrono::system_clock::time_point transact_time,  // XXX
+      roq::fix::OrdType const &ord_type)
+      : order_id_{order_id},
+        // no_party_ids_{no_party_ids},
+        orig_cl_ord_id_{orig_cl_ord_id}, cl_ord_id_{cl_ord_id}, secondary_cl_ord_id_{secondary_cl_ord_id},
+        account_{account}, symbol_{symbol}, security_exchange_{security_exchange}, order_qty_{order_qty, {}},
+        price_{price, {}}, side_{side}, transact_time_{DateTime{transact_time}}, ord_type_{ord_type} {}
+
+  operator value_type() const {
+    return {
+        .order_id = order_id_,
+        .no_party_ids = {},  // no_party_ids_,
+        .orig_cl_ord_id = orig_cl_ord_id_,
+        .cl_ord_id = cl_ord_id_,
+        .secondary_cl_ord_id = secondary_cl_ord_id_,
+        .account = account_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .order_qty = order_qty_,
+        .price = price_,
+        .side = side_,
+        .transact_time = transact_time_,
+        .ord_type = ord_type_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const order_id_;
+  // std::span<Party const> const no_party_ids_;
+  std::string const orig_cl_ord_id_;
+  std::string const cl_ord_id_;
+  std::string const secondary_cl_ord_id_;
+  std::string const account_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  roq::utils::Number const order_qty_;
+  roq::utils::Number const price_;
+  roq::fix::Side const side_;
+  std::chrono::milliseconds const transact_time_;
+  roq::fix::OrdType const ord_type_;
+};
+
+struct OrderMassCancelRequest final : public Encodeable {
+  using value_type = roq::codec::fix::OrderMassCancelRequest;
+
+  explicit OrderMassCancelRequest(value_type const &value)
+      : cl_ord_id_{value.cl_ord_id}, mass_cancel_request_type_{value.mass_cancel_request_type},
+        trading_session_id_{value.trading_session_id}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, side_{value.side},
+        transact_time_{value.transact_time}  // no_party_ids_{value.no_party_ids}
+  {}
+
+  OrderMassCancelRequest(
+      std::string_view const &cl_ord_id,
+      roq::fix::MassCancelRequestType const &mass_cancel_request_type,
+      std::string_view const &trading_session_id,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      roq::fix::Side const &side,
+      std::chrono::milliseconds const &transact_time
+      // std::span<Party const> const &no_party_ids
+      )
+      : cl_ord_id_{cl_ord_id}, mass_cancel_request_type_{mass_cancel_request_type},
+        trading_session_id_{trading_session_id}, symbol_{symbol}, security_exchange_{security_exchange}, side_{side},
+        transact_time_{transact_time}  // no_party_ids_{no_party_ids}
+  {}
+
+  // XXX
+  OrderMassCancelRequest(
+      std::string_view const &cl_ord_id,
+      roq::fix::MassCancelRequestType const &mass_cancel_request_type,
+      std::string_view const &trading_session_id,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      roq::fix::Side const &side,
+      std::chrono::system_clock::time_point transact_time  // XXX std::span<Party const> const &no_party_ids
+      )
+      : cl_ord_id_{cl_ord_id}, mass_cancel_request_type_{mass_cancel_request_type},
+        trading_session_id_{trading_session_id}, symbol_{symbol}, security_exchange_{security_exchange}, side_{side},
+        transact_time_{DateTime{transact_time}}  // no_party_ids_{no_party_ids}
+  {}
+
+  operator value_type() const {
+    return {
+        .cl_ord_id = cl_ord_id_,
+        .mass_cancel_request_type = mass_cancel_request_type_,
+        .trading_session_id = trading_session_id_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .side = side_,
+        .transact_time = transact_time_,
+        .no_party_ids = {},  // no_party_ids_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const cl_ord_id_;
+  roq::fix::MassCancelRequestType const mass_cancel_request_type_;
+  std::string const trading_session_id_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  roq::fix::Side const side_;
+  std::chrono::milliseconds const transact_time_;
+  // std::span<Party const> const no_party_ids_;
+};
+
+struct OrderCancelReject final : public Encodeable {
+  using value_type = roq::codec::fix::OrderCancelReject;
+
+  explicit OrderCancelReject(value_type const &value)
+      : order_id_{value.order_id}, secondary_cl_ord_id_{value.secondary_cl_ord_id}, cl_ord_id_{value.cl_ord_id},
+        orig_cl_ord_id_{value.orig_cl_ord_id}, ord_status_{value.ord_status},
+        working_indicator_{value.working_indicator}, account_{value.account},
+        cxl_rej_response_to_{value.cxl_rej_response_to}, cxl_rej_reason_{value.cxl_rej_reason}, text_{value.text} {}
+
+  operator value_type() const {
+    return {
+        .order_id = order_id_,
+        .secondary_cl_ord_id = secondary_cl_ord_id_,
+        .cl_ord_id = cl_ord_id_,
+        .orig_cl_ord_id = orig_cl_ord_id_,
+        .ord_status = ord_status_,
+        .working_indicator = working_indicator_,
+        .account = account_,
+        .cxl_rej_response_to = cxl_rej_response_to_,
+        .cxl_rej_reason = cxl_rej_reason_,
+        .text = text_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const order_id_;
+  std::string const secondary_cl_ord_id_;
+  std::string const cl_ord_id_;
+  std::string const orig_cl_ord_id_;
+  roq::fix::OrdStatus const ord_status_;
+  bool const working_indicator_;
+  std::string const account_;
+  roq::fix::CxlRejResponseTo const cxl_rej_response_to_;
+  roq::fix::CxlRejReason const cxl_rej_reason_;
+  std::string const text_;
+};
+
+struct OrderMassCancelReport final : public Encodeable {
+  using value_type = roq::codec::fix::OrderMassCancelReport;
+
+  explicit OrderMassCancelReport(value_type const &value)
+      : cl_ord_id_{value.cl_ord_id}, order_id_{value.order_id},
+        mass_cancel_request_type_{value.mass_cancel_request_type}, mass_cancel_response_{value.mass_cancel_response},
+        mass_cancel_reject_reason_{value.mass_cancel_reject_reason},
+        total_affected_orders_{value.total_affected_orders}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, side_{value.side},
+        text_{value.text}  // no_party_ids_{value.no_party_ids}
+  {}
+
+  operator value_type() const {
+    return {
+        .cl_ord_id = cl_ord_id_,
+        .order_id = order_id_,
+        .mass_cancel_request_type = mass_cancel_request_type_,
+        .mass_cancel_response = mass_cancel_response_,
+        .mass_cancel_reject_reason = mass_cancel_reject_reason_,
+        .total_affected_orders = total_affected_orders_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .side = side_,
+        .text = text_,
+        .no_party_ids = {},  // no_party_ids_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const cl_ord_id_;
+  std::string const order_id_;
+  roq::fix::MassCancelRequestType const mass_cancel_request_type_;
+  roq::fix::MassCancelResponse const mass_cancel_response_;
+  roq::fix::MassCancelRejectReason const mass_cancel_reject_reason_;
+  uint32_t const total_affected_orders_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  roq::fix::Side const side_;
+  std::string const text_;
+  // std::span<Party const> const no_party_ids_;
 };
 
 struct ExecutionReport final : public Encodeable {
@@ -1055,6 +1405,249 @@ struct ExecutionReport final : public Encodeable {
   roq::utils::Number const max_show_;
   std::string const text_;
   roq::fix::LastLiquidityInd const last_liquidity_ind_;
+};
+
+struct TradeCaptureReportRequest final : public Encodeable {
+  using value_type = roq::codec::fix::TradeCaptureReportRequest;
+
+  explicit TradeCaptureReportRequest(value_type const &value)
+      : trade_request_id_{value.trade_request_id}, trade_request_type_{value.trade_request_type},
+        subscription_request_type_{value.subscription_request_type}, order_id_{value.order_id},
+        cl_ord_id_{value.cl_ord_id},
+        // no_party_ids_{value.no_party_ids},
+        symbol_{value.symbol}, security_exchange_{value.security_exchange} {}
+
+  TradeCaptureReportRequest(
+      std::string_view const &trade_request_id,
+      roq::fix::TradeRequestType const &trade_request_type,
+      roq::fix::SubscriptionRequestType const &subscription_request_type,
+      std::string_view const &order_id,
+      std::string_view const &cl_ord_id,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange)
+      : trade_request_id_{trade_request_id}, trade_request_type_{trade_request_type},
+        subscription_request_type_{subscription_request_type}, order_id_{order_id}, cl_ord_id_{cl_ord_id},
+        // no_party_ids_{no_party_ids},
+        symbol_{symbol}, security_exchange_{security_exchange} {}
+
+  operator value_type() const {
+    return {
+        .trade_request_id = trade_request_id_,
+        .trade_request_type = trade_request_type_,
+        .subscription_request_type = subscription_request_type_,
+        .order_id = order_id_,
+        .cl_ord_id = cl_ord_id_,
+        .no_party_ids = {},  // no_party_ids_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const trade_request_id_;
+  roq::fix::TradeRequestType const trade_request_type_;
+  roq::fix::SubscriptionRequestType const subscription_request_type_;
+  std::string const order_id_;
+  std::string const cl_ord_id_;
+  // std::span<Party const> const no_party_ids_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+};
+
+struct TradeCaptureReport final : public Encodeable {
+  using value_type = roq::codec::fix::TradeCaptureReport;
+
+  explicit TradeCaptureReport(value_type const &value)
+      : trade_report_id_{value.trade_report_id}, trade_request_id_{value.trade_request_id}, exec_type_{value.exec_type},
+        tot_num_trade_reports_{value.tot_num_trade_reports}, last_rpt_requested_{value.last_rpt_requested},
+        unsolicited_indicator_{value.unsolicited_indicator}, trd_match_id_{value.trd_match_id}, exec_id_{value.exec_id},
+        previously_reported_{value.previously_reported}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, last_qty_{value.last_qty}, last_px_{value.last_px},
+        trade_date_{value.trade_date}, transact_time_{value.transact_time}  // no_sides_{value.no_sides}
+  {}
+
+  operator value_type() const {
+    return {
+        .trade_report_id = trade_report_id_,
+        .trade_request_id = trade_request_id_,
+        .exec_type = exec_type_,
+        .tot_num_trade_reports = tot_num_trade_reports_,
+        .last_rpt_requested = last_rpt_requested_,
+        .unsolicited_indicator = unsolicited_indicator_,
+        .trd_match_id = trd_match_id_,
+        .exec_id = exec_id_,
+        .previously_reported = previously_reported_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .last_qty = last_qty_,
+        .last_px = last_px_,
+        .trade_date = trade_date_,
+        .transact_time = transact_time_,
+        .no_sides = {},  // no_sides_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const trade_report_id_;
+  std::string const trade_request_id_;
+  roq::fix::ExecType const exec_type_;
+  uint32_t const tot_num_trade_reports_;
+  bool const last_rpt_requested_;
+  bool const unsolicited_indicator_;
+  std::string const trd_match_id_;
+  std::string const exec_id_;
+  bool const previously_reported_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  roq::utils::Number const last_qty_;
+  roq::utils::Number const last_px_;
+  std::chrono::year_month_day const trade_date_;
+  std::chrono::milliseconds const transact_time_;
+  // std::span<TrdCapRptSide const> const no_sides_;
+};
+
+struct RequestForPositions final : public Encodeable {
+  using value_type = roq::codec::fix::RequestForPositions;
+
+  explicit RequestForPositions(value_type const &value)
+      : pos_req_id_{value.pos_req_id}, pos_req_type_{value.pos_req_type},
+        subscription_request_type_{value.subscription_request_type},
+        // no_party_ids_{value.no_party_ids},
+        account_{value.account}, account_type_{value.account_type}, currency_{value.currency}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, clearing_business_date_{value.clearing_business_date},
+        // no_trading_sessions_{value.no_trading_sessions},
+        transact_time_{value.transact_time} {}
+
+  RequestForPositions(
+      std::string_view const &pos_req_id,
+      roq::fix::PosReqType const &pos_req_type,
+      roq::fix::SubscriptionRequestType const &subscription_request_type,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &account,
+      roq::fix::AccountType const &account_type,
+      std::string_view const &currency,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      std::chrono::year_month_day const &clearing_business_date,
+      // std::span<TradingSession const> const &no_trading_sessions,
+      std::chrono::milliseconds const &transact_time)
+      : pos_req_id_{pos_req_id}, pos_req_type_{pos_req_type}, subscription_request_type_{subscription_request_type},
+        // no_party_ids_{no_party_ids},
+        account_{account}, account_type_{account_type}, currency_{currency}, symbol_{symbol},
+        security_exchange_{security_exchange}, clearing_business_date_{clearing_business_date},
+        // no_trading_sessions_{no_trading_sessions},
+        transact_time_{transact_time} {}
+
+  // XXX
+  RequestForPositions(
+      std::string_view const &pos_req_id,
+      roq::fix::PosReqType const &pos_req_type,
+      roq::fix::SubscriptionRequestType const &subscription_request_type,
+      // std::span<Party const> const &no_party_ids,
+      std::string_view const &account,
+      roq::fix::AccountType const &account_type,
+      std::string_view const &currency,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      std::chrono::system_clock::time_point clearing_business_date,
+      // std::span<TradingSession const> const &no_trading_sessions,
+      std::chrono::system_clock::time_point transact_time)
+      : pos_req_id_{pos_req_id}, pos_req_type_{pos_req_type}, subscription_request_type_{subscription_request_type},
+        // no_party_ids_{no_party_ids},
+        account_{account}, account_type_{account_type}, currency_{currency}, symbol_{symbol},
+        security_exchange_{security_exchange}, clearing_business_date_{DateTime{clearing_business_date}},
+        // no_trading_sessions_{no_trading_sessions},
+        transact_time_{DateTime{transact_time}} {}
+
+  operator value_type() const {
+    return {
+        .pos_req_id = pos_req_id_,
+        .pos_req_type = pos_req_type_,
+        .subscription_request_type = subscription_request_type_,
+        .no_party_ids = {},  // no_party_ids_,
+        .account = account_,
+        .account_type = account_type_,
+        .currency = currency_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .clearing_business_date = clearing_business_date_,
+        .no_trading_sessions = {},  // no_trading_sessions_,
+        .transact_time = transact_time_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const pos_req_id_;
+  roq::fix::PosReqType const pos_req_type_;
+  roq::fix::SubscriptionRequestType const subscription_request_type_;
+  // std::span<Party const> const no_party_ids_;
+  std::string const account_;
+  roq::fix::AccountType const account_type_;
+  std::string const currency_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  std::chrono::year_month_day const clearing_business_date_;
+  // std::span<TradingSession const> const no_trading_sessions_;
+  std::chrono::milliseconds const transact_time_;
+};
+
+struct RequestForPositionsAck final : public Encodeable {
+  using value_type = roq::codec::fix::RequestForPositionsAck;
+
+  explicit RequestForPositionsAck(value_type const &value)
+      : pos_maint_rpt_id_{value.pos_maint_rpt_id}, pos_req_id_{value.pos_req_id},
+        total_num_pos_reports_{value.total_num_pos_reports}, unsolicited_indicator_{value.unsolicited_indicator},
+        pos_req_result_{value.pos_req_result}, pos_req_status_{value.pos_req_status},
+        // no_party_ids_{value.no_party_ids},
+        account_{value.account}, account_type_{value.account_type}, text_{value.text} {}
+
+  operator value_type() const {
+    return {
+        .pos_maint_rpt_id = pos_maint_rpt_id_,
+        .pos_req_id = pos_req_id_,
+        .total_num_pos_reports = total_num_pos_reports_,
+        .unsolicited_indicator = unsolicited_indicator_,
+        .pos_req_result = pos_req_result_,
+        .pos_req_status = pos_req_status_,
+        .no_party_ids = {},  // no_party_ids_,
+        .account = account_,
+        .account_type = account_type_,
+        .text = text_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const pos_maint_rpt_id_;
+  std::string const pos_req_id_;
+  uint32_t const total_num_pos_reports_;
+  bool const unsolicited_indicator_;
+  roq::fix::PosReqResult const pos_req_result_;
+  roq::fix::PosReqStatus const pos_req_status_;
+  // std::span<Party const> const no_party_ids_;
+  std::string const account_;
+  roq::fix::AccountType const account_type_;
+  std::string const text_;
 };
 
 }  // namespace fix
