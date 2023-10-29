@@ -741,6 +741,26 @@ struct SecurityStatus final : public Encodeable {
   roq::fix::SecurityTradingStatus const security_trading_status_;
 };
 
+struct InstrmtMDReq final {
+  using value_type = roq::codec::fix::InstrmtMDReq;
+
+  explicit InstrmtMDReq(value_type const &value) : symbol_{value.symbol}, security_exchange_{value.security_exchange} {}
+
+  InstrmtMDReq(std::string_view const &symbol, std::string_view const &security_exchange)
+      : symbol_{symbol}, security_exchange_{security_exchange} {}
+
+  operator value_type() const {
+    return {
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+    };
+  }
+
+ private:
+  std::string const symbol_;
+  std::string const security_exchange_;
+};
+
 struct MarketDataRequest final : public Encodeable {
   using value_type = roq::codec::fix::MarketDataRequest;
 
@@ -748,10 +768,11 @@ struct MarketDataRequest final : public Encodeable {
       : md_req_id_{value.md_req_id}, subscription_request_type_{value.subscription_request_type},
         market_depth_{value.market_depth}, md_update_type_{value.md_update_type},
         aggregated_book_{value.aggregated_book},
-        // no_md_entry_types_{value.no_md_entry_types},
-        // no_related_sym_{value.no_related_sym},
-        // no_trading_sessions_{value.no_trading_sessions},
-        custom_type_{value.custom_type}, custom_value_{value.custom_value} {}
+        no_md_entry_types_{std::begin(value.no_md_entry_types), std::end(value.no_md_entry_types)},
+        no_related_sym_{create<decltype(no_related_sym_)>(value.no_related_sym)},
+        no_related_sym_2_{create_2<decltype(no_related_sym_2_)>(no_related_sym_)}
+  // no_trading_sessions_{value.no_trading_sessions}
+  {}
 
   MarketDataRequest(
       std::string_view const &md_req_id,
@@ -759,36 +780,17 @@ struct MarketDataRequest final : public Encodeable {
       uint32_t const &market_depth,
       roq::fix::MDUpdateType const &md_update_type,
       bool const &aggregated_book,
-      // std::span<MDReq const> const &no_md_entry_types,
-      // std::span<InstrmtMDReq const> const &no_related_sym,
+      std::vector<roq::fix::MDEntryType> const &no_md_entry_types,
+      std::vector<roq::python::codec::fix::InstrmtMDReq> const &no_related_sym
       // std::span<TradingSession const> const &no_trading_sessions,
-      std::string_view const &custom_type,
-      roq::utils::Number const &custom_value)
+      )
       : md_req_id_{md_req_id}, subscription_request_type_{subscription_request_type}, market_depth_{market_depth},
         md_update_type_{md_update_type}, aggregated_book_{aggregated_book},
-        // no_md_entry_types_{no_md_entry_types},
-        // no_related_sym_{no_related_sym},
-        // no_trading_sessions_{no_trading_sessions},
-        custom_type_{custom_type}, custom_value_{custom_value} {}
-
-  // XXX
-  MarketDataRequest(
-      std::string_view const &md_req_id,
-      roq::fix::SubscriptionRequestType const &subscription_request_type,
-      uint32_t const &market_depth,
-      roq::fix::MDUpdateType const &md_update_type,
-      bool const &aggregated_book,
-      // std::span<MDReq const> const &no_md_entry_types,
-      // std::span<InstrmtMDReq const> const &no_related_sym,
-      // std::span<TradingSession const> const &no_trading_sessions,
-      std::string_view const &custom_type,
-      double custom_value)  // XXX
-      : md_req_id_{md_req_id}, subscription_request_type_{subscription_request_type}, market_depth_{market_depth},
-        md_update_type_{md_update_type}, aggregated_book_{aggregated_book},
-        // no_md_entry_types_{no_md_entry_types},
-        // no_related_sym_{no_related_sym},
-        // no_trading_sessions_{no_trading_sessions},
-        custom_type_{custom_type}, custom_value_{custom_value, {}} {}
+        no_md_entry_types_{std::begin(no_md_entry_types), std::end(no_md_entry_types)},
+        no_related_sym_{create<decltype(no_related_sym_)>(no_related_sym)},
+        no_related_sym_2_{create_2<decltype(no_related_sym_2_)>(no_related_sym_)}
+  // no_trading_sessions_{no_trading_sessions}
+  {}
 
   operator value_type() const {
     return {
@@ -797,11 +799,11 @@ struct MarketDataRequest final : public Encodeable {
         .market_depth = market_depth_,
         .md_update_type = md_update_type_,
         .aggregated_book = aggregated_book_,
-        .no_md_entry_types = {},    // no_md_entry_types_,
-        .no_related_sym = {},       // no_related_sym_,
+        .no_md_entry_types = no_md_entry_types_,
+        .no_related_sym = no_related_sym_2_,
         .no_trading_sessions = {},  // no_trading_sessions_,
-        .custom_type = custom_type_,
-        .custom_value = custom_value_,
+        .custom_type = {},
+        .custom_value = {},
     };
   }
 
@@ -810,17 +812,40 @@ struct MarketDataRequest final : public Encodeable {
     return encoder.encode(static_cast<value_type>(*this), sending_time);
   }
 
+  template <typename R>
+  static R create(auto const &value) {
+    using result_type = std::remove_cvref<R>::type;
+    result_type result;
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      value_type item_2{item};
+      result.emplace_back(std::move(item_2));
+    }
+    return result;
+  }
+
+  template <typename R>
+  static R create_2(auto const &value) {
+    using result_type = std::remove_cvref<R>::type;
+    result_type result;
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      auto item_2 = static_cast<value_type>(item);
+      result.emplace_back(std::move(item_2));
+    }
+    return result;
+  }
+
  private:
   std::string const md_req_id_;
   roq::fix::SubscriptionRequestType const subscription_request_type_;
   uint32_t const market_depth_;
   roq::fix::MDUpdateType const md_update_type_;
   bool const aggregated_book_;
-  // std::span<MDReq const> const no_md_entry_types_;
-  // std::span<InstrmtMDReq const> const no_related_sym_;
+  std::vector<roq::codec::fix::MDReq> const no_md_entry_types_;
+  std::vector<InstrmtMDReq> const no_related_sym_;
+  std::vector<roq::codec::fix::InstrmtMDReq> const no_related_sym_2_;
   // std::span<TradingSession const> const no_trading_sessions_;
-  std::string const custom_type_;
-  roq::utils::Number const custom_value_;
 };
 
 struct MarketDataRequestReject final : public Encodeable {
@@ -848,20 +873,101 @@ struct MarketDataRequestReject final : public Encodeable {
   std::string text_;
 };
 
+struct MDFull final {
+  using value_type = roq::codec::fix::MDFull;
+
+  explicit MDFull(value_type const &value)
+      : md_entry_type_{value.md_entry_type}, md_entry_px_{value.md_entry_px}, md_entry_size_{value.md_entry_size},
+        md_entry_date_{value.md_entry_date}, md_entry_time_{value.md_entry_time},
+        trading_session_id_{value.trading_session_id}, expire_time_{value.expire_time}, order_id_{value.order_id},
+        number_of_orders_{value.number_of_orders}, md_entry_position_no_{value.md_entry_position_no} {}
+
+  operator value_type() const {
+    return {
+        .md_entry_type = md_entry_type_,
+        .md_entry_px = md_entry_px_,
+        .md_entry_size = md_entry_size_,
+        .md_entry_date = md_entry_date_,
+        .md_entry_time = md_entry_time_,
+        .trading_session_id = trading_session_id_,
+        .expire_time = expire_time_,
+        .order_id = order_id_,
+        .number_of_orders = number_of_orders_,
+        .md_entry_position_no = md_entry_position_no_,
+    };
+  };
+
+ private:
+  roq::fix::MDEntryType const md_entry_type_;
+  roq::utils::Number const md_entry_px_;
+  roq::utils::Number const md_entry_size_;
+  std::chrono::year_month_day const md_entry_date_;
+  std::chrono::hh_mm_ss<std::chrono::milliseconds> const md_entry_time_;
+  std::string const trading_session_id_;
+  std::string const expire_time_;
+  std::string const order_id_;
+  uint32_t const number_of_orders_;
+  uint32_t const md_entry_position_no_;
+};
+
+struct MDInc final {
+  using value_type = roq::codec::fix::MDInc;
+
+  explicit MDInc(value_type const &value)
+      : md_update_action_{value.md_update_action}, md_entry_type_{value.md_entry_type}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, md_entry_px_{value.md_entry_px},
+        md_entry_size_{value.md_entry_size}, md_entry_date_{value.md_entry_date}, md_entry_time_{value.md_entry_time},
+        trading_session_id_{value.trading_session_id}, expire_time_{value.expire_time}, order_id_{value.order_id},
+        number_of_orders_{value.number_of_orders}, md_entry_position_no_{value.md_entry_position_no} {}
+
+  operator value_type() const {
+    return {
+        .md_update_action = md_update_action_,
+        .md_entry_type = md_entry_type_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .md_entry_px = md_entry_px_,
+        .md_entry_size = md_entry_size_,
+        .md_entry_date = md_entry_date_,
+        .md_entry_time = md_entry_time_,
+        .trading_session_id = trading_session_id_,
+        .expire_time = expire_time_,
+        .order_id = order_id_,
+        .number_of_orders = number_of_orders_,
+        .md_entry_position_no = md_entry_position_no_,
+    };
+  };
+
+ private:
+  roq::fix::MDUpdateAction const md_update_action_;
+  roq::fix::MDEntryType const md_entry_type_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  roq::utils::Number const md_entry_px_;
+  roq::utils::Number const md_entry_size_;
+  std::chrono::year_month_day const md_entry_date_;
+  std::chrono::hh_mm_ss<std::chrono::milliseconds> const md_entry_time_;
+  std::string const trading_session_id_;
+  std::string const expire_time_;
+  std::string const order_id_;
+  uint32_t const number_of_orders_;
+  uint32_t const md_entry_position_no_;
+};
+
 struct MarketDataSnapshotFullRefresh final : public Encodeable {
   using value_type = roq::codec::fix::MarketDataSnapshotFullRefresh;
 
   explicit MarketDataSnapshotFullRefresh(value_type const &value)
-      : md_req_id_{value.md_req_id}, symbol_{value.symbol},
-        security_exchange_{value.security_exchange}  // no_md_entries_{value.no_md_entries}
-  {}
+      : md_req_id_{value.md_req_id}, symbol_{value.symbol}, security_exchange_{value.security_exchange},
+        no_md_entries_{create<decltype(no_md_entries_)>(value.no_md_entries)},
+        no_md_entries_2_{create_2<decltype(no_md_entries_2_)>(no_md_entries_)} {}
 
   operator value_type() const {
     return {
         .md_req_id = md_req_id_,
         .symbol = symbol_,
         .security_exchange = security_exchange_,
-        .no_md_entries = {},  // no_md_entries_,
+        .no_md_entries = no_md_entries_2_,
     };
   }
 
@@ -870,23 +976,50 @@ struct MarketDataSnapshotFullRefresh final : public Encodeable {
     return encoder.encode(static_cast<value_type>(*this), sending_time);
   }
 
- private:
+  template <typename R>
+  static R create(auto const &value) {
+    using result_type = std::remove_cvref<R>::type;
+    result_type result;
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      value_type item_2{item};
+      result.emplace_back(std::move(item_2));
+    }
+    return result;
+  }
+
+  template <typename R>
+  static R create_2(auto const &value) {
+    using result_type = std::remove_cvref<R>::type;
+    result_type result;
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      auto item_2 = static_cast<value_type>(item);
+      result.emplace_back(std::move(item_2));
+    }
+    return result;
+  }
+
+  // private:
+ public:  // XXX FIXME
   std::string const md_req_id_;
   std::string const symbol_;
   std::string const security_exchange_;
-  // std::span<MDFull const> const no_md_entries_;
+  std::vector<MDFull> const no_md_entries_;
+  std::vector<roq::codec::fix::MDFull> const no_md_entries_2_;
 };
 
 struct MarketDataIncrementalRefresh final : public Encodeable {
   using value_type = roq::codec::fix::MarketDataIncrementalRefresh;
 
   explicit MarketDataIncrementalRefresh(value_type const &value)
-      : md_req_id_{value.md_req_id}  // no_md_entries{value.no_md_entries}
-  {}
+      : md_req_id_{value.md_req_id}, no_md_entries_{create<decltype(no_md_entries_)>(value.no_md_entries)},
+        no_md_entries_2_{create_2<decltype(no_md_entries_2_)>(no_md_entries_)} {}
 
   operator value_type() const {
     return {
-        .md_req_id = md_req_id_, .no_md_entries = {},  // no_md_entries,
+        .md_req_id = md_req_id_,
+        .no_md_entries = no_md_entries_2_,
     };
   }
 
@@ -895,9 +1028,35 @@ struct MarketDataIncrementalRefresh final : public Encodeable {
     return encoder.encode(static_cast<value_type>(*this), sending_time);
   }
 
- private:
+  template <typename R>
+  static R create(auto const &value) {
+    using result_type = std::remove_cvref<R>::type;
+    result_type result;
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      value_type item_2{item};
+      result.emplace_back(std::move(item_2));
+    }
+    return result;
+  }
+
+  template <typename R>
+  static R create_2(auto const &value) {
+    using result_type = std::remove_cvref<R>::type;
+    result_type result;
+    using value_type = result_type::value_type;
+    for (auto &item : value) {
+      auto item_2 = static_cast<value_type>(item);
+      result.emplace_back(std::move(item_2));
+    }
+    return result;
+  }
+
+  // private:
+ public:  // XXX FIXME
   std::string const md_req_id_;
-  // std::span<MDInc const> const no_md_entries_;
+  std::vector<MDInc> const no_md_entries_;
+  std::vector<roq::codec::fix::MDInc> const no_md_entries_2_;
 };
 
 struct OrderStatusRequest final : public Encodeable {

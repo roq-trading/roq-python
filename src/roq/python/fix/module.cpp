@@ -24,7 +24,9 @@
 #include "roq/fix/mass_cancel_request_type.hpp"
 #include "roq/fix/mass_cancel_response.hpp"
 #include "roq/fix/mass_status_req_type.hpp"
+#include "roq/fix/md_entry_type.hpp"
 #include "roq/fix/md_req_rej_reason.hpp"
+#include "roq/fix/md_update_action.hpp"
 #include "roq/fix/md_update_type.hpp"
 #include "roq/fix/ord_rej_reason.hpp"
 #include "roq/fix/ord_status.hpp"
@@ -70,7 +72,9 @@ void Module::create(pybind11::module_ &module) {
   utils::create_enum<roq::fix::MassCancelRequestType>(module);
   utils::create_enum<roq::fix::MassCancelResponse>(module);
   utils::create_enum<roq::fix::MassStatusReqType>(module);
+  utils::create_enum<roq::fix::MDEntryType>(module);
   utils::create_enum<roq::fix::MDReqRejReason>(module);
+  utils::create_enum<roq::fix::MDUpdateAction>(module);
   utils::create_enum<roq::fix::MDUpdateType>(module);
   utils::create_enum<roq::fix::OrdRejReason>(module);
   utils::create_enum<roq::fix::OrdStatus>(module);

@@ -139,7 +139,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         reject: roq.codec.fix.Reject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] reject=%s, header=%s",
             reject,
             header,
@@ -152,7 +152,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         business_message_reject: roq.codec.fix.BusinessMessageReject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] business_message_reject=%s, header=%s",
             business_message_reject,
             header,
@@ -301,7 +301,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         market_data_request_reject: roq.codec.fix.MarketDataRequestReject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] market_data_request_reject=%s, header=%s",
             market_data_request_reject,
             header,
@@ -409,7 +409,7 @@ class Client(asyncio.Protocol):
         header: roq.codec.fix.Header,
         order_cancel_reject: roq.codec.fix.OrderCancelReject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] order_cancel_reject=%s, header=%s",
             order_cancel_reject,
             header,
@@ -529,7 +529,7 @@ class MyMixin:
         )
         logging.info("Logon was successful")
         security_list_request = roq.codec.fix.SecurityListRequest(
-            security_req_id="req1",
+            security_req_id="security_req_id_1",
             security_list_request_type=roq.fix.SecurityListRequestType.ALL_SECURITIES,
             subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
         )
@@ -582,7 +582,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         reject: roq.codec.fix.Reject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] reject=%s, header=%s",
             reject,
             header,
@@ -594,7 +594,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         business_message_reject: roq.codec.fix.BusinessMessageReject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] business_message_reject=%s, header=%s",
             business_message_reject,
             header,
@@ -624,7 +624,7 @@ class MyMixin:
             header,
         )
         security_definition_request = roq.codec.fix.SecurityDefinitionRequest(
-            security_req_id="req1",
+            security_req_id="security_req_id_2",
             security_request_type=roq.fix.SecurityRequestType.REQUEST_SECURITY_IDENTITY_AND_SPECIFICATIONS,
             symbol="BTC-PERPETUAL",
             security_exchange="deribit",
@@ -644,13 +644,31 @@ class MyMixin:
             header,
         )
         security_status_request = roq.codec.fix.SecurityStatusRequest(
-            security_status_req_id="req1",
+            security_status_req_id="security_status_req_id_1",
             symbol="BTC-PERPETUAL",
             security_exchange="deribit",
             subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
             trading_session_id="deribit",
         )
         self._send(security_status_request)
+        market_data_request = roq.codec.fix.MarketDataRequest(
+            md_req_id="md_req_id_1",
+            subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT_UPDATES,
+            market_depth=5,
+            md_update_type=roq.fix.MDUpdateType.INCREMENTAL_REFRESH,
+            aggregated_book=True,
+            no_md_entry_types=[
+                roq.fix.MDEntryType.BID,
+                roq.fix.MDEntryType.OFFER,
+            ],
+            no_related_sym=[
+                roq.codec.fix.InstrmtMDReq(
+                    symbol="BTC-PERPETUAL",
+                    security_exchange="deribit",
+                ),
+            ],
+        )
+        self._send(market_data_request)
 
     @typedispatch
     def _callback(
@@ -664,7 +682,7 @@ class MyMixin:
             header,
         )
         order_status_request = roq.codec.fix.OrderStatusRequest(
-            ord_status_req_id="req1",
+            ord_status_req_id="ord_status_req_id_1",
         )
         self._send(order_status_request)
 
@@ -674,7 +692,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         market_data_request_reject: roq.codec.fix.MarketDataRequestReject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] market_data_request_reject=%s, header=%s",
             market_data_request_reject,
             header,
@@ -686,7 +704,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         market_data_snapshot_full_refresh: roq.codec.fix.MarketDataSnapshotFullRefresh,
     ):
-        logging.debug(
+        logging.info(
             "[EVENT] market_data_snapshot_full_refresh=%s, header=%s",
             market_data_snapshot_full_refresh,
             header,
@@ -710,7 +728,7 @@ class MyMixin:
         header: roq.codec.fix.Header,
         order_cancel_reject: roq.codec.fix.OrderCancelReject,
     ):
-        logging.debug(
+        logging.warning(
             "[EVENT] order_cancel_reject=%s, header=%s",
             order_cancel_reject,
             header,
@@ -739,30 +757,15 @@ class MyMixin:
             execution_report,
             header,
         )
-        logging.info(
-            "order_id=%s, cl_ord_id=%s, orig_cl_ord_id=%s, ord_status_req_id=%s, mass_status_req_id=%s, "
-            "exec_type=%s, ord_status=%s, ord_rej_reason=%s, side=%s, ord_type=%s, time_in_force=%s",
-            execution_report.order_id,
-            execution_report.cl_ord_id,
-            execution_report.orig_cl_ord_id,
-            execution_report.ord_status_req_id,
-            execution_report.mass_status_req_id,
-            execution_report.exec_type,
-            execution_report.ord_status,
-            execution_report.ord_rej_reason,
-            execution_report.side,
-            execution_report.ord_type,
-            execution_report.time_in_force,
-        )
         if len(execution_report.ord_status_req_id) > 0:
             order_mass_status_request = roq.codec.fix.OrderMassStatusRequest(
-                mass_status_req_id="req1",
+                mass_status_req_id="mass_status_req_id_1",
                 mass_status_req_type=roq.fix.MassStatusReqType.ORDERS,
             )
             self._send(order_mass_status_request)
         if len(execution_report.mass_status_req_id) > 0:
             new_order_single = roq.codec.fix.NewOrderSingle(
-                cl_ord_id="req1",
+                cl_ord_id="cl_ord_id_1",
                 account="A1",
                 symbol="BTC-PERPETUAL",
                 security_exchange="deribit",
@@ -777,7 +780,7 @@ class MyMixin:
         else:
             # TODO not yet functional
             trading_session_status_request = roq.codec.fix.TradingSessionStatusRequest(
-                trad_ses_req_id="req1",
+                trad_ses_req_id="trad_ses_req_id_1",
                 trading_session_id="deribit",
                 subscription_request_type=roq.fix.SubscriptionRequestType.SNAPSHOT,
             )

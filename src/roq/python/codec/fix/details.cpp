@@ -17,6 +17,8 @@ using namespace std::literals;
 namespace roq {
 namespace python {
 
+// helpers (create)
+
 template <>
 void utils::create_struct<roq::python::codec::fix::SecListGrp>(pybind11::module_ &module) {
   using value_type = roq::python::codec::fix::SecListGrp;
@@ -29,6 +31,106 @@ void utils::create_struct<roq::python::codec::fix::SecListGrp>(pybind11::module_
           pybind11::arg("security_exchange"),
           pybind11::arg("min_trade_vol") = NaN,
           pybind11::arg("trading_session_id") = std::string{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_struct<roq::python::codec::fix::InstrmtMDReq>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::InstrmtMDReq;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type>(module, name.c_str())
+      .def(
+          pybind11::init<std::string_view, std::string_view>(),
+          pybind11::arg("symbol") = std::string_view{},
+          pybind11::arg("security_exchange") = std::string_view{})
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+// helpers (update)
+
+template <>
+void utils::create_struct<roq::python::codec::fix::MDFull>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::MDFull;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type>(module, name.c_str())
+      .def_property_readonly(
+          "md_entry_type",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_type; })
+      .def_property_readonly(
+          "md_entry_px",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_px.value; })
+      .def_property_readonly(
+          "md_entry_size",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_size.value; })
+      .def_property_readonly(
+          "md_entry_date",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_date; })
+      .def_property_readonly(
+          "md_entry_time",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_time; })
+      .def_property_readonly(
+          "trading_session_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).trading_session_id; })
+      .def_property_readonly(
+          "expire_time", [](value_type const &self) { return static_cast<value_type::value_type>(self).expire_time; })
+      .def_property_readonly(
+          "order_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).order_id; })
+      .def_property_readonly(
+          "number_of_orders",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).number_of_orders; })
+      .def_property_readonly(
+          "md_entry_position_no",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_position_no; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_struct<roq::python::codec::fix::MDInc>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::MDInc;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type>(module, name.c_str())
+      .def_property_readonly(
+          "md_update_action",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_update_action; })
+      .def_property_readonly(
+          "md_entry_type",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_type; })
+      .def_property_readonly(
+          "symbol", [](value_type const &self) { return static_cast<value_type::value_type>(self).symbol; })
+      .def_property_readonly(
+          "security_exchange",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).security_exchange; })
+      .def_property_readonly(
+          "md_entry_px",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_px.value; })
+      .def_property_readonly(
+          "md_entry_size",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_size.value; })
+      .def_property_readonly(
+          "md_entry_date",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_date; })
+      .def_property_readonly(
+          "md_entry_time",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_time; })
+      .def_property_readonly(
+          "trading_session_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).trading_session_id; })
+      .def_property_readonly(
+          "expire_time", [](value_type const &self) { return static_cast<value_type::value_type>(self).expire_time; })
+      .def_property_readonly(
+          "order_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).order_id; })
+      .def_property_readonly(
+          "number_of_orders",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).number_of_orders; })
+      .def_property_readonly(
+          "md_entry_position_no",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_entry_position_no; })
       .def("__repr__", [](value_type const &self) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
@@ -431,15 +533,15 @@ void utils::create_ref_struct_2<roq::python::codec::fix::MarketDataRequest, roq:
               uint32_t,
               roq::fix::MDUpdateType,
               bool,
-              std::string_view,
-              double>(),
-          pybind11::arg("md_req_id") = std::string_view{},
-          pybind11::arg("subscription_request_type") = roq::fix::SubscriptionRequestType{},
-          pybind11::arg("market_depth") = uint32_t{},
+              std::vector<roq::fix::MDEntryType>,
+              std::vector<roq::python::codec::fix::InstrmtMDReq>>(),
+          pybind11::arg("md_req_id"),                  // required
+          pybind11::arg("subscription_request_type"),  // required
+          pybind11::arg("market_depth") = uint32_t{},  // required
           pybind11::arg("md_update_type") = roq::fix::MDUpdateType{},
           pybind11::arg("aggregated_book") = false,
-          pybind11::arg("custom_type") = std::string_view{},
-          pybind11::arg("custom_value") = std::numeric_limits<double>::quiet_NaN())
+          pybind11::arg("no_md_entry_types"),  // required
+          pybind11::arg("no_related_sym"))     // required
       .def("__repr__", [](value_type const &self) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
@@ -479,6 +581,11 @@ void utils::create_ref_struct_2<
       .def_property_readonly(
           "security_exchange",
           [](value_type const &self) { return static_cast<value_type::value_type>(self).security_exchange; })
+      .def_property_readonly(
+          "no_md_entries",
+          [](value_type const &self) {
+            return self.no_md_entries_;  // XXX FIXME
+          })
       .def("__repr__", [](value_type const &self) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });
@@ -494,6 +601,11 @@ void utils::create_ref_struct_2<
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def_property_readonly(
           "md_req_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).md_req_id; })
+      .def_property_readonly(
+          "no_md_entries",
+          [](value_type const &self) {
+            return self.no_md_entries_;  // XXX FIXME
+          })
       .def("__repr__", [](value_type const &self) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });

@@ -22,7 +22,12 @@ namespace codec {
 namespace fix {
 
 void Module::create(pybind11::module_ &module) {
+  // helpers
+  utils::create_struct<roq::python::codec::fix::InstrmtMDReq>(module);
   utils::create_struct<roq::python::codec::fix::SecListGrp>(module);
+
+  utils::create_struct<roq::python::codec::fix::MDFull>(module);
+  utils::create_struct<roq::python::codec::fix::MDInc>(module);
 
   utils::create_struct<roq::python::codec::fix::Encodeable>(module);
   utils::create_struct<roq::python::codec::fix::Encoder>(module);
