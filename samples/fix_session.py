@@ -17,6 +17,8 @@ import roq
 
 
 # TODO timer
+# TODO reconnect
+# TODO check asyncio is used properly
 
 
 class Client(asyncio.Protocol):
