@@ -58,6 +58,16 @@ void Module::create(pybind11::module_ &module) {
       module);
   utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatus, roq::python::codec::fix::Encodeable>(module);
 
+  utils::create_ref_struct_2<roq::python::codec::fix::MarketDataRequest, roq::python::codec::fix::Encodeable>(module);
+  utils::create_ref_struct_2<roq::python::codec::fix::MarketDataRequestReject, roq::python::codec::fix::Encodeable>(
+      module);
+  utils::
+      create_ref_struct_2<roq::python::codec::fix::MarketDataSnapshotFullRefresh, roq::python::codec::fix::Encodeable>(
+          module);
+  utils::
+      create_ref_struct_2<roq::python::codec::fix::MarketDataIncrementalRefresh, roq::python::codec::fix::Encodeable>(
+          module);
+
   utils::create_ref_struct_2<roq::python::codec::fix::OrderStatusRequest, roq::python::codec::fix::Encodeable>(module);
   utils::create_ref_struct_2<roq::python::codec::fix::OrderMassStatusRequest, roq::python::codec::fix::Encodeable>(
       module);
@@ -80,6 +90,7 @@ void Module::create(pybind11::module_ &module) {
   utils::create_ref_struct_2<roq::python::codec::fix::RequestForPositions, roq::python::codec::fix::Encodeable>(module);
   utils::create_ref_struct_2<roq::python::codec::fix::RequestForPositionsAck, roq::python::codec::fix::Encodeable>(
       module);
+  utils::create_ref_struct_2<roq::python::codec::fix::PositionReport, roq::python::codec::fix::Encodeable>(module);
 
   utils::create_struct<roq::python::codec::fix::Header>(module);
   utils::create_struct<roq::python::codec::fix::Decoder>(module);

@@ -80,12 +80,20 @@ struct Decoder final {
     void operator()(roq::fix::Header const &header, roq::codec::fix::SecurityStatus const &value) override {
       dispatch<SecurityStatus>(header, value);
     }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequest const &value) override {}
-    void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequestReject const &value) override {}
+    void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequest const &value) override {
+      dispatch<MarketDataRequest>(header, value);
+    }
+    void operator()(roq::fix::Header const &header, roq::codec::fix::MarketDataRequestReject const &value) override {
+      dispatch<MarketDataRequestReject>(header, value);
+    }
     void operator()(
-        roq::fix::Header const &header, roq::codec::fix::MarketDataSnapshotFullRefresh const &value) override {}
+        roq::fix::Header const &header, roq::codec::fix::MarketDataSnapshotFullRefresh const &value) override {
+      dispatch<MarketDataSnapshotFullRefresh>(header, value);
+    }
     void operator()(
-        roq::fix::Header const &header, roq::codec::fix::MarketDataIncrementalRefresh const &value) override {}
+        roq::fix::Header const &header, roq::codec::fix::MarketDataIncrementalRefresh const &value) override {
+      dispatch<MarketDataIncrementalRefresh>(header, value);
+    }
     void operator()(roq::fix::Header const &header, roq::codec::fix::OrderStatusRequest const &value) override {
       dispatch<OrderStatusRequest>(header, value);
     }
@@ -125,7 +133,9 @@ struct Decoder final {
     void operator()(roq::fix::Header const &header, roq::codec::fix::RequestForPositionsAck const &value) override {
       dispatch<RequestForPositionsAck>(header, value);
     }
-    void operator()(roq::fix::Header const &header, roq::codec::fix::PositionReport const &value) override {}
+    void operator()(roq::fix::Header const &header, roq::codec::fix::PositionReport const &value) override {
+      dispatch<PositionReport>(header, value);
+    }
 
    private:
     Callback const &callback_;

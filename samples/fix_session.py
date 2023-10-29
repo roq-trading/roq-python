@@ -287,6 +287,54 @@ class Client(asyncio.Protocol):
     def _callback(
         self,
         header: roq.codec.fix.Header,
+        market_data_request: roq.codec.fix.MarketDataRequest,
+    ):
+        logging.fatal(
+            "[EVENT] market_data_request=%s, header=%s",
+            market_data_request,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        market_data_request_reject: roq.codec.fix.MarketDataRequestReject,
+    ):
+        logging.debug(
+            "[EVENT] market_data_request_reject=%s, header=%s",
+            market_data_request_reject,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        market_data_snapshot_full_refresh: roq.codec.fix.MarketDataSnapshotFullRefresh,
+    ):
+        logging.debug(
+            "[EVENT] market_data_snapshot_full_refresh=%s, header=%s",
+            market_data_snapshot_full_refresh,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        market_data_incremental_refresh: roq.codec.fix.MarketDataIncrementalRefresh,
+    ):
+        logging.debug(
+            "[EVENT] market_data_incremental_refresh=%s, header=%s",
+            market_data_incremental_refresh,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
         order_status_request: roq.codec.fix.OrderStatusRequest,
     ):
         logging.fatal(
@@ -624,6 +672,42 @@ class MyMixin:
     def _callback(
         self,
         header: roq.codec.fix.Header,
+        market_data_request_reject: roq.codec.fix.MarketDataRequestReject,
+    ):
+        logging.debug(
+            "[EVENT] market_data_request_reject=%s, header=%s",
+            market_data_request_reject,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        market_data_snapshot_full_refresh: roq.codec.fix.MarketDataSnapshotFullRefresh,
+    ):
+        logging.debug(
+            "[EVENT] market_data_snapshot_full_refresh=%s, header=%s",
+            market_data_snapshot_full_refresh,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
+        market_data_incremental_refresh: roq.codec.fix.MarketDataIncrementalRefresh,
+    ):
+        logging.debug(
+            "[EVENT] market_data_incremental_refresh=%s, header=%s",
+            market_data_incremental_refresh,
+            header,
+        )
+
+    @typedispatch
+    def _callback(
+        self,
+        header: roq.codec.fix.Header,
         order_cancel_reject: roq.codec.fix.OrderCancelReject,
     ):
         logging.debug(
@@ -734,6 +818,7 @@ class MyMixin:
             position_report,
             header,
         )
+
 
 class MySession(
     MyMixin,

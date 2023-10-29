@@ -741,6 +741,165 @@ struct SecurityStatus final : public Encodeable {
   roq::fix::SecurityTradingStatus const security_trading_status_;
 };
 
+struct MarketDataRequest final : public Encodeable {
+  using value_type = roq::codec::fix::MarketDataRequest;
+
+  explicit MarketDataRequest(value_type const &value)
+      : md_req_id_{value.md_req_id}, subscription_request_type_{value.subscription_request_type},
+        market_depth_{value.market_depth}, md_update_type_{value.md_update_type},
+        aggregated_book_{value.aggregated_book},
+        // no_md_entry_types_{value.no_md_entry_types},
+        // no_related_sym_{value.no_related_sym},
+        // no_trading_sessions_{value.no_trading_sessions},
+        custom_type_{value.custom_type}, custom_value_{value.custom_value} {}
+
+  MarketDataRequest(
+      std::string_view const &md_req_id,
+      roq::fix::SubscriptionRequestType const &subscription_request_type,
+      uint32_t const &market_depth,
+      roq::fix::MDUpdateType const &md_update_type,
+      bool const &aggregated_book,
+      // std::span<MDReq const> const &no_md_entry_types,
+      // std::span<InstrmtMDReq const> const &no_related_sym,
+      // std::span<TradingSession const> const &no_trading_sessions,
+      std::string_view const &custom_type,
+      roq::utils::Number const &custom_value)
+      : md_req_id_{md_req_id}, subscription_request_type_{subscription_request_type}, market_depth_{market_depth},
+        md_update_type_{md_update_type}, aggregated_book_{aggregated_book},
+        // no_md_entry_types_{no_md_entry_types},
+        // no_related_sym_{no_related_sym},
+        // no_trading_sessions_{no_trading_sessions},
+        custom_type_{custom_type}, custom_value_{custom_value} {}
+
+  // XXX
+  MarketDataRequest(
+      std::string_view const &md_req_id,
+      roq::fix::SubscriptionRequestType const &subscription_request_type,
+      uint32_t const &market_depth,
+      roq::fix::MDUpdateType const &md_update_type,
+      bool const &aggregated_book,
+      // std::span<MDReq const> const &no_md_entry_types,
+      // std::span<InstrmtMDReq const> const &no_related_sym,
+      // std::span<TradingSession const> const &no_trading_sessions,
+      std::string_view const &custom_type,
+      double custom_value)  // XXX
+      : md_req_id_{md_req_id}, subscription_request_type_{subscription_request_type}, market_depth_{market_depth},
+        md_update_type_{md_update_type}, aggregated_book_{aggregated_book},
+        // no_md_entry_types_{no_md_entry_types},
+        // no_related_sym_{no_related_sym},
+        // no_trading_sessions_{no_trading_sessions},
+        custom_type_{custom_type}, custom_value_{custom_value, {}} {}
+
+  operator value_type() const {
+    return {
+        .md_req_id = md_req_id_,
+        .subscription_request_type = subscription_request_type_,
+        .market_depth = market_depth_,
+        .md_update_type = md_update_type_,
+        .aggregated_book = aggregated_book_,
+        .no_md_entry_types = {},    // no_md_entry_types_,
+        .no_related_sym = {},       // no_related_sym_,
+        .no_trading_sessions = {},  // no_trading_sessions_,
+        .custom_type = custom_type_,
+        .custom_value = custom_value_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const md_req_id_;
+  roq::fix::SubscriptionRequestType const subscription_request_type_;
+  uint32_t const market_depth_;
+  roq::fix::MDUpdateType const md_update_type_;
+  bool const aggregated_book_;
+  // std::span<MDReq const> const no_md_entry_types_;
+  // std::span<InstrmtMDReq const> const no_related_sym_;
+  // std::span<TradingSession const> const no_trading_sessions_;
+  std::string const custom_type_;
+  roq::utils::Number const custom_value_;
+};
+
+struct MarketDataRequestReject final : public Encodeable {
+  using value_type = roq::codec::fix::MarketDataRequestReject;
+
+  explicit MarketDataRequestReject(value_type const &value)
+      : md_req_id_{value.md_req_id}, md_req_rej_reason_{value.md_req_rej_reason}, text_{value.text} {}
+
+  operator value_type() const {
+    return {
+        .md_req_id = md_req_id_,
+        .md_req_rej_reason = md_req_rej_reason_,
+        .text = text_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string md_req_id_;
+  roq::fix::MDReqRejReason md_req_rej_reason_;
+  std::string text_;
+};
+
+struct MarketDataSnapshotFullRefresh final : public Encodeable {
+  using value_type = roq::codec::fix::MarketDataSnapshotFullRefresh;
+
+  explicit MarketDataSnapshotFullRefresh(value_type const &value)
+      : md_req_id_{value.md_req_id}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}  // no_md_entries_{value.no_md_entries}
+  {}
+
+  operator value_type() const {
+    return {
+        .md_req_id = md_req_id_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .no_md_entries = {},  // no_md_entries_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const md_req_id_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  // std::span<MDFull const> const no_md_entries_;
+};
+
+struct MarketDataIncrementalRefresh final : public Encodeable {
+  using value_type = roq::codec::fix::MarketDataIncrementalRefresh;
+
+  explicit MarketDataIncrementalRefresh(value_type const &value)
+      : md_req_id_{value.md_req_id}  // no_md_entries{value.no_md_entries}
+  {}
+
+  operator value_type() const {
+    return {
+        .md_req_id = md_req_id_, .no_md_entries = {},  // no_md_entries,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const md_req_id_;
+  // std::span<MDInc const> const no_md_entries_;
+};
+
 struct OrderStatusRequest final : public Encodeable {
   using value_type = roq::codec::fix::OrderStatusRequest;
 
@@ -1647,6 +1806,75 @@ struct RequestForPositionsAck final : public Encodeable {
   // std::span<Party const> const no_party_ids_;
   std::string const account_;
   roq::fix::AccountType const account_type_;
+  std::string const text_;
+};
+
+struct PositionReport final : public Encodeable {
+  using value_type = roq::codec::fix::PositionReport;
+
+  explicit PositionReport(value_type const &value)
+      : pos_maint_rpt_id_{value.pos_maint_rpt_id}, pos_req_id_{value.pos_req_id}, pos_req_type_{value.pos_req_type},
+        subscription_request_type_{value.subscription_request_type},
+        total_num_pos_reports_{value.total_num_pos_reports}, unsolicited_indicator_{value.unsolicited_indicator},
+        pos_req_result_{value.pos_req_result}, clearing_business_date_{value.clearing_business_date},
+        // no_party_ids_{value.no_party_ids},
+        account_{value.account}, account_type_{value.account_type}, symbol_{value.symbol},
+        security_exchange_{value.security_exchange}, currency_{value.currency}, settl_price_{value.settl_price},
+        settl_price_type_{value.settl_price_type}, prior_settl_price_{value.prior_settl_price},
+        // no_positions_{value.no_positions},
+        // no_pos_amt_{value.no_pos_amt},
+        text_{value.text} {}
+
+  operator value_type() const {
+    return {
+        .pos_maint_rpt_id = pos_maint_rpt_id_,
+        .pos_req_id = pos_req_id_,
+        .pos_req_type = pos_req_type_,
+        .subscription_request_type = subscription_request_type_,
+        .total_num_pos_reports = total_num_pos_reports_,
+        .unsolicited_indicator = unsolicited_indicator_,
+        .pos_req_result = pos_req_result_,
+        .clearing_business_date = clearing_business_date_,
+        .no_party_ids = {},  // no_party_ids_,
+        .account = account_,
+        .account_type = account_type_,
+        .symbol = symbol_,
+        .security_exchange = security_exchange_,
+        .currency = currency_,
+        .settl_price = settl_price_,
+        .settl_price_type = settl_price_type_,
+        .prior_settl_price = prior_settl_price_,
+        .no_positions = {},  // no_positions_,
+        .no_pos_amt = {},    // no_pos_amt_,
+        .text = text_,
+    };
+  }
+
+ protected:
+  std::span<std::byte const> encode(Encoder &encoder, std::chrono::nanoseconds sending_time) const override {
+    return encoder.encode(static_cast<value_type>(*this), sending_time);
+  }
+
+ private:
+  std::string const pos_maint_rpt_id_;
+  std::string const pos_req_id_;
+  roq::fix::PosReqType const pos_req_type_;
+  roq::fix::SubscriptionRequestType const subscription_request_type_;
+  uint32_t const total_num_pos_reports_;
+  bool const unsolicited_indicator_;
+  roq::fix::PosReqResult const pos_req_result_;
+  std::chrono::year_month_day const clearing_business_date_;
+  // std::span<Party const> const no_party_ids_;
+  std::string const account_;
+  roq::fix::AccountType const account_type_;
+  std::string const symbol_;
+  std::string const security_exchange_;
+  std::string const currency_;
+  roq::utils::Number const settl_price_;
+  roq::fix::SettlPriceType const settl_price_type_;
+  roq::utils::Number const prior_settl_price_;
+  // std::span<PositionQty const> const no_positions_;
+  // std::span<PositionAmountData const> const no_pos_amt_;
   std::string const text_;
 };
 

@@ -418,6 +418,88 @@ void utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatus, roq::py
 }
 
 template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::MarketDataRequest, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::MarketDataRequest;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def(
+          pybind11::init<
+              std::string_view,
+              roq::fix::SubscriptionRequestType,
+              uint32_t,
+              roq::fix::MDUpdateType,
+              bool,
+              std::string_view,
+              double>(),
+          pybind11::arg("md_req_id") = std::string_view{},
+          pybind11::arg("subscription_request_type") = roq::fix::SubscriptionRequestType{},
+          pybind11::arg("market_depth") = uint32_t{},
+          pybind11::arg("md_update_type") = roq::fix::MDUpdateType{},
+          pybind11::arg("aggregated_book") = false,
+          pybind11::arg("custom_type") = std::string_view{},
+          pybind11::arg("custom_value") = std::numeric_limits<double>::quiet_NaN())
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::MarketDataRequestReject, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::MarketDataRequestReject;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def_property_readonly(
+          "md_req_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).md_req_id; })
+      .def_property_readonly(
+          "md_req_rej_reason",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).md_req_rej_reason; })
+      .def_property_readonly(
+          "text", [](value_type const &self) { return static_cast<value_type::value_type>(self).text; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<
+    roq::python::codec::fix::MarketDataSnapshotFullRefresh,
+    roq::python::codec::fix::Encodeable>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::MarketDataSnapshotFullRefresh;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def_property_readonly(
+          "md_req_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).md_req_id; })
+      .def_property_readonly(
+          "symbol", [](value_type const &self) { return static_cast<value_type::value_type>(self).symbol; })
+      .def_property_readonly(
+          "security_exchange",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).security_exchange; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<
+    roq::python::codec::fix::MarketDataIncrementalRefresh,
+    roq::python::codec::fix::Encodeable>(pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::MarketDataIncrementalRefresh;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def_property_readonly(
+          "md_req_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).md_req_id; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
 void utils::create_ref_struct_2<roq::python::codec::fix::OrderStatusRequest, roq::python::codec::fix::Encodeable>(
     pybind11::module_ &module) {
   using value_type = roq::python::codec::fix::OrderStatusRequest;
@@ -938,6 +1020,62 @@ void utils::create_ref_struct_2<roq::python::codec::fix::RequestForPositionsAck,
           "account", [](value_type const &self) { return static_cast<value_type::value_type>(self).account; })
       .def_property_readonly(
           "account_type", [](value_type const &self) { return static_cast<value_type::value_type>(self).account_type; })
+      .def_property_readonly(
+          "text", [](value_type const &self) { return static_cast<value_type::value_type>(self).text; })
+      .def("__repr__", [](value_type const &self) {
+        return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
+      });
+}
+
+template <>
+void utils::create_ref_struct_2<roq::python::codec::fix::PositionReport, roq::python::codec::fix::Encodeable>(
+    pybind11::module_ &module) {
+  using value_type = roq::python::codec::fix::PositionReport;
+  using base_type = roq::python::codec::fix::Encodeable;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type, base_type>(module, name.c_str())
+      .def_property_readonly(
+          "pos_maint_rpt_id",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).pos_maint_rpt_id; })
+      .def_property_readonly(
+          "pos_req_id", [](value_type const &self) { return static_cast<value_type::value_type>(self).pos_req_id; })
+      .def_property_readonly(
+          "pos_req_type", [](value_type const &self) { return static_cast<value_type::value_type>(self).pos_req_type; })
+      .def_property_readonly(
+          "subscription_request_type",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).subscription_request_type; })
+      .def_property_readonly(
+          "total_num_pos_reports",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).total_num_pos_reports; })
+      .def_property_readonly(
+          "unsolicited_indicator",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).unsolicited_indicator; })
+      .def_property_readonly(
+          "pos_req_result",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).pos_req_result; })
+      .def_property_readonly(
+          "clearing_business_date",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).clearing_business_date; })
+      .def_property_readonly(
+          "account", [](value_type const &self) { return static_cast<value_type::value_type>(self).account; })
+      .def_property_readonly(
+          "account_type", [](value_type const &self) { return static_cast<value_type::value_type>(self).account_type; })
+      .def_property_readonly(
+          "symbol", [](value_type const &self) { return static_cast<value_type::value_type>(self).symbol; })
+      .def_property_readonly(
+          "security_exchange",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).security_exchange; })
+      .def_property_readonly(
+          "currency", [](value_type const &self) { return static_cast<value_type::value_type>(self).currency; })
+      .def_property_readonly(
+          "settl_price",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).settl_price.value; })
+      .def_property_readonly(
+          "settl_price_type",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).settl_price_type; })
+      .def_property_readonly(
+          "prior_settl_price",
+          [](value_type const &self) { return static_cast<value_type::value_type>(self).prior_settl_price.value; })
       .def_property_readonly(
           "text", [](value_type const &self) { return static_cast<value_type::value_type>(self).text; })
       .def("__repr__", [](value_type const &self) {
