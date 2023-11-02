@@ -90,18 +90,23 @@ template <>
 void utils::create_struct<utils::mbp::MarketByPrice>(pybind11::module_ &module) {
   using value_type = utils::mbp::MarketByPrice;
   std::string name{nameof::nameof_short_type<value_type>()};
-  pybind11::class_<value_type>(module, name.c_str())
+  pybind11::class_<value_type>(module, name.c_str(), "Maintains order book (by price) state")
       .def(
           pybind11::init<std::string_view const &, std::string_view const &>(),
           pybind11::arg("exchange") = "",
           pybind11::arg("symbol"))
-      .def("clear", [](value_type &self) { self.clear(); })
+      .def(
+          "clear", [](value_type &self) { self.clear(); }, "Reset state")
       .def(
           "apply",
           [](value_type &self, utils::Ref<MarketByPriceUpdate> const &market_by_price_update) {
             self(market_by_price_update);
-          })
-      .def("extract", [](value_type const &self, size_t depth) { return self.extract(depth); })
+          },
+          "Apply an update")
+      .def(
+          "extract",
+          [](value_type const &self, size_t depth) { return self.extract(depth); },
+          "Extract best levels from book")
       .def("__repr__", [](value_type const &self) { return self.print(); });
 }
 
