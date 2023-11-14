@@ -37,9 +37,6 @@ struct Decoder final {
     void operator()(Event<MarketByOrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
-    // ...
-    void operator()(Event<OrderAck> const &event) override { dispatch(event.message_info, event.value); }
-    void operator()(Event<OrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
 
    private:
     Callback const &callback_;

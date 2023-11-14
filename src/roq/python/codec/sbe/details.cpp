@@ -94,25 +94,7 @@ void utils::create_struct<roq::python::codec::sbe::Encoder>(pybind11::module_ &m
             return pybind11::bytes{result};
           },
           pybind11::arg("message_info"),
-          pybind11::arg("statistic_update"))
-      .def(
-          "encode",
-          [](value_type &self, utils::Ref<MessageInfo> &message_info, utils::Ref<OrderAck> &order_ack) {
-            auto message = self(static_cast<MessageInfo>(message_info), static_cast<OrderAck>(order_ack));
-            std::string_view result{reinterpret_cast<char const *>(std::data(message)), std::size(message)};
-            return pybind11::bytes{result};
-          },
-          pybind11::arg("message_info"),
-          pybind11::arg("order_ack"))
-      .def(
-          "encode",
-          [](value_type &self, utils::Ref<MessageInfo> &message_info, utils::Ref<OrderUpdate> &order_update) {
-            auto message = self(static_cast<MessageInfo>(message_info), static_cast<OrderUpdate>(order_update));
-            std::string_view result{reinterpret_cast<char const *>(std::data(message)), std::size(message)};
-            return pybind11::bytes{result};
-          },
-          pybind11::arg("message_info"),
-          pybind11::arg("order_update"));
+          pybind11::arg("statistic_update"));
 }
 
 template <>
