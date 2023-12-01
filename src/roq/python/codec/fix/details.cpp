@@ -173,10 +173,19 @@ void utils::create_ref_struct_2<roq::python::codec::fix::Logon, roq::python::cod
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type, base_type>(module, name.c_str())
       .def(
-          pybind11::
-              init<roq::fix::EncryptMethod, std::chrono::seconds, bool, uint64_t, std::string_view, std::string_view>(),
+          pybind11::init<
+              roq::fix::EncryptMethod,
+              std::chrono::seconds,
+              uint32_t,
+              std::string_view,
+              bool,
+              uint64_t,
+              std::string_view,
+              std::string_view>(),
           pybind11::arg("encrypt_method") = roq::fix::EncryptMethod::NONE,
           pybind11::arg("heart_bt_int"),
+          pybind11::arg("raw_data_length"),
+          pybind11::arg("raw_data"),
           pybind11::arg("reset_seq_num_flag") = bool{},
           pybind11::arg("next_expected_msg_seq_num") = uint64_t{},
           pybind11::arg("username"),

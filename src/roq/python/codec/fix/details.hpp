@@ -45,23 +45,29 @@ struct Logon final : public Encodeable {
 
   explicit Logon(value_type const &value)
       : encrypt_method_{value.encrypt_method}, heart_bt_int_{value.heart_bt_int},
+        raw_data_length_{value.raw_data_length}, raw_data_{value.raw_data},
         reset_seq_num_flag_{value.reset_seq_num_flag}, next_expected_msg_seq_num_{value.next_expected_msg_seq_num},
         username_{value.username}, password_{value.password} {}
 
   Logon(
       roq::fix::EncryptMethod encrypt_method,
       std::chrono::seconds heart_bt_int,
+      uint32_t raw_data_length,
+      std::string_view const &raw_data,
       bool reset_seq_num_flag,
       uint64_t next_expected_msg_seq_num,
       std::string_view const &username,
       std::string_view const &password)
-      : encrypt_method_{encrypt_method}, heart_bt_int_{heart_bt_int}, reset_seq_num_flag_{reset_seq_num_flag},
+      : encrypt_method_{encrypt_method}, heart_bt_int_{heart_bt_int}, raw_data_length_{raw_data_length},
+        raw_data_{raw_data}, reset_seq_num_flag_{reset_seq_num_flag},
         next_expected_msg_seq_num_{next_expected_msg_seq_num}, username_{username}, password_{password} {}
 
   operator value_type() const {
     return {
         .encrypt_method = encrypt_method_,
         .heart_bt_int = static_cast<uint16_t>(heart_bt_int_.count()),
+        .raw_data_length = raw_data_length_,
+        .raw_data = raw_data_,
         .reset_seq_num_flag = reset_seq_num_flag_,
         .next_expected_msg_seq_num = next_expected_msg_seq_num_,
         .username = username_,
@@ -77,6 +83,8 @@ struct Logon final : public Encodeable {
  private:
   roq::fix::EncryptMethod const encrypt_method_;
   std::chrono::seconds const heart_bt_int_;
+  uint32_t const raw_data_length_;
+  std::string const raw_data_;
   bool const reset_seq_num_flag_;
   uint64_t const next_expected_msg_seq_num_;
   std::string const username_;
