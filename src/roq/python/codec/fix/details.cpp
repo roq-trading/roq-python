@@ -516,13 +516,15 @@ void utils::create_ref_struct_2<roq::python::codec::fix::SecurityStatus, roq::py
               std::string_view,
               std::string_view,
               bool,
-              roq::fix::SecurityTradingStatus>(),
+              roq::fix::SecurityTradingStatus,
+              std::chrono::system_clock::time_point>(),
           pybind11::arg("security_status_req_id") = std::string_view{},
           pybind11::arg("symbol") = std::string_view{},
           pybind11::arg("security_exchange") = std::string_view{},
           pybind11::arg("trading_session_id") = std::string_view{},
           pybind11::arg("unsolicited_indicator,") = bool{},
-          pybind11::arg("security_trading_status") = roq::fix::SecurityTradingStatus{})
+          pybind11::arg("security_trading_status") = roq::fix::SecurityTradingStatus{},
+          pybind11::arg("transact_time") = std::chrono::system_clock::time_point{})
       .def("__repr__", [](value_type const &self) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });

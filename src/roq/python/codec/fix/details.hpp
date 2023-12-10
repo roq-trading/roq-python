@@ -711,7 +711,8 @@ struct SecurityStatus final : public Encodeable {
   explicit SecurityStatus(value_type const &value)
       : security_status_req_id_{value.security_status_req_id}, symbol_{value.symbol},
         security_exchange_{value.security_exchange}, trading_session_id_{value.trading_session_id},
-        unsolicited_indicator_{value.unsolicited_indicator}, security_trading_status_{value.security_trading_status} {}
+        unsolicited_indicator_{value.unsolicited_indicator}, security_trading_status_{value.security_trading_status},
+        transact_time_{value.transact_time} {}
 
   SecurityStatus(
       std::string_view const &security_status_req_id,
@@ -719,10 +720,23 @@ struct SecurityStatus final : public Encodeable {
       std::string_view const &security_exchange,
       std::string_view const &trading_session_id,
       bool unsolicited_indicator,
-      roq::fix::SecurityTradingStatus security_trading_status)
+      roq::fix::SecurityTradingStatus security_trading_status,
+      std::chrono::milliseconds transact_time)
       : security_status_req_id_{security_status_req_id}, symbol_{symbol}, security_exchange_{security_exchange},
         trading_session_id_{trading_session_id}, unsolicited_indicator_{unsolicited_indicator},
-        security_trading_status_{security_trading_status} {}
+        security_trading_status_{security_trading_status}, transact_time_{transact_time} {}
+
+  SecurityStatus(
+      std::string_view const &security_status_req_id,
+      std::string_view const &symbol,
+      std::string_view const &security_exchange,
+      std::string_view const &trading_session_id,
+      bool unsolicited_indicator,
+      roq::fix::SecurityTradingStatus security_trading_status,
+      std::chrono::system_clock::time_point transact_time)  // XXX
+      : security_status_req_id_{security_status_req_id}, symbol_{symbol}, security_exchange_{security_exchange},
+        trading_session_id_{trading_session_id}, unsolicited_indicator_{unsolicited_indicator},
+        security_trading_status_{security_trading_status}, transact_time_{DateTime{transact_time}} {}
 
   operator value_type() const {
     return {
@@ -732,6 +746,7 @@ struct SecurityStatus final : public Encodeable {
         .trading_session_id = trading_session_id_,
         .unsolicited_indicator = unsolicited_indicator_,
         .security_trading_status = security_trading_status_,
+        .transact_time = transact_time_,
     };
   }
 
@@ -747,6 +762,7 @@ struct SecurityStatus final : public Encodeable {
   std::string const trading_session_id_;
   bool const unsolicited_indicator_;
   roq::fix::SecurityTradingStatus const security_trading_status_;
+  std::chrono::milliseconds const transact_time_;
 };
 
 struct InstrmtMDReq final {
