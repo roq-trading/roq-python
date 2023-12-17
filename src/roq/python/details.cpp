@@ -1884,6 +1884,12 @@ void utils::create_ref_struct<roq::PositionUpdate>(pybind11::module_ &module) {
             return value.account;
           })
       .def_property_readonly(
+          "margin_mode",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.margin_mode;
+          })
+      .def_property_readonly(
           "exchange",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
@@ -1955,6 +1961,12 @@ void utils::create_ref_struct<roq::FundsUpdate>(pybind11::module_ &module) {
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.account;
+          })
+      .def_property_readonly(
+          "margin_mode",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.margin_mode;
           })
       .def_property_readonly(
           "currency",

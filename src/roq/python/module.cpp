@@ -31,6 +31,7 @@ void Module::create(pybind11::module_ &module) {
   roq::python::utils::create_enum<roq::Error>(module);
   roq::python::utils::create_enum<roq::ExecutionInstruction>(module);
   roq::python::utils::create_enum<roq::Liquidity>(module);
+  roq::python::utils::create_enum<roq::MarginMode>(module);
   roq::python::utils::create_enum<roq::OptionType>(module);
   roq::python::utils::create_enum<roq::OrderCancelPolicy>(module);
   roq::python::utils::create_enum<roq::OrderManagement>(module);
