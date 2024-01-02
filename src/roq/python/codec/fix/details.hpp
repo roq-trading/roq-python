@@ -480,6 +480,7 @@ struct SecListGrp final {
         .security_exchange = security_exchange,
         .min_trade_vol = {min_trade_vol, Decimals{}},
         .trading_session_id = trading_session_id,
+        .min_price_increment = NaN,  // XXX TODO
     };
   };
 
@@ -646,6 +647,7 @@ struct SecurityDefinition final : public Encodeable {
         .security_exchange = security_exchange_,
         .trading_session_id = trading_session_id_,
         .min_trade_vol = min_trade_vol_,
+        .min_price_increment = NaN,  // XXX TODO
     };
   }
 
@@ -959,6 +961,7 @@ struct MDInc final {
         .order_id = order_id_,
         .number_of_orders = number_of_orders_,
         .md_entry_position_no = md_entry_position_no_,
+        .text = {},  // XXX TODO
     };
   };
 
