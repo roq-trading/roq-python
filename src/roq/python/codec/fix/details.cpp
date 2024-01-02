@@ -25,12 +25,13 @@ void utils::create_struct<roq::python::codec::fix::SecListGrp>(pybind11::module_
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(
-          pybind11::init<std::string, double, std::string, double, std::string>(),
+          pybind11::init<std::string, double, std::string, double, std::string, double>(),
           pybind11::arg("symbol"),
           pybind11::arg("contract_multiplier") = NaN,
           pybind11::arg("security_exchange"),
           pybind11::arg("min_trade_vol") = NaN,
-          pybind11::arg("trading_session_id") = std::string{})
+          pybind11::arg("trading_session_id") = std::string{},
+          pybind11::arg("min_price_increment") = NaN)
       .def("__repr__", [](value_type const &self) {
         return fmt::format("{}"sv, static_cast<value_type::value_type>(self));
       });

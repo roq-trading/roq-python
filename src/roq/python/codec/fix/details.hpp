@@ -462,16 +462,18 @@ struct SecListGrp final {
   explicit SecListGrp(value_type const &value)
       : symbol{value.symbol}, contract_multiplier{value.contract_multiplier.value},
         security_exchange{value.security_exchange}, min_trade_vol{value.min_trade_vol.value},
-        trading_session_id{value.trading_session_id} {}
+        trading_session_id{value.trading_session_id}, min_price_increment{value.min_price_increment.value} {}
 
   SecListGrp(
       std::string_view const &symbol,
       double contract_multiplier,
       std::string_view const &security_exchange,
       double min_trade_vol,
-      std::string_view const &trading_session_id)
+      std::string_view const &trading_session_id,
+      double min_price_increment)
       : symbol{symbol}, contract_multiplier{contract_multiplier}, security_exchange{security_exchange},
-        min_trade_vol{min_trade_vol}, trading_session_id{trading_session_id} {}
+        min_trade_vol{min_trade_vol}, trading_session_id{trading_session_id}, min_price_increment{min_price_increment} {
+  }
 
   operator value_type() const {
     return {
@@ -480,7 +482,7 @@ struct SecListGrp final {
         .security_exchange = security_exchange,
         .min_trade_vol = {min_trade_vol, Decimals{}},
         .trading_session_id = trading_session_id,
-        .min_price_increment = NaN,  // XXX TODO
+        .min_price_increment = {min_price_increment, Decimals{}},
     };
   };
 
@@ -489,6 +491,7 @@ struct SecListGrp final {
   std::string security_exchange;
   double min_trade_vol = NaN;
   std::string trading_session_id;
+  double min_price_increment = NaN;
 };
 
 struct SecurityList final : public Encodeable {
@@ -647,7 +650,7 @@ struct SecurityDefinition final : public Encodeable {
         .security_exchange = security_exchange_,
         .trading_session_id = trading_session_id_,
         .min_trade_vol = min_trade_vol_,
-        .min_price_increment = NaN,  // XXX TODO
+        .min_price_increment = {},  // XXX TODO
     };
   }
 
@@ -944,7 +947,8 @@ struct MDInc final {
         security_exchange_{value.security_exchange}, md_entry_px_{value.md_entry_px},
         md_entry_size_{value.md_entry_size}, md_entry_date_{value.md_entry_date}, md_entry_time_{value.md_entry_time},
         trading_session_id_{value.trading_session_id}, expire_time_{value.expire_time}, order_id_{value.order_id},
-        number_of_orders_{value.number_of_orders}, md_entry_position_no_{value.md_entry_position_no} {}
+        number_of_orders_{value.number_of_orders}, md_entry_position_no_{value.md_entry_position_no},
+        text_{value.text} {}
 
   operator value_type() const {
     return {
@@ -961,7 +965,7 @@ struct MDInc final {
         .order_id = order_id_,
         .number_of_orders = number_of_orders_,
         .md_entry_position_no = md_entry_position_no_,
-        .text = {},  // XXX TODO
+        .text = text_,
     };
   };
 
@@ -979,6 +983,7 @@ struct MDInc final {
   std::string const order_id_;
   uint32_t const number_of_orders_;
   uint32_t const md_entry_position_no_;
+  std::string const text_;
 };
 
 struct MarketDataSnapshotFullRefresh final : public Encodeable {
