@@ -14,8 +14,8 @@ ParallelCompile("NPY_NUM_BUILD_JOBS").install()
 __version__ = os.environ.get("GIT_DESCRIBE_TAG", "0.0.0")
 
 extra_compile_args = []
-if sys.platform == "darwin":
-    extra_compile_args += ["-DFMT_USE_NONTYPE_TEMPLATE_ARGS=1"]
+#if sys.platform == "darwin":
+#    extra_compile_args += ["-DFMT_USE_NONTYPE_TEMPLATE_ARGS=1"]
 
 
 ext_modules = [
