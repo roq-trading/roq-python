@@ -1166,6 +1166,12 @@ void utils::create_ref_struct<roq::CreateOrder>(pybind11::module_ &module) {
             return value.position_effect;
           })
       .def_property_readonly(
+          "margin_mode",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.margin_mode;
+          })
+      .def_property_readonly(
           "max_show_quantity",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
@@ -1594,6 +1600,12 @@ void utils::create_ref_struct<roq::OrderUpdate>(pybind11::module_ &module) {
             return value.position_effect;
           })
       .def_property_readonly(
+          "margin_mode",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.margin_mode;
+          })
+      .def_property_readonly(
           "max_show_quantity",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
@@ -1803,6 +1815,12 @@ void utils::create_ref_struct<roq::TradeUpdate>(pybind11::module_ &module) {
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
             return value.position_effect;
+          })
+      .def_property_readonly(
+          "margin_mode",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.margin_mode;
           })
       .def_property_readonly(
           "create_time_utc",
