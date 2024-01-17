@@ -1394,10 +1394,10 @@ void utils::create_ref_struct<roq::CancelAllOrdersAck>(pybind11::module_ &module
             return value.origin;
           })
       .def_property_readonly(
-          "status",
+          "request_status",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.status;
+            return value.request_status;
           })
       .def_property_readonly(
           "error",
@@ -1479,10 +1479,22 @@ void utils::create_ref_struct<roq::OrderAck>(pybind11::module_ &module) {
             return value.side;
           })
       .def_property_readonly(
-          "type",
+          "position_effect",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.type;
+            return value.position_effect;
+          })
+      .def_property_readonly(
+          "margin_mode",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.margin_mode;
+          })
+      .def_property_readonly(
+          "request_type",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.request_type;
           })
       .def_property_readonly(
           "origin",
@@ -1491,10 +1503,10 @@ void utils::create_ref_struct<roq::OrderAck>(pybind11::module_ &module) {
             return value.origin;
           })
       .def_property_readonly(
-          "status",
+          "request_status",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.status;
+            return value.request_status;
           })
       .def_property_readonly(
           "error",
@@ -1660,10 +1672,10 @@ void utils::create_ref_struct<roq::OrderUpdate>(pybind11::module_ &module) {
             return value.client_order_id;
           })
       .def_property_readonly(
-          "status",
+          "order_status",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.status;
+            return value.order_status;
           })
       .def_property_readonly(
           "quantity",
