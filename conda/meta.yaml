@@ -10,6 +10,7 @@ build:
   script_env:
     - ROQ_BUILD_NUMBER
     - ROQ_BUILD_TYPE
+    - CPPFLAGS=-D_LIBCPP_DISABLE_AVAILABILITY  # [osx]
   script: python -m pip install . -vvv
 
 # https://conda-forge.org/blog/posts/2020-10-29-macos-arm64/#how-to-add-a-osx-arm64-build-to-a-feedstock
