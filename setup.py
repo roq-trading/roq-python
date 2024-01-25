@@ -27,7 +27,7 @@ ext_modules = [
         define_macros=[
             ("VERSION_INFO", __version__),
         ],
-        cxx_std=20,
+        cxx_std=23,
         include_dirs=[
             "src/",
         ],
