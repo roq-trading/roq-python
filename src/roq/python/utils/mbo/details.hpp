@@ -4,7 +4,7 @@
 
 #include "roq/cache/market_by_order.hpp"
 
-#include "roq/utils/mbo/factory.hpp"
+#include "roq/market/mbo/factory.hpp"
 
 #include "roq/python/utils.hpp"
 
@@ -15,7 +15,7 @@ namespace mbo {
 
 struct MarketByOrder final {
   MarketByOrder(std::string_view const &exchange, std::string_view const &symbol)
-      : market_by_order_{roq::utils::mbo::Factory::create(exchange, symbol)} {}
+      : market_by_order_{roq::market::mbo::Factory::create(exchange, symbol)} {}
 
   template <typename T>
   void operator()(T const &value) {
