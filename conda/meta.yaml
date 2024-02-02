@@ -29,6 +29,7 @@ requirements:
     - roq-codec
     - roq-fix
     - roq-io
+    - roq-market
     - roq-oss-magic_enum
     - roq-oss-nameof
     - roq-utils

@@ -4,8 +4,8 @@
 
 #include "roq/cache/market_by_order.hpp"
 
-#include "roq/utils/mbp/factory.hpp"
-#include "roq/utils/mbp/sequencer.hpp"
+#include "roq/market/mbp/factory.hpp"
+#include "roq/market/mbp/sequencer.hpp"
 
 #include "roq/python/utils.hpp"
 
@@ -16,7 +16,7 @@ namespace mbp {
 
 struct MarketByPrice final {
   MarketByPrice(std::string_view const &exchange, std::string_view const &symbol)
-      : market_by_price_{roq::utils::mbp::Factory::create(exchange, symbol)} {}
+      : market_by_price_{roq::market::mbp::Factory::create(exchange, symbol)} {}
 
   void clear() { (*market_by_price_).clear(); }
 
@@ -46,7 +46,7 @@ struct MarketByPrice final {
 };
 
 struct Sequencer final {
-  roq::utils::mbp::Sequencer sequencer;
+  roq::market::mbp::Sequencer sequencer;
 };
 
 }  // namespace mbp

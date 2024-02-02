@@ -36,6 +36,7 @@ ext_modules = [
             "roq-client",
             "roq-codec",
             "roq-io",
+            "roq-market",
             "roq-utils",
         ],
         extra_compile_args=extra_compile_args,
