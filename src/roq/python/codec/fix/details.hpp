@@ -478,11 +478,11 @@ struct SecListGrp final {
   operator value_type() const {
     return {
         .symbol = symbol,
-        .contract_multiplier = {contract_multiplier, Decimals{}},
+        .contract_multiplier = {contract_multiplier, Precision{}},
         .security_exchange = security_exchange,
-        .min_trade_vol = {min_trade_vol, Decimals{}},
+        .min_trade_vol = {min_trade_vol, Precision{}},
         .trading_session_id = trading_session_id,
-        .min_price_increment = {min_price_increment, Decimals{}},
+        .min_price_increment = {min_price_increment, Precision{}},
     };
   };
 
@@ -617,15 +617,15 @@ struct SecurityDefinition final : public Encodeable {
       std::string_view const &security_response_id,
       roq::fix::SecurityResponseType security_response_type,
       std::string_view const &symbol,
-      roq::utils::Number const &contract_multiplier,
+      Decimal const &contract_multiplier,
       std::string_view const &security_exchange,
       std::string_view const &trading_session_id,
-      roq::utils::Number const &min_trade_vol)
+      Decimal const &min_trade_vol)
       : security_req_id_{security_req_id}, security_response_id_{security_response_id},
         security_response_type_{security_response_type}, symbol_{symbol}, contract_multiplier_{contract_multiplier},
         security_exchange_{security_exchange}, trading_session_id_{trading_session_id}, min_trade_vol_{min_trade_vol} {}
 
-  // XXX roq::utils::Number
+  // XXX Decimal
   SecurityDefinition(
       std::string_view const &security_req_id,
       std::string_view const &security_response_id,
@@ -664,10 +664,10 @@ struct SecurityDefinition final : public Encodeable {
   std::string const security_response_id_;
   roq::fix::SecurityResponseType const security_response_type_;
   std::string const symbol_;
-  roq::utils::Number const contract_multiplier_;
+  Decimal const contract_multiplier_;
   std::string const security_exchange_;
   std::string const trading_session_id_;
-  roq::utils::Number const min_trade_vol_;
+  Decimal const min_trade_vol_;
 };
 
 struct SecurityStatusRequest final : public Encodeable {
@@ -928,8 +928,8 @@ struct MDFull final {
 
  private:
   roq::fix::MDEntryType const md_entry_type_;
-  roq::utils::Number const md_entry_px_;
-  roq::utils::Number const md_entry_size_;
+  Decimal const md_entry_px_;
+  Decimal const md_entry_size_;
   std::chrono::year_month_day const md_entry_date_;
   std::chrono::hh_mm_ss<std::chrono::milliseconds> const md_entry_time_;
   std::string const trading_session_id_;
@@ -974,8 +974,8 @@ struct MDInc final {
   roq::fix::MDEntryType const md_entry_type_;
   std::string const symbol_;
   std::string const security_exchange_;
-  roq::utils::Number const md_entry_px_;
-  roq::utils::Number const md_entry_size_;
+  Decimal const md_entry_px_;
+  Decimal const md_entry_size_;
   std::chrono::year_month_day const md_entry_date_;
   std::chrono::hh_mm_ss<std::chrono::milliseconds> const md_entry_time_;
   std::string const trading_session_id_;
@@ -1220,14 +1220,14 @@ struct NewOrderSingle final : public Encodeable {
       std::string_view const &security_exchange,
       roq::fix::Side const &side,
       std::chrono::milliseconds const &transact_time,
-      roq::utils::Number const &order_qty,
+      Decimal const &order_qty,
       roq::fix::OrdType const &ord_type,
-      roq::utils::Number const &price,
-      roq::utils::Number const &stop_px,
+      Decimal const &price,
+      Decimal const &stop_px,
       roq::fix::TimeInForce const &time_in_force,
       std::string_view const &text,
       roq::fix::PositionEffect const &position_effect,
-      roq::utils::Number const &max_show)
+      Decimal const &max_show)
       : cl_ord_id_{cl_ord_id}, secondary_cl_ord_id_{secondary_cl_ord_id},
         // no_party_ids_{no_party_ids},
         account_{account}, handl_inst_{handl_inst}, exec_inst_{exec_inst},
@@ -1306,14 +1306,14 @@ struct NewOrderSingle final : public Encodeable {
   std::string const security_exchange_;
   roq::fix::Side const side_;
   std::chrono::milliseconds const transact_time_;
-  roq::utils::Number const order_qty_;
+  Decimal const order_qty_;
   roq::fix::OrdType const ord_type_;
-  roq::utils::Number const price_;
-  roq::utils::Number const stop_px_;
+  Decimal const price_;
+  Decimal const stop_px_;
   roq::fix::TimeInForce const time_in_force_;
   std::string const text_;
   roq::fix::PositionEffect const position_effect_;
-  roq::utils::Number const max_show_;
+  Decimal const max_show_;
 };
 
 struct OrderCancelRequest final : public Encodeable {
@@ -1337,7 +1337,7 @@ struct OrderCancelRequest final : public Encodeable {
       std::string_view const &security_exchange,
       roq::fix::Side const &side,
       std::chrono::milliseconds const &transact_time,
-      roq::utils::Number const &order_qty,
+      Decimal const &order_qty,
       std::string_view const &text)
       : orig_cl_ord_id_{orig_cl_ord_id}, order_id_{order_id}, cl_ord_id_{cl_ord_id},
         secondary_cl_ord_id_{secondary_cl_ord_id}, account_{account},
@@ -1398,7 +1398,7 @@ struct OrderCancelRequest final : public Encodeable {
   std::string const security_exchange_;
   roq::fix::Side const side_;
   std::chrono::milliseconds const transact_time_;
-  roq::utils::Number const order_qty_;
+  Decimal const order_qty_;
   std::string const text_;
 };
 
@@ -1422,8 +1422,8 @@ struct OrderCancelReplaceRequest final : public Encodeable {
       std::string_view const &account,
       std::string_view const &symbol,
       std::string_view const &security_exchange,
-      roq::utils::Number const &order_qty,
-      roq::utils::Number const &price,
+      Decimal const &order_qty,
+      Decimal const &price,
       roq::fix::Side const &side,
       std::chrono::milliseconds const &transact_time,
       roq::fix::OrdType const &ord_type)
@@ -1486,8 +1486,8 @@ struct OrderCancelReplaceRequest final : public Encodeable {
   std::string const account_;
   std::string const symbol_;
   std::string const security_exchange_;
-  roq::utils::Number const order_qty_;
-  roq::utils::Number const price_;
+  Decimal const order_qty_;
+  Decimal const price_;
   roq::fix::Side const side_;
   std::chrono::milliseconds const transact_time_;
   roq::fix::OrdType const ord_type_;
@@ -1738,21 +1738,21 @@ struct ExecutionReport final : public Encodeable {
   std::string const security_exchange_;
   roq::fix::Side const side_;
   roq::fix::OrdType const ord_type_;
-  roq::utils::Number const order_qty_;
-  roq::utils::Number const price_;
-  roq::utils::Number const stop_px_;
+  Decimal const order_qty_;
+  Decimal const price_;
+  Decimal const stop_px_;
   std::string const currency_;
   roq::fix::TimeInForce const time_in_force_;
   std::string const exec_inst_;
-  roq::utils::Number const last_qty_;
-  roq::utils::Number const last_px_;
+  Decimal const last_qty_;
+  Decimal const last_px_;
   std::string const trading_session_id_;
-  roq::utils::Number const leaves_qty_;
-  roq::utils::Number const cum_qty_;
-  roq::utils::Number const avg_px_;
+  Decimal const leaves_qty_;
+  Decimal const cum_qty_;
+  Decimal const avg_px_;
   std::chrono::milliseconds const transact_time_;
   roq::fix::PositionEffect const position_effect_;
-  roq::utils::Number const max_show_;
+  Decimal const max_show_;
   std::string const text_;
   roq::fix::LastLiquidityInd const last_liquidity_ind_;
 };
@@ -1860,8 +1860,8 @@ struct TradeCaptureReport final : public Encodeable {
   bool const previously_reported_;
   std::string const symbol_;
   std::string const security_exchange_;
-  roq::utils::Number const last_qty_;
-  roq::utils::Number const last_px_;
+  Decimal const last_qty_;
+  Decimal const last_px_;
   std::chrono::year_month_day const trade_date_;
   std::chrono::milliseconds const transact_time_;
   // std::span<TrdCapRptSide const> const no_sides_;
@@ -2061,9 +2061,9 @@ struct PositionReport final : public Encodeable {
   std::string const symbol_;
   std::string const security_exchange_;
   std::string const currency_;
-  roq::utils::Number const settl_price_;
+  Decimal const settl_price_;
   roq::fix::SettlPriceType const settl_price_type_;
-  roq::utils::Number const prior_settl_price_;
+  Decimal const prior_settl_price_;
   // std::span<PositionQty const> const no_positions_;
   // std::span<PositionAmountData const> const no_pos_amt_;
   std::string const text_;

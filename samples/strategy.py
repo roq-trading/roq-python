@@ -231,7 +231,7 @@ class Strategy(roq.client.Handler):
         global MBP_CACHE
         mbp = MBP_CACHE.get(key)
         if mbp is None:
-            mbp = roq.utils.mbp.MarketByPrice(*key)
+            mbp = roq.market.mbp.MarketByPrice(*key)
             MBP_CACHE[key] = mbp
         mbp.apply(market_by_price_update)
 

@@ -34,8 +34,8 @@ class Instrument:
         """
         self.exchange = exchange
         self.symbol = symbol
-        self.sequencer = roq.utils.mbp.Sequencer()
-        self.market_by_price = roq.utils.mbp.MarketByPrice(
+        self.sequencer = roq.market.mbp.Sequencer()
+        self.market_by_price = roq.market.mbp.MarketByPrice(
             exchange=self.exchange,
             symbol=self.symbol,
         )

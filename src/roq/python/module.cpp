@@ -26,7 +26,7 @@ void Module::create(pybind11::module_ &module) {
   // enums
 
   roq::python::utils::create_enum<roq::ConnectionStatus>(module);
-  roq::python::utils::create_enum<roq::Decimals>(module);
+  roq::python::utils::create_enum<roq::Precision>(module);
   roq::python::utils::create_enum<roq::Encoding>(module);
   roq::python::utils::create_enum<roq::Error>(module);
   roq::python::utils::create_enum<roq::ExecutionInstruction>(module);
