@@ -10,7 +10,7 @@
 
 namespace roq {
 namespace python {
-namespace utils {
+namespace market {
 namespace mbo {
 
 struct MarketByOrder final {
@@ -43,6 +43,6 @@ struct MarketByOrder final {
 };
 
 }  // namespace mbo
-}  // namespace utils
+}  // namespace market
 }  // namespace python
 }  // namespace roq

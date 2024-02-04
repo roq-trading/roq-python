@@ -2,25 +2,25 @@
 
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 
-#include "roq/python/utils/module.hpp"
+#include "roq/python/market/module.hpp"
 
-#include "roq/python/utils/mbo/module.hpp"
-#include "roq/python/utils/mbp/module.hpp"
+#include "roq/python/market/mbo/module.hpp"
+#include "roq/python/market/mbp/module.hpp"
 
 using namespace std::literals;
 
 namespace roq {
 namespace python {
-namespace utils {
+namespace market {
 
 void Module::create(pybind11::module_ &module) {
   auto mbp = module.def_submodule("mbp");
-  roq::python::utils::mbp::Module::create(mbp);
+  roq::python::market::mbp::Module::create(mbp);
 
   auto mbo = module.def_submodule("mbo");
-  roq::python::utils::mbo::Module::create(mbo);
+  roq::python::market::mbo::Module::create(mbo);
 }
 
-}  // namespace utils
+}  // namespace market
 }  // namespace python
 }  // namespace roq

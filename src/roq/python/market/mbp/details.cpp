@@ -2,7 +2,7 @@
 
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 
-#include "roq/python/utils/mbp/details.hpp"
+#include "roq/python/market/mbp/details.hpp"
 
 #include <pybind11/pybind11.h>
 
@@ -87,8 +87,8 @@ void sequence_helper(auto &sequencer, auto &market_by_price_update, auto &header
 }  // namespace
 
 template <>
-void utils::create_struct<utils::mbp::MarketByPrice>(pybind11::module_ &module) {
-  using value_type = utils::mbp::MarketByPrice;
+void utils::create_struct<market::mbp::MarketByPrice>(pybind11::module_ &module) {
+  using value_type = market::mbp::MarketByPrice;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str(), "Maintains order book (by price) state")
       .def(
@@ -111,8 +111,8 @@ void utils::create_struct<utils::mbp::MarketByPrice>(pybind11::module_ &module) 
 }
 
 template <>
-void utils::create_struct<utils::mbp::Sequencer>(pybind11::module_ &module) {
-  using value_type = utils::mbp::Sequencer;
+void utils::create_struct<market::mbp::Sequencer>(pybind11::module_ &module) {
+  using value_type = market::mbp::Sequencer;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(pybind11::init<>())

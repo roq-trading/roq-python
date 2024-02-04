@@ -15,7 +15,7 @@
 #include "roq/python/codec/module.hpp"
 #include "roq/python/fix/module.hpp"
 #include "roq/python/io/module.hpp"
-#include "roq/python/utils/module.hpp"
+#include "roq/python/market/module.hpp"
 
 using namespace std::literals;
 
@@ -120,8 +120,8 @@ void Module::create(pybind11::module_ &module) {
   auto codec = module.def_submodule("codec");
   roq::python::codec::Module::create(codec);
 
-  auto utils = module.def_submodule("utils");
-  roq::python::utils::Module::create(utils);
+  auto market = module.def_submodule("market");
+  roq::python::market::Module::create(market);
 
   auto io = module.def_submodule("io");
   roq::python::io::Module::create(io);

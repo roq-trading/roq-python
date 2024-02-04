@@ -6,14 +6,12 @@
 
 namespace roq {
 namespace python {
-namespace utils {
-namespace mbo {
+namespace market {
 
 struct Module final {
   static void create(pybind11::module_ &);
 };
 
-}  // namespace mbo
-}  // namespace utils
+}  // namespace market
 }  // namespace python
 }  // namespace roq

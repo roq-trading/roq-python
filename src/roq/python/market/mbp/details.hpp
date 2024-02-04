@@ -11,7 +11,7 @@
 
 namespace roq {
 namespace python {
-namespace utils {
+namespace market {
 namespace mbp {
 
 struct MarketByPrice final {
@@ -50,6 +50,6 @@ struct Sequencer final {
 };
 
 }  // namespace mbp
-}  // namespace utils
+}  // namespace market
 }  // namespace python
 }  // namespace roq

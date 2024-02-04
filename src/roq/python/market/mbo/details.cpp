@@ -2,7 +2,7 @@
 
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 
-#include "roq/python/utils/mbo/details.hpp"
+#include "roq/python/market/mbo/details.hpp"
 
 #include <pybind11/pybind11.h>
 
@@ -14,8 +14,8 @@ namespace roq {
 namespace python {
 
 template <>
-void utils::create_struct<utils::mbo::MarketByOrder>(pybind11::module_ &module) {
-  using value_type = utils::mbo::MarketByOrder;
+void utils::create_struct<market::mbo::MarketByOrder>(pybind11::module_ &module) {
+  using value_type = market::mbo::MarketByOrder;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(

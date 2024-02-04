@@ -6,7 +6,7 @@
 
 namespace roq {
 namespace python {
-namespace utils {
+namespace market {
 namespace mbp {
 
 struct Module final {
@@ -14,6 +14,6 @@ struct Module final {
 };
 
 }  // namespace mbp
-}  // namespace utils
+}  // namespace market
 }  // namespace python
 }  // namespace roq
