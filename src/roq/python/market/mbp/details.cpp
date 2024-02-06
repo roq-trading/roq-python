@@ -47,7 +47,11 @@ void sequence_helper(auto &sequencer, auto &market_by_price_update, auto &header
     auto mbp_update = create(bids, asks, UpdateType::INCREMENTAL);
     dispatch(mbp_update);
   };
-  auto publish_snapshot = [&](auto &bids, auto &asks, [[maybe_unused]] auto sequence) {
+  auto publish_snapshot = [&](auto &bids,
+                              auto &asks,
+                              [[maybe_unused]] auto sequence,
+                              [[maybe_unused]] auto retries,
+                              [[maybe_unused]] auto delay) {
     auto mbp_update = create(bids, asks, UpdateType::SNAPSHOT);
     dispatch(mbp_update);
   };
@@ -110,12 +114,25 @@ void utils::create_struct<market::mbp::MarketByPrice>(pybind11::module_ &module)
       .def("__repr__", [](value_type const &self) { return self.print(); });
 }
 
+namespace {
+auto create_sequencer(auto timeout) {
+  auto options = roq::market::mbp::Sequencer::Options{
+      .timeout = timeout,
+      .max_updates = {},
+  };
+  return roq::market::mbp::Sequencer{options};
+}
+}  // namespace
+
+market::mbp::Sequencer::Sequencer(std::chrono::milliseconds timeout) : sequencer{create_sequencer(timeout)} {
+}
+
 template <>
 void utils::create_struct<market::mbp::Sequencer>(pybind11::module_ &module) {
   using value_type = market::mbp::Sequencer;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
-      .def(pybind11::init<>())
+      .def(pybind11::init<std::chrono::milliseconds>(), pybind11::arg("timeout") = std::chrono::milliseconds{})
       .def(
           "apply",
           [](value_type &self,

@@ -46,6 +46,8 @@ struct MarketByPrice final {
 };
 
 struct Sequencer final {
+  explicit Sequencer(std::chrono::milliseconds timeout);
+
   roq::market::mbp::Sequencer sequencer;
 };
 
