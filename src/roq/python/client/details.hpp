@@ -2,6 +2,9 @@
 
 #include <pybind11/pybind11.h>
 
+#include <map>
+#include <set>
+
 #include <absl/flags/parse.h>  // XXX shouldn't be here...
 
 #include "roq/logging.hpp"
