@@ -13,7 +13,7 @@ ParallelCompile("NPY_NUM_BUILD_JOBS").install()
 
 __version__ = os.environ.get("GIT_DESCRIBE_TAG", "0.0.0")
 
-extra_compile_args = []
+extra_compile_args = ["-std=gnu++23"]
 
 ext_modules = [
     Pybind11Extension(
@@ -27,6 +27,7 @@ ext_modules = [
         define_macros=[
             ("VERSION_INFO", __version__),
         ],
+        language="c++",
         cxx_std=23,
         include_dirs=[
             "src/",
