@@ -85,6 +85,7 @@ void Module::create(pybind11::module_ &module) {
 
   roq::python::utils::create_ref_struct<roq::StreamStatus>(module);
   roq::python::utils::create_ref_struct<roq::ExternalLatency>(module);
+  roq::python::utils::create_ref_struct<roq::RateLimitsUpdate>(module);
   roq::python::utils::create_ref_struct<roq::RateLimitTrigger>(module);
 
   roq::python::utils::create_ref_struct<roq::GatewayStatus>(module);

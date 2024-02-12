@@ -92,6 +92,7 @@ struct Bridge final : public roq::client::Handler {
 
   void operator()(Event<roq::StreamStatus> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::ExternalLatency> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::RateLimitsUpdate> const &event) override { dispatch(event.message_info, event.value); }
   void operator()(Event<roq::RateLimitTrigger> const &event) override { dispatch(event.message_info, event.value); }
 
   void operator()(Event<roq::GatewayStatus> const &event) override { dispatch(event.message_info, event.value); }
@@ -252,6 +253,7 @@ struct EventLogReader final {
 
     void operator()(Event<roq::StreamStatus> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::ExternalLatency> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::RateLimitsUpdate> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::RateLimitTrigger> const &event) override { dispatch(event.message_info, event.value); }
 
     void operator()(Event<roq::GatewayStatus> const &event) override { dispatch(event.message_info, event.value); }
@@ -348,6 +350,7 @@ struct EventLogMultiplexer final {
 
     void operator()(Event<roq::StreamStatus> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::ExternalLatency> const &event) override { dispatch(event.message_info, event.value); }
+    void operator()(Event<roq::RateLimitsUpdate> const &event) override { dispatch(event.message_info, event.value); }
     void operator()(Event<roq::RateLimitTrigger> const &event) override { dispatch(event.message_info, event.value); }
 
     void operator()(Event<roq::GatewayStatus> const &event) override { dispatch(event.message_info, event.value); }

@@ -672,6 +672,36 @@ void utils::create_ref_struct<roq::MarketStatus>(pybind11::module_ &module) {
 }
 
 template <>
+void utils::create_ref_struct<roq::RateLimitsUpdate>(pybind11::module_ &module) {
+  using value_type = roq::RateLimitsUpdate;
+  using ref_type = utils::Ref<value_type>;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<ref_type>(module, name.c_str())
+      .def_property_readonly(
+          "stream_id",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.stream_id;
+          })
+      .def_property_readonly(
+          "account",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.account;
+          })
+      .def_property_readonly(
+          "origin",
+          [](ref_type const &obj) {
+            auto &value = static_cast<const value_type &>(obj);
+            return value.origin;
+          })
+      .def_property_readonly("rate_limits", [](ref_type const &obj) {
+        auto &value = static_cast<const value_type &>(obj);
+        return utils::to_list(value.rate_limits);
+      });
+}
+
+template <>
 void utils::create_ref_struct<roq::RateLimitTrigger>(pybind11::module_ &module) {
   using value_type = roq::RateLimitTrigger;
   using ref_type = utils::Ref<value_type>;
