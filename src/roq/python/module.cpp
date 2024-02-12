@@ -62,6 +62,7 @@ void Module::create(pybind11::module_ &module) {
   roq::python::utils::create_struct<roq::MBPUpdate>(module);
   roq::python::utils::create_struct<roq::MBOUpdate>(module);
   roq::python::utils::create_struct<roq::Measurement>(module);
+  roq::python::utils::create_struct<roq::RateLimit>(module);
   roq::python::utils::create_struct<roq::Statistics>(module);
   roq::python::utils::create_struct<roq::Trade>(module);
   roq::python::utils::create_struct<roq::UUID>(module);

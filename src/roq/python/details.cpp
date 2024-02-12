@@ -96,6 +96,22 @@ void utils::create_struct<roq::Measurement>(pybind11::module_ &module) {
 }
 
 template <>
+void utils::create_struct<roq::RateLimit>(pybind11::module_ &module) {
+  using value_type = roq::RateLimit;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type>(module, name.c_str())
+      .def_property_readonly("type", [](value_type const &value) { return value.type; })
+      .def_property_readonly("period", [](value_type const &value) { return value.period; })
+      .def_property_readonly("end_time_utc", [](value_type const &value) { return value.end_time_utc; })
+      .def_property_readonly("limit", [](value_type const &value) { return value.limit; })
+      .def_property_readonly("count", [](value_type const &value) { return value.count; })
+      .def("__repr__", [](value_type const &value) {
+        using namespace std::literals;
+        return fmt::format("{}"sv, value);
+      });
+}
+
+template <>
 void utils::create_struct<roq::Statistics>(pybind11::module_ &module) {
   using value_type = roq::Statistics;
   std::string name{nameof::nameof_short_type<value_type>()};
