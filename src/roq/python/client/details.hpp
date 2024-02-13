@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 
-#include <absl/flags/parse.h>  // XXX shouldn't be here...
+// #include <absl/flags/parse.h>  // XXX shouldn't be here...
 
 #include "roq/logging.hpp"
 
@@ -228,7 +228,7 @@ inline void set_flags(pybind11::dict const &key_value_pairs) {
       insert = true;
   }
   // initialize or override absl flags
-  absl::ParseCommandLine(std::size(args), std::data(args));
+  // XXX FIXME absl::ParseCommandLine(std::size(args), std::data(args));
 }
 
 struct EventLogReader final {

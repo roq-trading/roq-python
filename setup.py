@@ -34,11 +34,11 @@ ext_modules = [
         ],
         libraries=[
             "fmt",
-            "roq-client",
+            "roq-utils",
             "roq-codec",
             "roq-io",
             "roq-market",
-            "roq-utils",
+            "roq-client",
         ],
         extra_compile_args=extra_compile_args,
     ),
