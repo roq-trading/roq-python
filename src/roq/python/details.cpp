@@ -104,7 +104,7 @@ void utils::create_struct<roq::RateLimit>(pybind11::module_ &module) {
       .def_property_readonly("period", [](value_type const &value) { return value.period; })
       .def_property_readonly("end_time_utc", [](value_type const &value) { return value.end_time_utc; })
       .def_property_readonly("limit", [](value_type const &value) { return value.limit; })
-      .def_property_readonly("count", [](value_type const &value) { return value.count; })
+      .def_property_readonly("value", [](value_type const &value) { return value.value; })
       .def("__repr__", [](value_type const &value) {
         using namespace std::literals;
         return fmt::format("{}"sv, value);
