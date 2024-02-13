@@ -21,7 +21,7 @@ requirements:
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
     - rsync                                  # [build_platform != target_platform]
   host:
-    - libabseil
+    - abseil-cpp
     - fmt
     - pybind11
     - python {{ python }}
