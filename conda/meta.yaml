@@ -21,8 +21,8 @@ requirements:
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
     - rsync                                  # [build_platform != target_platform]
   host:
-    - libabseil
     - fmt
+    - libabseil
     - pybind11
     - python {{ python }}
     - roq-client
