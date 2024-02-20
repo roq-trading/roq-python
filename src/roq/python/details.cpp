@@ -541,16 +541,16 @@ void utils::create_ref_struct<roq::MarketByPriceUpdate>(pybind11::module_ &modul
             return value.sending_time_utc;
           })
       .def_property_readonly(
-          "price_decimals",
+          "price_precision",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.price_decimals;
+            return value.price_precision;
           })
       .def_property_readonly(
-          "quantity_decimals",
+          "quantity_precision",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.quantity_decimals;
+            return value.quantity_precision;
           })
       .def_property_readonly(
           "max_depth",
@@ -620,16 +620,16 @@ void utils::create_ref_struct<roq::MarketByOrderUpdate>(pybind11::module_ &modul
             return value.sending_time_utc;
           })
       .def_property_readonly(
-          "price_decimals",
+          "price_precision",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.price_decimals;
+            return value.price_precision;
           })
       .def_property_readonly(
-          "quantity_decimals",
+          "quantity_precision",
           [](ref_type const &obj) {
             auto &value = static_cast<const value_type &>(obj);
-            return value.quantity_decimals;
+            return value.quantity_precision;
           })
       .def_property_readonly(
           "max_depth",
