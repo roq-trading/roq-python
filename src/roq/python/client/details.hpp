@@ -9,7 +9,11 @@
 
 #include "roq/logging.hpp"
 
+#include "roq/io/engine/context_factory.hpp"
+
 #include "roq/client.hpp"
+
+#include "roq/client/simple.hpp"
 
 #include "roq/python/utils.hpp"
 
@@ -130,15 +134,97 @@ struct Bridge final : public roq::client::Handler {
  private:
   python::client::Handler &handler_;
 };
+
+struct Bridge2 final : public roq::client::Simple::Handler {
+  explicit Bridge2(python::client::Handler &handler) : handler_{handler} {}
+
+ protected:
+  template <typename T>
+  void dispatch(auto const &message_info, T const &value) {
+    auto arg0 = pybind11::cast(utils::Ref<MessageInfo>{message_info});
+    auto arg1 = pybind11::cast(utils::Ref<T>{value});
+    handler_.callback(arg0, arg1);
+    if (arg0.ref_count() > 1 || arg1.ref_count() > 1) {
+      using namespace std::literals;
+      throw std::runtime_error{"Objects must not be stored"s};
+    }
+  }
+
+ protected:
+  void operator()(Event<roq::Start> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::Stop> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::Connected> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::Disconnected> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::DownloadBegin> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::DownloadEnd> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::GatewaySettings> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::StreamStatus> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::ExternalLatency> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::RateLimitsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::RateLimitTrigger> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::GatewayStatus> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::ReferenceData> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::MarketStatus> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::TopOfBook> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::MarketByPriceUpdate> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::MarketByOrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::TradeSummary> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::StatisticsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::CancelAllOrdersAck> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::OrderAck> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::OrderUpdate> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::TradeUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::PositionUpdate> const &event) override { dispatch(event.message_info, event.value); }
+  void operator()(Event<roq::FundsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::CustomMetricsUpdate> const &event) override { dispatch(event.message_info, event.value); }
+
+  void operator()(Event<roq::ParametersUpdate> const &) override {
+    // XXX TODO
+  }
+
+  void operator()(Event<roq::PortfolioUpdate> const &) override {
+    // XXX TODO
+  }
+
+  void operator()(Event<roq::RiskLimitsUpdate> const &) override {
+    // XXX TODO
+  }
+
+ private:
+  python::client::Handler &handler_;
+};
 }  // namespace
 
 struct Manager final {
   Manager(pybind11::object handler, python::client::Config const &config, std::vector<std::string> const &connections)
-      : config_{config}, connections_{connections}, handler_{handler(123)} {
+      : config_{config}, connections_{connections}, handler_{handler(123)},
+        bridge_{pybind11::cast<python::client::Handler &>(handler_)},
+        context_{roq::io::engine::ContextFactory::create("libevent")},
+        dispatcher_{create_dispatcher(bridge_, settings_, config, *context_, connections)} {
     pybind11::cast<python::client::Handler &>(handler_);  // will throw exception if not inherited from
   }
 
  protected:
+  static std::unique_ptr<roq::client::Simple> create_dispatcher(
+      roq::client::Simple::Handler &handler,
+      roq::client::Settings2 const &settings,
+      roq::client::Config const &config,
+      roq::io::Context &context,
+      std::vector<std::string> const &connections) {
+    std::vector<std::string_view> tmp;
+    for (auto &item : connections)
+      tmp.emplace_back(item);
+    return roq::client::Simple::create(handler, settings, config, context, tmp);
+  }
+
   template <typename T>
   void dispatch(auto const &message_info, T const &value) {
     auto arg0 = pybind11::cast(utils::Ref<MessageInfo>{message_info});
@@ -159,8 +245,7 @@ struct Manager final {
       for (auto &connection : connections_)
         connections.emplace_back(connection);
       auto &handler = pybind11::cast<python::client::Handler &>(handler_);
-      roq::client::Settings2 settings;  // XXX TODO proper
-      roq::client::Trader(settings, config_, std::span{connections}).dispatch<Bridge>(handler);
+      roq::client::Trader(settings_, config_, std::span{connections}).dispatch<Bridge>(handler);
     } catch (pybind11::error_already_set &) {
       /*
       log::warn("caught exception!"sv);
@@ -192,9 +277,13 @@ struct Manager final {
   }
 
  private:
+  roq::client::Settings2 const settings_;  // XXX TODO proper
   python::client::Config const config_;
   std::vector<std::string> const connections_;
   pybind11::object handler_;
+  Bridge2 bridge_;
+  std::unique_ptr<roq::io::Context> context_;
+  std::unique_ptr<roq::client::Simple> dispatcher_;
 };
 
 inline void set_flags(pybind11::dict const &key_value_pairs) {
