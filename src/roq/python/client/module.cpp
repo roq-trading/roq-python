@@ -21,8 +21,6 @@ void Module::create(pybind11::module_ &module) {
   utils::create_struct<roq::python::client::Config>(module);
   utils::create_struct<roq::python::client::Dispatcher>(module);
 
-  module.def("set_flags", &roq::python::client::set_flags, "WORKAROUND", pybind11::arg("flags"));
-
   utils::create_struct<roq::python::client::EventLogReader>(module);
   utils::create_struct<roq::python::client::EventLogMultiplexer>(module);
 }

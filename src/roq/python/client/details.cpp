@@ -46,12 +46,15 @@ void utils::create_struct<client::Dispatcher>(pybind11::module_ &module) {
   pybind11::class_<value_type>(module, name.c_str())
       .def(
           pybind11::init<pybind11::object, python::client::Config const &, std::vector<std::string> const &>(),
-          pybind11::arg("handler"),
+          pybind11::arg("settings"),
           pybind11::arg("config"),
           pybind11::arg("connections"))
       .def("start", [](value_type &self) { return self.start(); })
       .def("stop", [](value_type &self) { return self.stop(); })
-      .def("dispatch", [](value_type &self) { return self.dispatch(); })
+      .def(
+          "dispatch",
+          [](value_type &self, pybind11::object handler) { return self.dispatch(handler); },
+          pybind11::arg("handler"))
       .def(
           "create_order",
           [](value_type &self,

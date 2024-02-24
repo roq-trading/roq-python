@@ -205,16 +205,13 @@ struct Bridge2 final : public roq::client::Simple::Handler {
 
 struct Dispatcher final {
   Dispatcher(
-      pybind11::object handler, python::client::Config const &config, std::vector<std::string> const &connections)
-      : settings_{create_settings()}, config_{config}, connections_{connections}, handler_{handler(123)},
-        bridge_{pybind11::cast<python::client::Handler &>(handler_)},
+      pybind11::object settings, python::client::Config const &config, std::vector<std::string> const &connections)
+      : settings_{create_settings(settings)}, config_{config}, connections_{connections},
         context_{roq::io::engine::ContextFactory::create("libevent")},
-        dispatcher_{create_dispatcher(bridge_, settings_, config, *context_, connections)} {
-    // pybind11::cast<python::client::Handler &>(handler_);  // will throw exception if not inherited from
-  }
+        dispatcher_{create_dispatcher(settings_, config, *context_, connections)} {}
 
  protected:
-  static roq::client::Settings2 create_settings() {
+  static roq::client::Settings2 create_settings(pybind11::object settings) {
     roq::client::Settings2 result;
     result.app.name = "trader";
     result.loop.timer_freq = std::chrono::milliseconds{100};
@@ -222,7 +219,6 @@ struct Dispatcher final {
   }
 
   static std::unique_ptr<roq::client::Simple> create_dispatcher(
-      roq::client::Simple::Handler &handler,
       roq::client::Settings2 const &settings,
       roq::client::Config const &config,
       roq::io::Context &context,
@@ -232,7 +228,7 @@ struct Dispatcher final {
       tmp.emplace_back(item);
     log::info("settings={}", settings);
     log::info("connections={}", connections);
-    return roq::client::Simple::create(handler, settings, config, context, tmp);
+    return roq::client::Simple::create(settings, config, context, tmp);
   }
 
   template <typename T>
@@ -251,9 +247,10 @@ struct Dispatcher final {
 
   void stop() { (*dispatcher_).stop(); }
 
-  bool dispatch() {
+  bool dispatch(pybind11::object handler) {
     try {
-      return (*dispatcher_).dispatch();
+      Bridge2 bridge{pybind11::cast<python::client::Handler &>(handler)};
+      return (*dispatcher_).dispatch(bridge);
     } catch (pybind11::error_already_set &) {
       throw;
     }
@@ -270,45 +267,9 @@ struct Dispatcher final {
   roq::client::Settings2 const settings_;  // XXX TODO proper
   python::client::Config const config_;
   std::vector<std::string> const connections_;
-  pybind11::object handler_;
-  Bridge2 bridge_;
   std::unique_ptr<roq::io::Context> context_;
   std::unique_ptr<roq::client::Simple> dispatcher_;
 };
-
-inline void set_flags(pybind11::dict const &key_value_pairs) {
-  // buffer (represents the command-line)
-  std::vector<char> buffer;
-  // - program
-  buffer.emplace_back('\0');
-  for (auto &[key, value] : key_value_pairs) {
-    // - key
-    auto k = pybind11::cast<std::string>(key);
-    buffer.emplace_back('-');
-    buffer.emplace_back('-');
-    std::for_each(std::begin(k), std::end(k), [&](auto c) { buffer.emplace_back(c); });
-    buffer.emplace_back('\0');
-    // - value
-    auto v = pybind11::cast<std::string>(value);
-    std::for_each(std::begin(v), std::end(v), [&](auto c) { buffer.emplace_back(c); });
-    buffer.emplace_back('\0');
-  }
-  assert(!std::empty(buffer));
-  // - args
-  std::vector<char *> args;
-  args.emplace_back(&buffer[0]);
-  bool insert = true;
-  for (size_t i = 1; i < std::size(buffer); ++i) {
-    if (insert) {
-      args.emplace_back(&buffer[i]);
-      insert = false;
-    }
-    if (buffer[i] == '\0')
-      insert = true;
-  }
-  // initialize or override absl flags
-  // XXX FIXME absl::ParseCommandLine(std::size(args), std::data(args));
-}
 
 struct EventLogReader final {
   template <typename Callback>
