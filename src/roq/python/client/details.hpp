@@ -203,16 +203,24 @@ struct Bridge2 final : public roq::client::Simple::Handler {
 };
 }  // namespace
 
-struct Manager final {
-  Manager(pybind11::object handler, python::client::Config const &config, std::vector<std::string> const &connections)
-      : config_{config}, connections_{connections}, handler_{handler(123)},
+struct Dispatcher final {
+  Dispatcher(
+      pybind11::object handler, python::client::Config const &config, std::vector<std::string> const &connections)
+      : settings_{create_settings()}, config_{config}, connections_{connections}, handler_{handler(123)},
         bridge_{pybind11::cast<python::client::Handler &>(handler_)},
         context_{roq::io::engine::ContextFactory::create("libevent")},
         dispatcher_{create_dispatcher(bridge_, settings_, config, *context_, connections)} {
-    pybind11::cast<python::client::Handler &>(handler_);  // will throw exception if not inherited from
+    // pybind11::cast<python::client::Handler &>(handler_);  // will throw exception if not inherited from
   }
 
  protected:
+  static roq::client::Settings2 create_settings() {
+    roq::client::Settings2 result;
+    result.app.name = "trader";
+    result.loop.timer_freq = std::chrono::milliseconds{100};
+    return result;
+  }
+
   static std::unique_ptr<roq::client::Simple> create_dispatcher(
       roq::client::Simple::Handler &handler,
       roq::client::Settings2 const &settings,
@@ -222,6 +230,8 @@ struct Manager final {
     std::vector<std::string_view> tmp;
     for (auto &item : connections)
       tmp.emplace_back(item);
+    log::info("settings={}", settings);
+    log::info("connections={}", connections);
     return roq::client::Simple::create(handler, settings, config, context, tmp);
   }
 
@@ -237,43 +247,23 @@ struct Manager final {
   }
 
  public:
+  void start() { (*dispatcher_).start(); }
+
+  void stop() { (*dispatcher_).stop(); }
+
   bool dispatch() {
-    // XXX we need an external loop here
-    // XXX for now, only exceptions can break the dispatch loop
     try {
-      std::vector<std::string_view> connections;
-      for (auto &connection : connections_)
-        connections.emplace_back(connection);
-      auto &handler = pybind11::cast<python::client::Handler &>(handler_);
-      roq::client::Trader(settings_, config_, std::span{connections}).dispatch<Bridge>(handler);
+      return (*dispatcher_).dispatch();
     } catch (pybind11::error_already_set &) {
-      /*
-      log::warn("caught exception!"sv);
-      return true;  // break
-      */
       throw;
     }
     return false;
   }
-  void send(roq::CreateOrder const &, [[maybe_unused]] uint8_t source) {
-    using namespace std::literals;
-    log::info("HERE"sv);
-    // XXX send
-  }
-  void send(roq::ModifyOrder const &, [[maybe_unused]] uint8_t source) {
-    using namespace std::literals;
-    log::info("HERE"sv);
-    // XXX send
-  }
-  void send(roq::CancelOrder const &, [[maybe_unused]] uint8_t source) {
-    using namespace std::literals;
-    log::info("HERE"sv);
-    // XXX send
-  }
-  void send(roq::CancelAllOrders const &, [[maybe_unused]] uint8_t source) {
-    using namespace std::literals;
-    log::info("HERE"sv);
-    // XXX send
+  void send(roq::CreateOrder const &create_order, uint8_t source) { (*dispatcher_).send(create_order, source); }
+  void send(roq::ModifyOrder const &modify_order, uint8_t source) { (*dispatcher_).send(modify_order, source); }
+  void send(roq::CancelOrder const &cancel_order, uint8_t source) { (*dispatcher_).send(cancel_order, source); }
+  void send(roq::CancelAllOrders const &cancel_all_orders, uint8_t source) {
+    (*dispatcher_).send(cancel_all_orders, source);
   }
 
  private:

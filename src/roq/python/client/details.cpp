@@ -40,8 +40,8 @@ void utils::create_struct<client::Config>(pybind11::module_ &module) {
 }
 
 template <>
-void utils::create_struct<client::Manager>(pybind11::module_ &module) {
-  using value_type = client::Manager;
+void utils::create_struct<client::Dispatcher>(pybind11::module_ &module) {
+  using value_type = client::Dispatcher;
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(
@@ -49,6 +49,8 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
           pybind11::arg("handler"),
           pybind11::arg("config"),
           pybind11::arg("connections"))
+      .def("start", [](value_type &self) { return self.start(); })
+      .def("stop", [](value_type &self) { return self.stop(); })
       .def("dispatch", [](value_type &self) { return self.dispatch(); })
       .def(
           "create_order",
@@ -69,6 +71,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
              double price,
              double stop_price,
              std::string_view const &routing_id,
+             uint32_t strategy_id,
              uint8_t source) {
             auto create_order = roq::CreateOrder{
                 .account = account,
@@ -87,6 +90,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
                 .price = price,
                 .stop_price = stop_price,
                 .routing_id = routing_id,
+                .strategy_id = strategy_id,
             };
             self.send(create_order, source);
           },
@@ -106,6 +110,7 @@ void utils::create_struct<client::Manager>(pybind11::module_ &module) {
           pybind11::arg("price") = NaN,
           pybind11::arg("stop_price") = NaN,
           pybind11::arg("routing_id") = "",
+          pybind11::arg("strategy_id") = 0,
           pybind11::arg("source"))
       .def(
           "modify_order",

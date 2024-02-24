@@ -9,6 +9,7 @@ Although not required, **all** callback methods have been implemented here.
 """
 
 import os
+import signal
 
 from time import sleep
 
@@ -359,12 +360,19 @@ def test_client(connections: list[str]):
 
     # note!
     # you must pass the *type* of the strategy
-    # this is because the manager must be control the life-time of the object
+    # this is because the dispatcher must be control the life-time of the object
 
-    manager = roq.client.Manager(Strategy, config, connections)
+    dispatcher = roq.client.Dispatcher(Strategy, config, connections)
+
+    def signal_handler(sig, frame):
+        print("*** STOP ***")
+        dispatcher.stop()
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     try:
-        while manager.dispatch():
+        dispatcher.start()
+        while dispatcher.dispatch():
             pass
     except Exception as err:
         print(f"{err}")
@@ -386,4 +394,4 @@ roq.client.set_flags(
 
 # main
 
-test_client(["{HOME}/run/deribit-test.sock".format(**os.environ)])
+test_client(["{HOME}/run/deribit.sock".format(**os.environ)])
