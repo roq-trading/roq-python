@@ -15,6 +15,7 @@
 #include "roq/python/codec/module.hpp"
 #include "roq/python/fix/module.hpp"
 #include "roq/python/io/module.hpp"
+#include "roq/python/logging/module.hpp"
 #include "roq/python/market/module.hpp"
 
 using namespace std::literals;
@@ -115,6 +116,9 @@ void Module::create(pybind11::module_ &module) {
   roq::python::utils::create_ref_struct<roq::CustomMetricsUpdate>(module);
 
   // sub-modules
+
+  auto logging = module.def_submodule("logging");
+  roq::python::logging::Module::create(logging);
 
   auto fix = module.def_submodule("fix");
   roq::python::fix::Module::create(fix);

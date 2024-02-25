@@ -379,6 +379,13 @@ def test_client(connections: list[str]):
         print(f"{err}")
 
 
+# logging
+
+def logging_callback(level, message):
+    print(f"CALLBACK {level}: {message}")
+
+roq.logging.set_callback(logging_callback)
+
 # main
 
 test_client(["{HOME}/run/deribit.sock".format(**os.environ)])
