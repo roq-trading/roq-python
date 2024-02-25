@@ -385,7 +385,6 @@ def test_client(connections: list[str]):
 
 # logging
 
-
 def log_handler(level, message):
     print(f"{level}: {message}")
 
@@ -395,3 +394,9 @@ roq.logging.set_handler(log_handler)
 # main
 
 test_client(["{HOME}/run/deribit.sock".format(**os.environ)])
+
+
+# clean-up
+# note! workaround to deal with logging shutdown (required for now)
+
+roq.logging.reset()

@@ -24,8 +24,12 @@ struct LogHandler final : public roq::logging::Handler {
   std::function<void(roq::logging::Level, std::string_view const &)> handler_;
 };
 
-static std::unique_ptr<LogHandler> HANDLER;
+static std::unique_ptr<roq::logging::Handler> HANDLER;
 }  // namespace
+
+void reset() {
+  HANDLER.reset();
+}
 
 void set_handler(std::function<void(roq::logging::Level, std::string_view const &)> const &handler) {
   HANDLER = std::make_unique<LogHandler>(handler);

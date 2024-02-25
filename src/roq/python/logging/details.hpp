@@ -12,7 +12,9 @@ namespace roq {
 namespace python {
 namespace logging {
 
-void ROQ_PUBLIC set_handler(std::function<void(roq::logging::Level, std::string_view const &)> const &);
+void reset();
+
+void set_handler(std::function<void(roq::logging::Level, std::string_view const &)> const &);
 
 }  // namespace logging
 }  // namespace python
