@@ -19,10 +19,6 @@ from fastcore.all import typedispatch
 
 import roq
 
-# cache: market by price (L2 order book)
-
-MBP_CACHE = {}
-
 
 class Strategy(roq.client.Handler):
     """
@@ -37,6 +33,7 @@ class Strategy(roq.client.Handler):
         """
         roq.client.Handler.__init__(self)  # important! required by pybind11
         self.dispatcher = dispatcher
+        self.mbp_cache = dict()
         self.count = 0
 
     @typedispatch
@@ -217,17 +214,17 @@ class Strategy(roq.client.Handler):
 
         # update cache
         key = (market_by_price_update.exchange, market_by_price_update.symbol)
-        global MBP_CACHE
-        mbp = MBP_CACHE.get(key)
+        mbp = self.mbp_cache.get(key)
         if mbp is None:
             mbp = roq.market.mbp.MarketByPrice(*key)
-            MBP_CACHE[key] = mbp
+            self.mbp_cache[key] = mbp
         mbp.apply(market_by_price_update)
 
         # extract top 2 layers
         depth = mbp.extract(2)
         print(f"DEPTH: {depth}")
 
+        # cancel all orders
         self.count = self.count + 1
         if self.count == 20:
             self.dispatcher.cancel_all_orders(
@@ -385,8 +382,10 @@ def test_client(connections: list[str]):
 
 # logging
 
+
 def log_handler(level, message):
     print(f"{level}: {message}")
+
 
 roq.logging.set_handler(log_handler)
 
