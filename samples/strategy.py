@@ -371,12 +371,15 @@ def test_client(connections: list[str]):
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    # run...
+    # start the i/o loop (timers, connectors, etc.)
+
+    dispatcher.start()
+
+    # dispatch (loop) until done
 
     try:
-        dispatcher.start()
         while dispatcher.dispatch(strategy):
-            pass
+            pass  # note! this is an option to do other work
     except Exception as err:
         print(f"{err}")
 
@@ -387,8 +390,8 @@ def test_client(connections: list[str]):
 def log_handler(level, message):
     print(f"{level}: {message}")
 
-
 roq.logging.set_callback(log_handler)
+
 
 # main
 
