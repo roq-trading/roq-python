@@ -327,6 +327,7 @@ def test_client(connections: list[str]):
     """
 
     # settings
+    # note! this is not yet used (not fully implemented)...
 
     settings = roq.client.Settings2(
         app={
@@ -340,11 +341,10 @@ def test_client(connections: list[str]):
     )
 
     # configuration
-    # note! instruct gateway to auto-cancel open orders if we disconnect
 
     config = roq.client.Config(
         settings=roq.client.Settings(
-            order_cancel_policy=roq.OrderCancelPolicy.BY_ACCOUNT,
+            order_cancel_policy=roq.OrderCancelPolicy.BY_ACCOUNT,  # note! auto-cancel on disconnect
         ),
         accounts={"A1"},
         symbols={
