@@ -327,7 +327,7 @@ def test_client(connections: list[str]):
     """
 
     # settings
-    # note! this is not yet used... (not implemented)
+    # note! this is not yet used... (not properly implemented)
 
     settings = roq.client.Settings2(
         app={
