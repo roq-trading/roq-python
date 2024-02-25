@@ -8,10 +8,8 @@ Demonstrates how to connect to a gateway and receive the various callbacks.
 Although not required, **all** callback methods have been implemented here.
 """
 
-import os
 import signal
-
-from time import sleep
+import sys
 
 from datetime import timedelta
 
@@ -33,7 +31,7 @@ class Strategy(roq.client.Handler):
         """
         roq.client.Handler.__init__(self)  # important! required by pybind11
         self.dispatcher = dispatcher
-        self.mbp_cache = dict()
+        self.mbp_cache = {}
         self.count = 0
 
     @typedispatch
@@ -321,7 +319,7 @@ class Strategy(roq.client.Handler):
         print(f"custom_metrics_update={custom_metrics_update}")
 
 
-def test_client(connections: list[str]):
+def main(connections: list[str]):
     """
     The main function.
     """
@@ -362,7 +360,7 @@ def test_client(connections: list[str]):
 
     # signal handler
 
-    def signal_handler(signal, frame):
+    def signal_handler(sig, frame):
         dispatcher.stop()  # note! detected on next call to dispatch()
 
     signal.signal(signal.SIGINT, signal_handler)
@@ -380,16 +378,49 @@ def test_client(connections: list[str]):
         print(f"{err}")
 
 
-# logging
+if __name__ == "__main__":
+    import argparse
 
+    parser = argparse.ArgumentParser(
+        prog="Strategy (TEST)",
+        description="Demonstrates how to implement a client",
+    )
 
-def log_handler(level, message):
-    print(f"{level}: {message}")
+    parser.add_argument(
+        "--loglevel",
+        type=str,
+        required=False,
+        default="info",
+        help="logging level",
+    )
 
+    parser.add_argument("connections", metavar="N", type=str, nargs="+", help="connections")
 
-roq.logging.set_handler(log_handler)
+    args = parser.parse_args()
 
+    import logging
 
-# main
+    logging.basicConfig(level=args.loglevel.upper())
 
-test_client(["{HOME}/run/deribit.sock".format(**os.environ)])
+    del args.loglevel
+
+    logger = logging.getLogger("main")
+
+    def log_handler(level, message):
+        """log handler"""
+        if level == roq.logging.Level.DEBUG:
+            logger.debug(message)
+        elif level == roq.logging.Level.INFO:
+            logger.info(message)
+        elif level == roq.logging.Level.WARNING:
+            logger.warning(message)
+        elif level == roq.logging.Level.ERROR:
+            logger.error(message)
+        elif level == roq.logging.Level.CRITICAL:
+            logger.critical(message)
+        else:
+            sys.exit()
+
+    roq.logging.set_handler(log_handler)
+
+    main(args.connections)
