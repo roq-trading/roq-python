@@ -365,10 +365,8 @@ def test_client(connections: list[str]):
 
     # signal handler
 
-    def signal_handler(sig, frame):
-        print("*** STOP ***")
-        # instruct the dispatcher to stop (on next call to dispatch())
-        dispatcher.stop()
+    def signal_handler(signal, frame):
+        dispatcher.stop()  # note! detected on next call to dispatch()
 
     signal.signal(signal.SIGINT, signal_handler)
 
