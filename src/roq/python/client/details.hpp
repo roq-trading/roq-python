@@ -23,9 +23,6 @@ namespace client {
 
 struct Settings2 final : public roq::client::Settings2 {
   Settings2(pybind11::object app, pybind11::object loop, pybind11::object service, pybind11::object common) {}
-
- private:
-  roq::client::Settings2 const settings_;
 };
 
 struct Config final : public roq::client::Config {
@@ -212,13 +209,15 @@ struct Bridge2 final : public roq::client::Simple::Handler {
 
 struct Dispatcher final {
   Dispatcher(
-      pybind11::object settings, python::client::Config const &config, std::vector<std::string> const &connections)
+      python::client::Settings2 const &settings,
+      python::client::Config const &config,
+      std::vector<std::string> const &connections)
       : settings_{create_settings(settings)}, config_{config}, connections_{connections},
         context_{roq::io::engine::ContextFactory::create("libevent")},
         dispatcher_{create_dispatcher(settings_, config, *context_, connections)} {}
 
  protected:
-  static roq::client::Settings2 create_settings(pybind11::object settings) {
+  static roq::client::Settings2 create_settings(roq::client::Settings2 const &) {
     roq::client::Settings2 result;
     result.app.name = "trader";
     result.loop.timer_freq = std::chrono::milliseconds{100};

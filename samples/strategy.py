@@ -389,7 +389,7 @@ def test_client(connections: list[str]):
 def log_handler(level, message):
     print(f"{level}: {message}")
 
-roq.logging.set_callback(log_handler)
+roq.logging.set_handler(log_handler)
 
 
 # main

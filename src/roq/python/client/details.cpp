@@ -58,7 +58,10 @@ void utils::create_struct<client::Dispatcher>(pybind11::module_ &module) {
   std::string name{nameof::nameof_short_type<value_type>()};
   pybind11::class_<value_type>(module, name.c_str())
       .def(
-          pybind11::init<pybind11::object, python::client::Config const &, std::vector<std::string> const &>(),
+          pybind11::init<
+              python::client::Settings2 const &,
+              python::client::Config const &,
+              std::vector<std::string> const &>(),
           pybind11::arg("settings"),
           pybind11::arg("config"),
           pybind11::arg("connections"))

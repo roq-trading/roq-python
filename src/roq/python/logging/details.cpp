@@ -16,19 +16,19 @@ namespace logging {
 
 namespace {
 struct LogHandler final : public roq::logging::Handler {
-  explicit LogHandler(std::function<void(roq::logging::Level, std::string_view const &)> const &callback)
-      : callback_{callback} {}
-  void operator()(roq::logging::Level level, std::string_view const &message) override { callback_(level, message); }
+  explicit LogHandler(std::function<void(roq::logging::Level, std::string_view const &)> const &handler)
+      : handler_{handler} {}
+  void operator()(roq::logging::Level level, std::string_view const &message) override { handler_(level, message); }
 
  private:
-  std::function<void(roq::logging::Level, std::string_view const &)> callback_;
+  std::function<void(roq::logging::Level, std::string_view const &)> handler_;
 };
 
 static std::unique_ptr<LogHandler> HANDLER;
 }  // namespace
 
-void set_callback(std::function<void(roq::logging::Level, std::string_view const &)> const &callback) {
-  HANDLER = std::make_unique<LogHandler>(callback);
+void set_handler(std::function<void(roq::logging::Level, std::string_view const &)> const &handler) {
+  HANDLER = std::make_unique<LogHandler>(handler);
 }
 
 }  // namespace logging

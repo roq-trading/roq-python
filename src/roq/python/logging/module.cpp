@@ -23,7 +23,7 @@ namespace logging {
 void Module::create(pybind11::module_ &module) {
   utils::create_enum<roq::logging::Level>(module);
 
-  module.def("set_callback", &roq::python::logging::set_callback, "WIP", pybind11::arg("callback"));
+  module.def("set_handler", &roq::python::logging::set_handler, "WIP", pybind11::arg("callback"));
 }
 
 }  // namespace logging
