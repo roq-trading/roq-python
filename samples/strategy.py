@@ -331,13 +331,15 @@ def test_client(connections: list[str]):
 
     # settings
 
-    settings = dict(
-        app=dict(
-            name="trader",
-        ),
-        loop=dict(
-            timer_freq=timedelta(milliseconds=100),
-        ),
+    settings = roq.client.Settings2(
+        app={
+            "name": "trader",
+        },
+        loop={
+            "timer_freq": timedelta(milliseconds=100),
+        },
+        service={},
+        common={},
     )
 
     # configuration
@@ -381,8 +383,10 @@ def test_client(connections: list[str]):
 
 # logging
 
+
 def logging_callback(level, message):
     print(f"CALLBACK {level}: {message}")
+
 
 roq.logging.set_callback(logging_callback)
 

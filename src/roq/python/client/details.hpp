@@ -21,6 +21,13 @@ namespace roq {
 namespace python {
 namespace client {
 
+struct Settings2 final : public roq::client::Settings2 {
+  Settings2(pybind11::object app, pybind11::object loop, pybind11::object service, pybind11::object common) {}
+
+ private:
+  roq::client::Settings2 const settings_;
+};
+
 struct Config final : public roq::client::Config {
   Config(
       roq::client::Settings const &settings,

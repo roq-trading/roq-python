@@ -14,6 +14,19 @@ namespace roq {
 namespace python {
 
 template <>
+void utils::create_struct<client::Settings2>(pybind11::module_ &module) {
+  using value_type = client::Settings2;
+  std::string name{nameof::nameof_short_type<value_type>()};
+  pybind11::class_<value_type>(module, name.c_str())
+      .def(
+          pybind11::init<pybind11::object, pybind11::object, pybind11::object, pybind11::object>(),
+          pybind11::arg("app"),
+          pybind11::arg("loop"),
+          pybind11::arg("service"),
+          pybind11::arg("common"));
+}
+
+template <>
 void utils::create_struct<roq::client::Settings>(pybind11::module_ &module) {
   using value_type = roq::client::Settings;
   std::string name{nameof::nameof_short_type<value_type>()};

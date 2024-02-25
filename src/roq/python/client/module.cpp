@@ -17,8 +17,11 @@ void Module::create(pybind11::module_ &module) {
       .def(pybind11::init<>())
       .def("callback", &roq::python::client::Handler::callback);
 
-  utils::create_struct<roq::client::Settings>(module);
+  utils::create_struct<roq::python::client::Settings2>(module);
+
+  utils::create_struct<roq::client::Settings>(module);  // XXX
   utils::create_struct<roq::python::client::Config>(module);
+
   utils::create_struct<roq::python::client::Dispatcher>(module);
 
   utils::create_struct<roq::python::client::EventLogReader>(module);
