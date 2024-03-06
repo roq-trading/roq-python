@@ -22,7 +22,11 @@ namespace python {
 namespace client {
 
 struct Settings2 final : public roq::client::Settings2 {
-  Settings2(pybind11::object app, pybind11::object loop, pybind11::object service, pybind11::object common) {}
+  Settings2(
+      [[maybe_unused]] pybind11::object app,
+      [[maybe_unused]] pybind11::object loop,
+      [[maybe_unused]] pybind11::object service,
+      [[maybe_unused]] pybind11::object common) {}
 };
 
 struct Config final : public roq::client::Config {
