@@ -22,7 +22,7 @@ namespace logging {
 
 namespace {
 auto cleanup = []() { roq::python::logging::reset(); };
-}
+}  // namespace
 
 void Module::create(pybind11::module_ &module) {
   utils::create_enum<roq::logging::Level>(module);
